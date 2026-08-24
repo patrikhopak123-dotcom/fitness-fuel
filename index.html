@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="description" content="Fitness Fuel — training, nutrition, motivation and health.">
+<meta property="og:title" content="Fitness Fuel">
+<meta property="og:description" content="Push your limits with practical fitness advice.">
+<title>Fitness Fuel — Push Your Limits</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="topbar">
+  <a class="brand" href="#"><span>⚡</span> FITNESS <b>FUEL</b></a>
+  <nav class="desktop-nav">
+    <a class="active" href="#home">HOME</a><a href="#articles">ARTICLES</a><a href="#training">TRAINING</a>
+    <a href="#nutrition">NUTRITION</a><a href="#motivation">MOTIVATION</a><a href="#about">ABOUT US</a>
+  </nav>
+  <div class="actions">
+    <button class="icon-btn" aria-label="Search">⌕</button>
+    <button class="login" onclick="openAuth()">LOG IN</button>
+    <button class="menu-btn" onclick="toggleDrawer()" aria-label="Open articles">☰</button>
+  </div>
+</header>
+
+<aside id="drawer" class="drawer">
+  <div class="drawer-head"><h2>ALL ARTICLES</h2><button onclick="toggleDrawer()">×</button></div>
+  <div id="drawerArticles"></div>
+  <a class="drawer-all" href="#articles" onclick="toggleDrawer()">VIEW ALL ARTICLES</a>
+</aside>
+
+<main>
+<section id="home" class="hero">
+  <div class="hero-copy">
+    <div class="kicker">TRAINING • NUTRITION • MINDSET</div>
+    <h1>PUSH YOUR<br><em>LIMITS</em></h1>
+    <p>Practical tips, training plans and motivation to help you become the strongest version of yourself.</p>
+    <div class="hero-buttons"><a class="btn red" href="#articles">LATEST ARTICLES</a><a class="btn dark" href="#training">TRAINING PLANS</a></div>
+    <div class="social-proof"><div class="avatars">● ● ● ●</div><span>Join <b>3,247+</b> people<br>getting better every day.</span></div>
+  </div>
+  <div class="hero-athlete" aria-hidden="true"></div>
+</section>
+
+<section class="categories">
+  <a href="#training"><strong>⚡</strong><span>TRAINING<small>Tips & workout plans</small></span></a>
+  <a href="#nutrition"><strong>♧</strong><span>NUTRITION<small>Food & supplementation</small></span></a>
+  <a href="#articles"><strong>◉</strong><span>FAT LOSS<small>Guides for getting lean</small></span></a>
+  <a href="#motivation"><strong>♢</strong><span>MOTIVATION<small>Mindset & discipline</small></span></a>
+  <a href="#about"><strong>♡</strong><span>HEALTH<small>Recovery & wellbeing</small></span></a>
+</section>
+
+<section id="articles" class="content">
+  <div class="stats-card">
+    <div class="kicker">STATISTICS</div>
+    <div class="chart"></div><strong>12,458</strong><small>TOTAL VISITS</small>
+    <hr><strong>512</strong><small>VISITS TODAY</small>
+    <hr><p>Thanks for your support! 💪</p>
+  </div>
+  <div class="latest">
+    <div class="section-title"><div><div class="kicker">THE LATEST</div><h2>LATEST ARTICLES</h2></div><a href="#">VIEW ALL</a></div>
+    <div id="cards" class="cards"></div>
+  </div>
+  <aside class="subscribe">
+    <div class="kicker">NEWSLETTER</div><h3>GET NEW ARTICLES<br>IN YOUR INBOX.</h3>
+    <p>Subscribe and get the latest training, nutrition and motivation articles by email.</p>
+    <form id="subscribe"><input type="email" placeholder="Your email" required><button class="btn red">SUBSCRIBE</button></form>
+    <small>No spam. Unsubscribe anytime.</small>
+    <div class="follow"><b>FOLLOW US</b><span>◎</span><span>▶</span><span>f</span></div>
+  </aside>
+</section>
+
+<section class="bottom-strip">
+  <div><b>100+</b><span>ARTICLES</span></div><div><b>3,000+</b><span>HAPPY READERS</span></div><div><b>2</b><span>ADMINISTRATORS</span></div><div><b>REGULAR</b><span>NEW ARTICLES</span></div>
+</section>
+</main>
+
+<div id="auth" class="modal hidden"><div class="modal-box"><button class="close" onclick="closeAuth()">×</button><div class="kicker">YOUR ACCOUNT</div><h2>LOG IN</h2><input type="email" placeholder="Email"><input type="password" placeholder="Password"><button class="btn red full">LOG IN</button><p>Don't have an account? <b>Sign up</b></p></div></div>
+<script src="app.js"></script>
+</body>
+</html>
