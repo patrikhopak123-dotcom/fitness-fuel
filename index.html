@@ -2,15 +2,14 @@
 <html lang="cs">
 <head>
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <meta
     name="description"
-    content="Vireno – magazín pro aktivní a zdravý život po 40."
+    content="Vireno – praktické články o pohybu, zdraví, výživě a aktivním životě po čtyřicítce."
   >
 
-  <meta name="theme-color" content="#173d2a">
+  <meta name="theme-color" content="#159447">
 
   <title>VIRENO – Aktivní život po 40</title>
 
@@ -27,10 +26,6 @@
 
 <body>
 
-<!-- =====================================================
-     HEADER
-===================================================== -->
-
 <header class="topbar">
 
   <a href="#home" class="brand">
@@ -38,19 +33,9 @@
   </a>
 
   <nav class="desktop-nav">
-
-    <a href="#home" class="active">
-      DOMŮ
-    </a>
-
-    <a href="#articles">
-      ČLÁNKY
-    </a>
-
-    <a href="#about">
-      O NÁS
-    </a>
-
+    <a href="#home" class="active">DOMŮ</a>
+    <a href="#articles">ČLÁNKY</a>
+    <a href="#about">O NÁS</a>
   </nav>
 
   <div class="actions">
@@ -59,7 +44,7 @@
       type="button"
       class="icon-btn"
       id="searchBtn"
-      aria-label="Vyhledávání">
+      aria-label="Vyhledat">
       🔍
     </button>
 
@@ -73,8 +58,8 @@
     <button
       type="button"
       class="menu-btn"
-      id="menuBtn"
-      aria-label="Menu">
+      onclick="toggleDrawer()"
+      aria-label="Otevřít menu">
       ☰
     </button>
 
@@ -83,19 +68,13 @@
 </header>
 
 
-<!-- =====================================================
-     SEARCH
-===================================================== -->
+<!-- VYHLEDÁVÁNÍ -->
 
-<div
-  id="searchOverlay"
-  class="search-overlay hidden">
+<div id="searchOverlay" class="search-overlay hidden">
 
   <div class="search-panel">
 
-    <div class="search-symbol">
-      🔍
-    </div>
+    <span>🔍</span>
 
     <input
       id="searchInput"
@@ -106,24 +85,17 @@
 
     <button
       id="searchClose"
-      class="search-close"
-      type="button">
+      type="button"
+      class="search-close">
       ×
     </button>
 
   </div>
 
-  <div
-    id="searchResults"
-    class="search-results hidden">
-  </div>
-
 </div>
 
 
-<!-- =====================================================
-     HERO
-===================================================== -->
+<!-- HERO -->
 
 <section id="home" class="hero">
 
@@ -139,156 +111,93 @@
     </h1>
 
     <p>
-      Praktické informace pro pohyb, zdraví,
-      výživu, regeneraci a energii.
-      Bez extrémů a bez zbytečného tlaku.
+      Praktické rady pro pohyb, zdraví, výživu
+      a energii. Bez extrémů a bez zbytečného tlaku.
     </p>
 
     <div class="hero-buttons">
 
-      <a
-        href="#articles"
-        class="btn green">
+      <a href="#articles" class="btn green">
         PROHLÉDNOUT ČLÁNKY
       </a>
 
-      <a
-        href="#about"
-        class="btn light">
-        O VIRENU
+      <a href="#about" class="btn light">
+        O NÁS
       </a>
 
     </div>
 
     <div class="social-proof">
-
-      <div class="avatars">
-        ● ● ●
-      </div>
+      <div class="avatars">● ● ●</div>
 
       <span>
         Pro lidi, kteří chtějí být aktivní
         <b>i po čtyřicítce.</b>
       </span>
-
     </div>
 
   </div>
 
-  <div class="hero-art">
-
+  <div class="hero-athlete">
     <div class="hero-circle"></div>
 
     <div class="hero-card">
-
       <strong>40+</strong>
-
-      <span>
-        Věk není konec.
-      </span>
-
+      <span>Věk není konec.</span>
     </div>
-
   </div>
 
 </section>
 
 
-<!-- =====================================================
-     CATEGORY BAR
-===================================================== -->
+<!-- TÉMATA -->
 
-<section class="categories" id="categories">
+<section class="categories">
 
-  <button
-    class="category active"
-    data-category="ALL">
-
-    <strong>✦</strong>
-
-    <div>
-      <span>VŠE</span>
-      <small>Všechny články</small>
-    </div>
-
-  </button>
-
-
-  <button
-    class="category"
-    data-category="POHYB">
-
+  <a href="#articles" data-category="POHYB">
     <strong>🏃</strong>
-
     <div>
       <span>POHYB</span>
       <small>Kondice a cvičení</small>
     </div>
+  </a>
 
-  </button>
-
-
-  <button
-    class="category"
-    data-category="VÝŽIVA">
-
+  <a href="#articles" data-category="VÝŽIVA">
     <strong>🥗</strong>
-
     <div>
       <span>VÝŽIVA</span>
       <small>Jídlo a energie</small>
     </div>
+  </a>
 
-  </button>
-
-
-  <button
-    class="category"
-    data-category="HUBNUTÍ">
-
+  <a href="#articles" data-category="HUBNUTÍ">
     <strong>⚖</strong>
-
     <div>
       <span>HUBNUTÍ</span>
       <small>Zdravá váha</small>
     </div>
+  </a>
 
-  </button>
-
-
-  <button
-    class="category"
-    data-category="REGENERACE">
-
-    <strong>◌</strong>
-
+  <a href="#articles" data-category="REGENERACE">
+    <strong>😴</strong>
     <div>
       <span>REGENERACE</span>
       <small>Spánek a odpočinek</small>
     </div>
+  </a>
 
-  </button>
-
-
-  <button
-    class="category"
-    data-category="ZDRAVÍ">
-
-    <strong>♥</strong>
-
+  <a href="#articles" data-category="ZDRAVÍ">
+    <strong>❤</strong>
     <div>
       <span>ZDRAVÍ</span>
       <small>Vitalita a prevence</small>
     </div>
-
-  </button>
+  </a>
 
 </section>
 
 
-<!-- =====================================================
-     ARTICLES
-===================================================== -->
+<!-- ČLÁNKY -->
 
 <main id="articles" class="content">
 
@@ -297,33 +206,28 @@
     <div class="section-title">
 
       <div>
+        <div class="kicker">VIRENO</div>
 
-        <div class="kicker">
-          VIRENO
-        </div>
-
-        <h2 id="articlesTitle">
+        <h2 id="articlesHeading">
           NEJNOVĚJŠÍ ČLÁNKY
         </h2>
-
       </div>
 
-      <span
-        id="articleCount"
-        class="article-count">
-        0 článků
-      </span>
+      <button
+        type="button"
+        id="showAllBtn"
+        class="section-link">
+        VŠECHNY ČLÁNKY
+      </button>
 
     </div>
 
+    <div id="searchStatus" class="search-status hidden"></div>
 
-    <div
-      id="cards"
-      class="cards">
+    <div id="cards" class="cards">
 
-      <div class="loading">
-        <div class="loader"></div>
-        <span>Načítám články...</span>
+      <div class="no-results">
+        <strong>Načítám články...</strong>
       </div>
 
     </div>
@@ -331,152 +235,94 @@
   </section>
 
 
-  <!-- =====================================================
-       SIDEBAR
-  ===================================================== -->
+  <!-- NEWSLETTER -->
 
-  <aside class="sidebar">
+  <aside class="subscribe">
 
-    <section class="subscribe">
+    <div class="kicker">
+      VIRENO NEWSLETTER
+    </div>
 
-      <div class="kicker">
-        VIRENO NEWSLETTER
-      </div>
+    <h3>
+      ZŮSTAŇTE<br>
+      V OBRAZE
+    </h3>
 
-      <h3>
-        ZŮSTAŇTE<br>
-        V OBRAZE
-      </h3>
+    <p>
+      Praktické tipy pro pohyb, výživu,
+      zdraví a lepší kondici po čtyřicítce.
+    </p>
 
-      <p>
-        Praktické tipy pro pohyb, výživu,
-        zdraví a lepší kondici po čtyřicítce.
-      </p>
+    <form id="subscribe">
 
-      <form id="subscribe">
+      <input
+        type="email"
+        placeholder="Váš e-mail"
+        required
+      >
 
-        <input
-          type="email"
-          placeholder="Váš e-mail"
-          required
-        >
+      <button
+        type="submit"
+        class="btn green">
+        PŘIHLÁSIT SE
+      </button>
 
-        <button
-          type="submit"
-          class="btn green">
-          PŘIHLÁSIT SE
-        </button>
+    </form>
 
-      </form>
+    <small>
+      Žádný spam. Jen užitečný obsah.
+    </small>
 
-      <small>
-        Žádný spam. Jen užitečný obsah.
-      </small>
-
-      <div id="subscribeMsg"></div>
-
-    </section>
-
-
-    <section class="sidebar-about">
-
-      <span class="mini-label">
-        VIRENO
-      </span>
-
-      <h3>
-        ŽIVOT NENÍ<br>
-        PO ČTYŘICÍTCE U KONCE.
-      </h3>
-
-      <p>
-        Naopak. Je čas začít dělat věci,
-        které vám dávají smysl.
-      </p>
-
-      <a href="#about">
-        VÍCE O VIRENU →
-      </a>
-
-    </section>
+    <div class="follow">
+      <b>SLEDUJTE VIRENO</b>
+      <span>●</span>
+      <span>●</span>
+      <span>●</span>
+    </div>
 
   </aside>
 
 </main>
 
 
-<!-- =====================================================
-     ABOUT
-===================================================== -->
+<!-- O NÁS -->
 
 <section id="about" class="about-section">
 
   <div class="about-inner">
 
-    <div class="about-copy">
-
-      <div class="kicker">
-        O VIRENU
-      </div>
-
-      <h2>
-        AKTIVNÍ ŽIVOT.<br>
-        <em>V KAŽDÉM VĚKU.</em>
-      </h2>
-
-      <p>
-        Vireno je magazín pro lidi, kteří nechtějí
-        zpomalit jen proto, že překročili čtyřicítku.
-      </p>
-
-      <p>
-        Přinášíme srozumitelné informace o pohybu,
-        výživě, zdraví a regeneraci. Bez zázračných
-        slibů a bez extrémních řešení.
-      </p>
-
+    <div class="kicker">
+      VIRENO
     </div>
 
+    <h2>
+      AKTIVNÍ ŽIVOT<br>
+      <em>V KAŽDÉM VĚKU.</em>
+    </h2>
 
-    <div class="about-values">
+    <p>
+      Vireno vzniklo pro všechny, kteří chtějí mít
+      více energie, lépe se hýbat a starat se o své
+      zdraví bez zbytečných extrémů.
+    </p>
 
-      <div>
-        <strong>01</strong>
-        <h3>PRAKTICKY</h3>
-        <p>
-          Rady, které můžete skutečně použít
-          v běžném životě.
-        </p>
-      </div>
+    <p>
+      Přinášíme praktické články o pohybu, výživě,
+      regeneraci, hubnutí a zdraví. Jednoduše,
+      srozumitelně a tak, aby se rady daly opravdu
+      používat v běžném životě.
+    </p>
 
-      <div>
-        <strong>02</strong>
-        <h3>ROZUMNĚ</h3>
-        <p>
-          Žádné extrémy. Důležitá je dlouhodobá
-          udržitelnost.
-        </p>
-      </div>
-
-      <div>
-        <strong>03</strong>
-        <h3>AKTIVNĚ</h3>
-        <p>
-          Protože čtyřicítka není důvod
-          přestat se hýbat.
-        </p>
-      </div>
-
-    </div>
+    <a href="#articles" class="btn green">
+      PROHLÉDNOUT ČLÁNKY
+    </a>
 
   </div>
 
 </section>
 
 
-<!-- =====================================================
-     STATS
-===================================================== -->
+<!-- STATISTIKY -->
 
 <section class="bottom-strip">
 
@@ -503,107 +349,55 @@
 </section>
 
 
-<!-- =====================================================
-     MOBILE DRAWER
-===================================================== -->
+<!-- MOBILNÍ MENU -->
 
 <aside id="drawer" class="drawer">
 
   <div class="drawer-head">
 
     <div>
-
-      <span>
-        VIRENO
-      </span>
-
-      <h2>
-        MENU
-      </h2>
-
+      <div class="drawer-label">VIRENO</div>
+      <h2>MENU</h2>
     </div>
 
     <button
-      id="drawerClose"
-      type="button">
+      type="button"
+      onclick="toggleDrawer()">
       ×
     </button>
 
   </div>
 
-
   <nav class="mobile-nav">
 
-    <a href="#home">
+    <a href="#home" onclick="toggleDrawer()">
       DOMŮ
     </a>
 
-    <a href="#articles">
+    <a href="#articles" onclick="showAllArticles(); toggleDrawer()">
       ČLÁNKY
     </a>
 
-    <a href="#about">
+    <a href="#about" onclick="toggleDrawer()">
       O NÁS
     </a>
 
   </nav>
 
-
   <div class="drawer-divider"></div>
 
-  <h3 class="drawer-title">
-    TÉMATA
-  </h3>
+  <div class="drawer-label">
+    NEJNOVĚJŠÍ
+  </div>
 
-
-  <button
-    class="drawer-category"
-    data-category="ALL">
-    VŠECHNY ČLÁNKY
-  </button>
-
-  <button
-    class="drawer-category"
-    data-category="POHYB">
-    POHYB
-  </button>
-
-  <button
-    class="drawer-category"
-    data-category="VÝŽIVA">
-    VÝŽIVA
-  </button>
-
-  <button
-    class="drawer-category"
-    data-category="HUBNUTÍ">
-    HUBNUTÍ
-  </button>
-
-  <button
-    class="drawer-category"
-    data-category="REGENERACE">
-    REGENERACE
-  </button>
-
-  <button
-    class="drawer-category"
-    data-category="ZDRAVÍ">
-    ZDRAVÍ
-  </button>
+  <div id="drawerArticles">
+    <p class="muted">Načítám články...</p>
+  </div>
 
 </aside>
 
 
-<div
-  id="drawerBackdrop"
-  class="drawer-backdrop hidden">
-</div>
-
-
-<!-- =====================================================
-     AUTH
-===================================================== -->
+<!-- PŘIHLÁŠENÍ -->
 
 <div id="auth" class="modal hidden">
 
@@ -612,13 +406,11 @@
     <button
       type="button"
       class="close"
-      id="authClose">
+      onclick="closeAuth()">
       ×
     </button>
 
-    <div class="kicker">
-      VIRENO
-    </div>
+    <div class="kicker">VIRENO</div>
 
     <h2 id="authTitle">
       PŘIHLÁSIT SE
@@ -664,81 +456,15 @@
 </div>
 
 
-<!-- =====================================================
-     ARTICLE MODAL
-===================================================== -->
+<!-- ADMIN -->
 
-<div id="articleView" class="modal hidden">
-
-  <article class="article-view">
-
-    <button
-      type="button"
-      class="close"
-      id="articleClose">
-      ×
-    </button>
-
-    <img
-      id="articleViewImage"
-      src=""
-      alt=""
-    >
-
-    <div class="kicker">
-      VIRENO
-    </div>
-
-    <div
-      id="articleViewCategory"
-      class="article-category">
-    </div>
-
-    <h2 id="articleViewTitle"></h2>
-
-    <div
-      id="articleViewMeta"
-      class="muted">
-    </div>
-
-    <div
-      id="articleViewContent"
-      class="article-content">
-    </div>
-
-    <div class="related-section">
-
-      <h3>
-        DALŠÍ ČLÁNKY
-      </h3>
-
-      <div
-        id="relatedArticles"
-        class="related-grid">
-      </div>
-
-    </div>
-
-  </article>
-
-</div>
-
-
-<!-- =====================================================
-     ADMIN
-===================================================== -->
-
-<section
-  id="admin"
-  class="admin-panel hidden">
+<section id="admin" class="admin-panel hidden">
 
   <div class="kicker">
     VIRENO ADMIN
   </div>
 
-  <h2>
-    SPRÁVA WEBU
-  </h2>
+  <h2>SPRÁVA WEBU</h2>
 
   <div class="admin-stats">
 
@@ -762,9 +488,7 @@
 
   <div class="admin-editor">
 
-    <h3>
-      NOVÝ ČLÁNEK
-    </h3>
+    <h3>NOVÝ ČLÁNEK</h3>
 
     <form id="articleForm">
 
@@ -777,38 +501,19 @@
 
       <select id="category">
 
-        <option value="POHYB">
-          POHYB
-        </option>
-
-        <option value="VÝŽIVA">
-          VÝŽIVA
-        </option>
-
-        <option value="HUBNUTÍ">
-          HUBNUTÍ
-        </option>
-
-        <option value="REGENERACE">
-          REGENERACE
-        </option>
-
-        <option value="ZDRAVÍ">
-          ZDRAVÍ
-        </option>
+        <option value="POHYB">POHYB</option>
+        <option value="VÝŽIVA">VÝŽIVA</option>
+        <option value="HUBNUTÍ">HUBNUTÍ</option>
+        <option value="REGENERACE">REGENERACE</option>
+        <option value="ZDRAVÍ">ZDRAVÍ</option>
 
       </select>
 
-      <input
-        id="cover"
-        type="hidden"
-      >
+      <input id="cover" type="hidden">
 
       <div class="cover-upload">
 
-        <label>
-          TITULNÍ OBRÁZEK
-        </label>
+        <label>TITULNÍ OBRÁZEK</label>
 
         <input
           id="coverFile"
@@ -818,9 +523,7 @@
 
       </div>
 
-      <div
-        id="coverPreview"
-        class="cover-preview hidden">
+      <div id="coverPreview" class="cover-preview hidden">
 
         <img
           id="coverPreviewImg"
@@ -866,14 +569,10 @@
 
   <div class="admin-list">
 
-    <h3>
-      VŠECHNY ČLÁNKY
-    </h3>
+    <h3>ČLÁNKY</h3>
 
     <div id="adminList">
-      <p class="muted">
-        Načítám...
-      </p>
+      <p class="muted">Načítám...</p>
     </div>
 
   </div>
@@ -881,49 +580,39 @@
 </section>
 
 
-<!-- =====================================================
-     FOOTER
-===================================================== -->
+<!-- DETAIL ČLÁNKU -->
 
-<footer class="footer">
+<div id="articleView" class="modal hidden">
 
-  <div class="footer-inner">
+  <article class="article-view">
 
-    <div>
+    <button
+      type="button"
+      class="close"
+      onclick="closeArticle()">
+      ×
+    </button>
 
-      <a href="#home" class="brand">
-        <span>●</span> VIRENO
-      </a>
+    <img
+      id="articleViewImage"
+      src=""
+      alt="Obrázek článku"
+    >
 
-      <p>
-        Aktivní život po 40.
-      </p>
+    <div class="kicker">VIRENO</div>
 
-    </div>
+    <h2 id="articleViewTitle"></h2>
 
-    <div class="footer-links">
+    <div id="articleViewMeta" class="muted"></div>
 
-      <a href="#home">DOMŮ</a>
-      <a href="#articles">ČLÁNKY</a>
-      <a href="#about">O NÁS</a>
+    <div id="articleViewContent"></div>
 
-    </div>
+  </article>
 
-  </div>
+</div>
 
-  <div class="footer-bottom">
-    © 2026 VIRENO · Všechna práva vyhrazena.
-  </div>
-
-</footer>
-
-
-<!-- =====================================================
-     SUPABASE
-===================================================== -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
 <script src="app.js"></script>
 
 </body>
