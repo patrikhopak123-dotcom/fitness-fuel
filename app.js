@@ -4,32 +4,36 @@ const SUPABASE_URL =
 const SUPABASE_PUBLISHABLE_KEY =
   'sb_publishable_L2uEZD5AX-AkKEuZ_YKQDw_6uH1FS6O';
 
+
 let db = null;
 let articles = [];
 let editingId = null;
 let authMode = 'login';
 let searchOpen = false;
-let activeCategory = null;
+let showingAll = false;
 
 
-/* =========================
-   POMOCNÉ FUNKCE
-========================= */
+/* =====================================================
+   HELPERS
+===================================================== */
 
-const $ = id => document.getElementById(id);
+const $ = id =>
+  document.getElementById(id);
+
 
 function esc(value = '') {
 
   return String(value).replace(
     /[&<>'"]/g,
     char => ({
-      '&': '&amp;',
-      '<': '&lt;',
-      '>': '&gt;',
-      "'": '&#39;',
-      '"': '&quot;'
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      "'":'&#39;',
+      '"':'&quot;'
     }[char])
   );
+
 }
 
 
@@ -37,30 +41,25 @@ function formatDate(value) {
 
   if (!value) return '';
 
-  const date = new Date(value);
-
-  if (Number.isNaN(date.getTime())) {
-    return '';
-  }
-
-  return date.toLocaleDateString(
+  return new Date(value).toLocaleDateString(
     'cs-CZ',
     {
-      year: 'numeric',
-      month: 'short',
-      day: 'numeric'
+      year:'numeric',
+      month:'short',
+      day:'numeric'
     }
   );
+
 }
 
 
-/* =========================
+/* =====================================================
    SUPABASE
-========================= */
+===================================================== */
 
-function initSupabase() {
+function initSupabase(){
 
-  if (!window.supabase) {
+  if(!window.supabase){
 
     console.error(
       'Supabase knihovna nebyla načtena.'
@@ -69,84 +68,90 @@ function initSupabase() {
     return false;
   }
 
-  db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
+  db =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
 
   return true;
 }
 
 
-/* =========================
-   VYHLEDÁVÁNÍ
-========================= */
+/* =====================================================
+   SEARCH
+===================================================== */
 
-function setupSearch() {
+function setupSearch(){
 
   const button = $('searchBtn');
   const input = $('searchInput');
   const close = $('searchClose');
   const overlay = $('searchOverlay');
 
-  if (!button || !input || !close || !overlay) {
-    return;
-  }
+  if(
+    !button ||
+    !input ||
+    !close ||
+    !overlay
+  ) return;
+
 
   button.addEventListener(
     'click',
-    event => {
-      event.stopPropagation();
-      openSearch();
-    }
+    openSearch
   );
+
 
   close.addEventListener(
     'click',
     closeSearch
   );
 
+
   input.addEventListener(
     'input',
-    () => {
-      filterArticles(input.value);
-    }
+    () => filterArticles(input.value)
   );
+
 
   input.addEventListener(
     'keydown',
     event => {
 
-      if (event.key === 'Escape') {
+      if(event.key === 'Escape'){
         closeSearch();
       }
 
     }
   );
+
 
   overlay.addEventListener(
     'click',
     event => {
 
-      if (event.target === overlay) {
+      if(event.target === overlay){
         closeSearch();
       }
 
     }
   );
+
 }
 
 
-function openSearch() {
+function openSearch(){
 
   const overlay = $('searchOverlay');
   const input = $('searchInput');
 
-  if (!overlay || !input) return;
+  if(!overlay || !input) return;
 
   searchOpen = true;
 
   overlay.classList.remove('hidden');
+
   document.body.classList.add(
     'search-active'
   );
@@ -155,15 +160,16 @@ function openSearch() {
     () => input.focus(),
     50
   );
+
 }
 
 
-function closeSearch() {
+function closeSearch(){
 
   const overlay = $('searchOverlay');
   const input = $('searchInput');
 
-  if (!overlay || !input) return;
+  if(!overlay || !input) return;
 
   searchOpen = false;
 
@@ -175,21 +181,32 @@ function closeSearch() {
     'search-active'
   );
 
+  showingAll = false;
+
   renderArticles();
+
 }
 
 
-function filterArticles(search = '') {
+function filterArticles(value = ''){
 
   const query =
-    search.trim().toLowerCase();
+    value
+      .trim()
+      .toLowerCase();
 
-  if (!query) {
+  const cards = $('cards');
+
+  if(!cards) return;
+
+
+  if(!query){
 
     renderArticles();
 
     return;
   }
+
 
   const filtered =
     articles.filter(article => {
@@ -220,90 +237,127 @@ function filterArticles(search = '') {
         excerpt.includes(query) ||
         content.includes(query)
       );
+
     });
 
-  renderArticleCollection(filtered);
+
+  if($('articlesHeading')){
+    $('articlesHeading').textContent =
+      'VÝSLEDKY VYHLEDÁVÁNÍ';
+  }
+
+
+  if(!filtered.length){
+
+    cards.innerHTML = `
+      <div class="no-results">
+        <strong>Nic jsme nenašli</strong>
+        <span>Zkuste jiný název nebo téma.</span>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  cards.innerHTML =
+    filtered
+      .map(card)
+      .join('');
+
 }
 
 
-/* =========================
+/* =====================================================
    AUTH
-========================= */
+===================================================== */
 
-function openAuth(mode = 'login') {
+function openAuth(mode='login'){
 
   authMode = mode;
 
   const auth = $('auth');
 
-  if (!auth) return;
+  if(!auth) return;
 
   auth.classList.remove('hidden');
 
-  if ($('authTitle')) {
+
+  if($('authTitle')){
 
     $('authTitle').textContent =
       mode === 'signup'
         ? 'VYTVOŘIT ÚČET'
         : 'PŘIHLÁSIT SE';
+
   }
 
-  if ($('authSubmit')) {
+
+  if($('authSubmit')){
 
     $('authSubmit').textContent =
       mode === 'signup'
         ? 'VYTVOŘIT ÚČET'
         : 'PŘIHLÁSIT SE';
+
   }
 
-  if ($('authSwitch')) {
+
+  if($('authSwitch')){
 
     $('authSwitch').textContent =
       mode === 'signup'
         ? 'Už máte účet? Přihlaste se'
         : 'Nemáte účet? Vytvořte si ho';
+
   }
 
-  if ($('authMsg')) {
+
+  if($('authMsg')){
     $('authMsg').textContent = '';
   }
+
 
   setTimeout(
     () => $('authEmail')?.focus(),
     50
   );
+
 }
 
 
-function closeAuth() {
+function closeAuth(){
 
   $('auth')?.classList.add(
     'hidden'
   );
+
 }
 
 
-function toggleAuthMode() {
+function toggleAuthMode(){
 
   openAuth(
     authMode === 'login'
       ? 'signup'
       : 'login'
   );
+
 }
 
 
-async function handleAuth(event) {
+async function handleAuth(event){
 
   event.preventDefault();
 
-  if (!db) {
+  if(!db){
 
     $('authMsg').textContent =
       'Spojení se serverem není dostupné.';
 
     return;
   }
+
 
   const email =
     $('authEmail')
@@ -314,7 +368,8 @@ async function handleAuth(event) {
     $('authPassword')
       .value;
 
-  if (!email || !password) {
+
+  if(!email || !password){
 
     $('authMsg').textContent =
       'Vyplňte e-mail a heslo.';
@@ -322,12 +377,14 @@ async function handleAuth(event) {
     return;
   }
 
+
   $('authMsg').textContent =
     'Pracuji...';
 
-  try {
 
-    if (authMode === 'signup') {
+  try{
+
+    if(authMode === 'signup'){
 
       const {
         data,
@@ -338,7 +395,8 @@ async function handleAuth(event) {
           password
         });
 
-      if (error) {
+
+      if(error){
 
         $('authMsg').textContent =
           error.message;
@@ -346,10 +404,11 @@ async function handleAuth(event) {
         return;
       }
 
-      if (data.session) {
+
+      if(data.session){
 
         $('authMsg').textContent =
-          'Účet byl úspěšně vytvořen.';
+          'Účet byl vytvořen.';
 
         setTimeout(
           async () => {
@@ -362,23 +421,27 @@ async function handleAuth(event) {
           700
         );
 
-      } else {
+      }else{
 
         $('authMsg').textContent =
           'Účet byl vytvořen. Zkontrolujte e-mail a potvrďte registraci.';
+
       }
 
       return;
     }
 
 
-    const { error } =
+    const {
+      error
+    } =
       await db.auth.signInWithPassword({
         email,
         password
       });
 
-    if (error) {
+
+    if(error){
 
       $('authMsg').textContent =
         error.message;
@@ -386,11 +449,12 @@ async function handleAuth(event) {
       return;
     }
 
+
     closeAuth();
 
     await updateUserUI();
 
-  } catch (error) {
+  }catch(error){
 
     console.error(
       'Chyba přihlášení:',
@@ -400,29 +464,31 @@ async function handleAuth(event) {
     $('authMsg').textContent =
       error.message ||
       'Přihlášení se nepodařilo.';
+
   }
+
 }
 
 
-async function logout() {
+async function logout(){
 
-  if (!db) return;
+  if(!db) return;
 
   await db.auth.signOut();
 
   await updateUserUI();
+
 }
 
 
-/* =========================
-   PROFIL / ADMIN
-========================= */
+/* =====================================================
+   PROFILE / ADMIN
+===================================================== */
 
-async function getProfile(userId) {
+async function getProfile(userId){
 
-  if (!db || !userId) {
-    return null;
-  }
+  if(!db || !userId) return null;
+
 
   const {
     data,
@@ -434,7 +500,8 @@ async function getProfile(userId) {
       .eq('id', userId)
       .maybeSingle();
 
-  if (error) {
+
+  if(error){
 
     console.error(
       'Chyba profilu:',
@@ -444,44 +511,51 @@ async function getProfile(userId) {
     return null;
   }
 
+
   return data;
+
 }
 
 
-async function isAdmin() {
+async function isAdmin(){
 
-  if (!db) return false;
+  if(!db) return false;
+
 
   const {
-    data: {
+    data:{
       user
     }
   } =
     await db.auth.getUser();
 
-  if (!user) {
-    return false;
-  }
+
+  if(!user) return false;
+
 
   const profile =
     await getProfile(user.id);
 
+
   return profile?.role === 'admin';
+
 }
 
 
-async function updateUserUI() {
+async function updateUserUI(){
 
-  if (!db) return;
+  if(!db) return;
 
-  try {
+
+  try{
 
     const {
-      data: {
+      data:{
         user
       }
     } =
       await db.auth.getUser();
+
 
     const loginBtn =
       $('loginBtn');
@@ -490,20 +564,19 @@ async function updateUserUI() {
       $('admin');
 
 
-    if (!user) {
+    if(!user){
 
-      if (loginBtn) {
+      if(loginBtn){
 
         loginBtn.textContent =
           'PŘIHLÁSIT SE';
 
         loginBtn.onclick =
           () => openAuth('login');
+
       }
 
-      admin?.classList.add(
-        'hidden'
-      );
+      admin?.classList.add('hidden');
 
       return;
     }
@@ -513,17 +586,18 @@ async function updateUserUI() {
       await getProfile(user.id);
 
 
-    if (loginBtn) {
+    if(loginBtn){
 
       loginBtn.textContent =
         'ODHLÁSIT SE';
 
       loginBtn.onclick =
         logout;
+
     }
 
 
-    if (profile?.role === 'admin') {
+    if(profile?.role === 'admin'){
 
       admin?.classList.remove(
         'hidden'
@@ -531,35 +605,41 @@ async function updateUserUI() {
 
       await refreshAdminStats();
 
-    } else {
+    }else{
 
       admin?.classList.add(
         'hidden'
       );
+
     }
 
-  } catch (error) {
+  }catch(error){
 
     console.error(
-      'Chyba UI uživatele:',
+      'Chyba uživatelského rozhraní:',
       error
     );
+
   }
+
 }
 
 
-/* =========================
-   KARTA ČLÁNKU
-========================= */
+/* =====================================================
+   ARTICLE CARD
+===================================================== */
 
-function card(article) {
+function card(article){
 
   const image =
     article.cover_url ||
     'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=80';
 
+
   return `
-    <article class="card">
+    <article
+      class="card"
+      onclick="openArticle(${article.id})">
 
       <div
         class="card-img"
@@ -573,7 +653,7 @@ function card(article) {
         </span>
 
         <h3>
-          ${esc(article.title || 'Bez názvu')}
+          ${esc(article.title)}
         </h3>
 
         <p class="card-excerpt">
@@ -586,12 +666,13 @@ function card(article) {
             ${formatDate(article.created_at)}
           </span>
 
-          <button
-            type="button"
-            class="read-btn"
-            onclick="openArticle(${Number(article.id)})">
-            ČÍST ČLÁNEK →
-          </button>
+          <a
+            href="#"
+            onclick="event.stopPropagation(); openArticle(${article.id}); return false;">
+
+            ČÍST →
+
+          </a>
 
         </div>
 
@@ -599,176 +680,140 @@ function card(article) {
 
     </article>
   `;
+
 }
 
 
-/* =========================
-   VYKRESLENÍ ČLÁNKŮ
-========================= */
+/* =====================================================
+   RENDER
+===================================================== */
 
-function renderArticleCollection(list) {
+function renderArticles(){
 
-  const cards = $('cards');
-
-  if (!cards) return;
-
-  if (!list.length) {
-
-    cards.innerHTML = `
-      <div class="no-results">
-
-        <strong>
-          Nic jsme nenašli
-        </strong>
-
-        <span>
-          Zkuste jiný název, téma nebo hledaný výraz.
-        </span>
-
-      </div>
-    `;
-
-    return;
-  }
-
-  cards.innerHTML =
-    list
-      .map(card)
-      .join('');
-}
-
-
-function renderArticles() {
-
-  let visible =
-    [...articles];
-
-
-  if (activeCategory) {
-
-    visible =
-      visible.filter(
-        article =>
-          String(
-            article.category || ''
-          ).toUpperCase() ===
-          activeCategory
-      );
-  }
-
-
-  renderArticleCollection(
-    visible
-  );
-
-
-  renderDrawer();
-
-
-  const publicArticles =
-    $('publicArticles');
-
-  if (publicArticles) {
-
-    publicArticles.textContent =
-      articles.length;
-  }
-
-
-  const adminArticles =
-    $('adminArticles');
-
-  if (adminArticles) {
-
-    adminArticles.textContent =
-      articles.length;
-  }
-
-
-  const filter =
-    $('activeFilter');
-
-  if (filter) {
-
-    if (activeCategory) {
-
-      filter.textContent =
-        `Zobrazené téma: ${activeCategory} · kliknutím na „VŠECHNY ČLÁNKY“ zobrazíte vše.`;
-
-      filter.classList.remove(
-        'hidden'
-      );
-
-    } else {
-
-      filter.classList.add(
-        'hidden'
-      );
-    }
-  }
-}
-
-
-function renderDrawer() {
+  const cards =
+    $('cards');
 
   const drawer =
     $('drawerArticles');
 
-  if (!drawer) return;
 
-  if (!articles.length) {
+  let visible =
+    showingAll
+      ? articles
+      : articles.slice(0,4);
 
-    drawer.innerHTML =
-      '<p class="muted">Zatím nejsou žádné články.</p>';
 
-    return;
+  if(cards){
+
+    if(visible.length){
+
+      cards.innerHTML =
+        visible
+          .map(card)
+          .join('');
+
+    }else{
+
+      cards.innerHTML = `
+        <div class="no-results">
+
+          <strong>
+            Zatím zde nejsou žádné články.
+          </strong>
+
+        </div>
+      `;
+
+    }
+
   }
 
-  drawer.innerHTML =
-    articles
-      .slice(0, 8)
-      .map(article => {
 
-        const image =
-          article.cover_url
-            ? `<img src="${esc(article.cover_url)}" alt="">`
-            : '';
+  if($('articlesHeading')){
 
-        return `
-          <div
-            class="drawer-item"
-            onclick="openArticle(${Number(article.id)}); toggleDrawer();">
+    $('articlesHeading').textContent =
+      showingAll
+        ? 'VŠECHNY ČLÁNKY'
+        : 'NEJNOVĚJŠÍ ČLÁNKY';
 
-            ${image}
+  }
 
-            <div>
 
-              <b>
-                ${esc(article.title)}
-              </b>
+  if($('showAllArticles')){
 
-              <small>
-                ${formatDate(article.created_at)}
-                ·
-                ${esc(article.category || 'POHYB')}
-              </small>
+    $('showAllArticles').textContent =
+      showingAll
+        ? 'ZOBRAZIT MÉNĚ'
+        : 'VŠECHNY ČLÁNKY';
+
+  }
+
+
+  if(drawer){
+
+    if(!articles.length){
+
+      drawer.innerHTML =
+        '<p class="muted">Zatím nejsou žádné články.</p>';
+
+    }else{
+
+      drawer.innerHTML =
+        articles
+          .slice(0,8)
+          .map(article => `
+
+            <div
+              class="drawer-item"
+              onclick="openArticle(${article.id}); toggleDrawer();">
+
+              ${
+                article.cover_url
+                  ? `
+                    <img
+                      src="${esc(article.cover_url)}"
+                      alt="">
+                  `
+                  : ''
+              }
+
+              <div>
+
+                <b>
+                  ${esc(article.title)}
+                </b>
+
+                <small>
+                  ${formatDate(article.created_at)}
+                  ·
+                  ${esc(article.category || 'POHYB')}
+                </small>
+
+              </div>
 
             </div>
 
-          </div>
-        `;
-      })
-      .join('');
+          `)
+          .join('');
+
+    }
+
+  }
+
+
+  renderAdminList();
+
 }
 
 
-/* =========================
-   NAČTENÍ ČLÁNKŮ
-========================= */
+/* =====================================================
+   LOAD ARTICLES
+===================================================== */
 
-async function loadArticles() {
+async function loadArticles(){
 
-  if (!db) return;
+  if(!db) return;
+
 
   const {
     data,
@@ -784,135 +829,129 @@ async function loadArticles() {
         }
       );
 
-  if (error) {
+
+  if(error){
 
     console.error(
       'Články se nepodařilo načíst:',
       error
     );
 
-    $('cards').innerHTML = `
-      <div class="no-results">
-        <strong>
-          Články se nepodařilo načíst.
-        </strong>
-        <span>
-          Zkuste stránku obnovit.
-        </span>
-      </div>
-    `;
+
+    if($('cards')){
+
+      $('cards').innerHTML = `
+        <div class="no-results">
+
+          <strong>
+            Články se nepodařilo načíst.
+          </strong>
+
+          <span>
+            Zkuste stránku obnovit.
+          </span>
+
+        </div>
+      `;
+
+    }
 
     return;
   }
 
+
   articles =
     data || [];
 
+
   renderArticles();
 
-  renderAdminList();
 
-  await refreshAdminStats();
+  if($('adminArticles')){
+    $('adminArticles').textContent =
+      articles.length;
+  }
+
+
+  if($('publicArticles')){
+    $('publicArticles').textContent =
+      articles.length;
+  }
+
 }
 
 
-/* =========================
-   KATEGORIE
-========================= */
+/* =====================================================
+   ALL ARTICLES
+===================================================== */
 
-function setupCategories() {
+function setupAllArticles(){
 
-  const buttons =
-    document.querySelectorAll(
-      '.category-card'
-    );
+  const button =
+    $('showAllArticles');
 
-  buttons.forEach(button => {
-
-    button.addEventListener(
-      'click',
-      () => {
-
-        const category =
-          String(
-            button.dataset.category || ''
-          ).toUpperCase();
-
-        if (
-          activeCategory === category
-        ) {
-
-          activeCategory = null;
-
-        } else {
-
-          activeCategory =
-            category;
-        }
+  if(!button) return;
 
 
-        buttons.forEach(item => {
+  button.addEventListener(
+    'click',
+    () => {
 
-          item.classList.toggle(
-            'active',
-            item === button &&
-            activeCategory
-          );
+      showingAll =
+        !showingAll;
 
-        });
+      renderArticles();
 
-
-        renderArticles();
-
-
-        $('articles')?.scrollIntoView({
+      document
+        .getElementById('articles')
+        ?.scrollIntoView({
           behavior:'smooth',
           block:'start'
         });
-      }
-    );
-  });
+
+    }
+  );
+
 }
 
 
-/* =========================
+/* =====================================================
    DRAWER
-========================= */
+===================================================== */
 
-function toggleDrawer() {
+function toggleDrawer(){
 
   $('drawer')
     ?.classList
     .toggle('open');
+
 }
 
 
-/* =========================
-   STATISTIKY
-========================= */
+/* =====================================================
+   STATS
+===================================================== */
 
-async function refreshAdminStats() {
+async function refreshAdminStats(){
 
-  if (!db) return;
+  if(!db) return;
 
-  try {
+
+  try{
 
     const {
-      count: subscribers
+      count:subscribers
     } =
       await db
         .from('subscribers')
-        .select(
-          '*',
-          {
-            count:'exact',
-            head:true
-          }
-        );
+        .select('*',{
+          count:'exact',
+          head:true
+        });
 
 
     const {
-      data: stats
+      data:stats
     } =
       await db
         .from('site_stats')
@@ -921,43 +960,49 @@ async function refreshAdminStats() {
         .maybeSingle();
 
 
-    if ($('subs')) {
+    if($('subs')){
 
       $('subs').textContent =
         subscribers ?? 0;
+
     }
 
 
-    if ($('adminArticles')) {
+    if($('adminArticles')){
 
       $('adminArticles').textContent =
         articles.length;
+
     }
 
 
-    if ($('visits')) {
+    if($('visits')){
 
       $('visits').textContent =
         stats?.visits ?? 0;
+
     }
 
-  } catch (error) {
+  }catch(error){
 
     console.error(
       'Chyba statistik:',
       error
     );
+
   }
+
 }
 
 
-/* =========================
-   UPLOAD
-========================= */
+/* =====================================================
+   IMAGE UPLOAD
+===================================================== */
 
-async function uploadCoverImage(file) {
+async function uploadCoverImage(file){
 
-  if (!file) return null;
+  if(!file) return null;
+
 
   const allowed = [
     'image/jpeg',
@@ -965,22 +1010,22 @@ async function uploadCoverImage(file) {
     'image/webp'
   ];
 
-  if (!allowed.includes(file.type)) {
+
+  if(!allowed.includes(file.type)){
 
     throw new Error(
       'Použijte JPG, PNG nebo WEBP.'
     );
+
   }
 
 
-  if (
-    file.size >
-    5 * 1024 * 1024
-  ) {
+  if(file.size > 5 * 1024 * 1024){
 
     throw new Error(
       'Obrázek musí být menší než 5 MB.'
     );
+
   }
 
 
@@ -992,11 +1037,12 @@ async function uploadCoverImage(file) {
     await db.auth.getUser();
 
 
-  if (!user) {
+  if(!user){
 
     throw new Error(
       'Musíte být přihlášeni.'
     );
+
   }
 
 
@@ -1027,7 +1073,7 @@ async function uploadCoverImage(file) {
       );
 
 
-  if (error) {
+  if(error){
     throw error;
   }
 
@@ -1037,16 +1083,19 @@ async function uploadCoverImage(file) {
   } =
     db.storage
       .from('article-images')
-      .getPublicUrl(
-        filename
-      );
+      .getPublicUrl(filename);
 
 
   return data.publicUrl;
+
 }
 
 
-function showCoverPreview(url) {
+/* =====================================================
+   PREVIEW
+===================================================== */
+
+function showCoverPreview(url){
 
   const preview =
     $('coverPreview');
@@ -1054,10 +1103,11 @@ function showCoverPreview(url) {
   const image =
     $('coverPreviewImg');
 
-  if (!preview || !image) return;
+
+  if(!preview || !image) return;
 
 
-  if (!url) {
+  if(!url){
 
     preview.classList.add(
       'hidden'
@@ -1074,18 +1124,20 @@ function showCoverPreview(url) {
   preview.classList.remove(
     'hidden'
   );
+
 }
 
 
-/* =========================
-   ULOŽENÍ ČLÁNKU
-========================= */
+/* =====================================================
+   SAVE ARTICLE
+===================================================== */
 
-async function saveArticle(event) {
+async function saveArticle(event){
 
   event.preventDefault();
 
-  if (!(await isAdmin())) {
+
+  if(!(await isAdmin())){
 
     $('articleMsg').textContent =
       'Přístup mají pouze administrátoři.';
@@ -1098,20 +1150,23 @@ async function saveArticle(event) {
     $('articleSubmit');
 
 
-  if (button) {
+  if(button){
 
     button.disabled = true;
+
     button.textContent =
       'UKLÁDÁM...';
+
   }
 
 
-  try {
+  try{
 
     let coverUrl =
       $('cover')
         ?.value
-        .trim() || null;
+        .trim() ||
+      null;
 
 
     const file =
@@ -1119,13 +1174,14 @@ async function saveArticle(event) {
         ?.files?.[0];
 
 
-    if (file) {
+    if(file){
 
       $('articleMsg').textContent =
         'Nahrávám obrázek...';
 
       coverUrl =
         await uploadCoverImage(file);
+
     }
 
 
@@ -1150,26 +1206,23 @@ async function saveArticle(event) {
         coverUrl,
 
       category:
-        $('category')
-          .value
+        $('category').value
+
     };
 
 
     let result;
 
 
-    if (editingId) {
+    if(editingId){
 
       result =
         await db
           .from('articles')
           .update(payload)
-          .eq(
-            'id',
-            editingId
-          );
+          .eq('id',editingId);
 
-    } else {
+    }else{
 
       const {
         data:{
@@ -1186,10 +1239,11 @@ async function saveArticle(event) {
             ...payload,
             author_id:user.id
           });
+
     }
 
 
-    if (result.error) {
+    if(result.error){
       throw result.error;
     }
 
@@ -1205,15 +1259,16 @@ async function saveArticle(event) {
 
     $('articleForm').reset();
 
-    if ($('cover')) {
+
+    if($('cover')){
       $('cover').value = '';
     }
+
 
     showCoverPreview(null);
 
 
-    if (button) {
-
+    if(button){
       button.textContent =
         'PUBLIKOVAT ČLÁNEK';
     }
@@ -1223,38 +1278,43 @@ async function saveArticle(event) {
 
     await refreshAdminStats();
 
-  } catch (error) {
+  }catch(error){
 
     console.error(
-      'Chyba ukládání:',
+      'Chyba při ukládání:',
       error
     );
+
 
     $('articleMsg').textContent =
       error.message ||
       'Něco se nepodařilo.';
 
-  } finally {
+  }finally{
 
-    if (button) {
+    if(button){
 
       button.disabled = false;
 
-      if (!editingId) {
+      if(!editingId){
 
         button.textContent =
           'PUBLIKOVAT ČLÁNEK';
+
       }
+
     }
+
   }
+
 }
 
 
-/* =========================
-   EDITACE
-========================= */
+/* =====================================================
+   EDIT
+===================================================== */
 
-function editArticle(id) {
+function editArticle(id){
 
   const article =
     articles.find(
@@ -1264,7 +1324,7 @@ function editArticle(id) {
     );
 
 
-  if (!article) return;
+  if(!article) return;
 
 
   editingId =
@@ -1303,16 +1363,17 @@ function editArticle(id) {
   $('admin').scrollIntoView({
     behavior:'smooth'
   });
+
 }
 
 
-/* =========================
-   SMAZÁNÍ
-========================= */
+/* =====================================================
+   DELETE
+===================================================== */
 
-async function deleteArticle(id) {
+async function deleteArticle(id){
 
-  if (!(await isAdmin())) {
+  if(!(await isAdmin())){
 
     alert(
       'Přístup mají pouze administrátoři.'
@@ -1322,11 +1383,9 @@ async function deleteArticle(id) {
   }
 
 
-  if (
-    !confirm(
-      'Opravdu chcete tento článek smazat?'
-    )
-  ) {
+  if(!confirm(
+    'Opravdu chcete tento článek smazat?'
+  )){
     return;
   }
 
@@ -1345,13 +1404,10 @@ async function deleteArticle(id) {
     await db
       .from('articles')
       .delete()
-      .eq(
-        'id',
-        id
-      );
+      .eq('id',id);
 
 
-  if (error) {
+  if(error){
 
     alert(error.message);
 
@@ -1359,7 +1415,7 @@ async function deleteArticle(id) {
   }
 
 
-  if (article?.cover_url) {
+  if(article?.cover_url){
 
     const marker =
       '/storage/v1/object/public/article-images/';
@@ -1371,7 +1427,7 @@ async function deleteArticle(id) {
       );
 
 
-    if (index !== -1) {
+    if(index !== -1){
 
       const path =
         article.cover_url.substring(
@@ -1379,44 +1435,47 @@ async function deleteArticle(id) {
         );
 
 
-      try {
+      try{
 
         await db.storage
           .from('article-images')
-          .remove([
-            path
-          ]);
+          .remove([path]);
 
-      } catch (error) {
+      }catch(error){
 
         console.warn(
           'Obrázek se nepodařilo odstranit:',
           error
         );
+
       }
+
     }
+
   }
 
 
   await loadArticles();
 
   await refreshAdminStats();
+
 }
 
 
-/* =========================
+/* =====================================================
    ADMIN LIST
-========================= */
+===================================================== */
 
-function renderAdminList() {
+function renderAdminList(){
 
   const box =
     $('adminList');
 
-  if (!box) return;
+
+  if(!box) return;
 
 
-  if (!articles.length) {
+  if(!articles.length){
 
     box.innerHTML =
       '<p class="muted">Zatím nejsou žádné články.</p>';
@@ -1449,15 +1508,19 @@ function renderAdminList() {
 
             <button
               type="button"
-              onclick="editArticle(${Number(article.id)})">
+              onclick="editArticle(${article.id})">
+
               UPRAVIT
+
             </button>
 
             <button
               type="button"
               class="danger"
-              onclick="deleteArticle(${Number(article.id)})">
+              onclick="deleteArticle(${article.id})">
+
               SMAZAT
+
             </button>
 
           </div>
@@ -1466,18 +1529,20 @@ function renderAdminList() {
 
       `)
       .join('');
+
 }
 
 
-/* =========================
+/* =====================================================
    NEWSLETTER
-========================= */
+===================================================== */
 
-async function subscribe(event) {
+async function subscribe(event){
 
   event.preventDefault();
 
-  if (!db) return;
+
+  if(!db) return;
 
 
   const input =
@@ -1492,7 +1557,7 @@ async function subscribe(event) {
       .toLowerCase();
 
 
-  if (!email) return;
+  if(!email) return;
 
 
   const {
@@ -1505,37 +1570,42 @@ async function subscribe(event) {
       });
 
 
-  if (
+  if(
     error &&
     !String(error.message)
       .toLowerCase()
       .includes('duplicate')
-  ) {
+  ){
 
     event.target.innerHTML =
-      `<b class="error-text">
-        ${esc(error.message)}
-      </b>`;
+      `
+        <b class="error-text">
+          ${esc(error.message)}
+        </b>
+      `;
 
     return;
   }
 
 
   event.target.innerHTML =
-    `<b class="success-text">
-      Jste přihlášeni. Vítejte ve Vireno!
-    </b>`;
+    `
+      <b class="success-text">
+        Jste přihlášeni. Vítejte ve Vireno!
+      </b>
+    `;
 
 
   await refreshAdminStats();
+
 }
 
 
-/* =========================
-   DETAIL ČLÁNKU
-========================= */
+/* =====================================================
+   ARTICLE VIEW
+===================================================== */
 
-function openArticle(id) {
+function openArticle(id){
 
   const article =
     articles.find(
@@ -1545,7 +1615,7 @@ function openArticle(id) {
     );
 
 
-  if (!article) return;
+  if(!article) return;
 
 
   $('articleViewTitle').textContent =
@@ -1561,12 +1631,6 @@ function openArticle(id) {
     'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80';
 
 
-  /*
-    Obsah je ponechán jako HTML,
-    aby v článcích fungovaly odstavce
-    a případné obrázky.
-  */
-
   $('articleViewContent').innerHTML =
     article.content || '';
 
@@ -1579,92 +1643,108 @@ function openArticle(id) {
   document.body.classList.add(
     'search-active'
   );
+
 }
 
 
-function closeArticle() {
+function closeArticle(){
 
   $('articleView')
     ?.classList
     .add('hidden');
 
+
   document.body.classList.remove(
     'search-active'
   );
+
 }
 
 
-/* =========================
-   FORMULÁŘ
-========================= */
+/* =====================================================
+   CLEAR FORM
+===================================================== */
 
-function clearArticleForm() {
+function clearArticleForm(){
 
   editingId = null;
 
+
   $('articleForm')?.reset();
 
-  if ($('cover')) {
+
+  if($('cover')){
     $('cover').value = '';
   }
 
-  if ($('coverFile')) {
+
+  if($('coverFile')){
     $('coverFile').value = '';
   }
 
+
   showCoverPreview(null);
 
-  if ($('articleSubmit')) {
+
+  if($('articleSubmit')){
 
     $('articleSubmit').textContent =
       'PUBLIKOVAT ČLÁNEK';
+
   }
 
-  if ($('articleMsg')) {
+
+  if($('articleMsg')){
 
     $('articleMsg').textContent = '';
+
   }
+
 }
 
 
-/* =========================
-   NÁVŠTĚVY
-========================= */
+/* =====================================================
+   VISITS
+===================================================== */
 
-async function trackVisit() {
+async function trackVisit(){
 
-  if (!db) return;
+  if(!db) return;
 
-  try {
+
+  try{
 
     await db.rpc(
       'track_page_view'
     );
 
-  } catch (error) {
+  }catch(error){
 
     console.warn(
       'Sledování návštěvy selhalo:',
       error
     );
+
   }
+
 }
 
 
-/* =========================
-   EVENTY
-========================= */
+/* =====================================================
+   EVENTS
+===================================================== */
 
-function setupEvents() {
+function setupEvents(){
 
   const loginBtn =
     $('loginBtn');
 
 
-  if (loginBtn) {
+  if(loginBtn){
 
     loginBtn.onclick =
       () => openAuth('login');
+
   }
 
 
@@ -1703,34 +1783,6 @@ function setupEvents() {
     );
 
 
-  $('showAllBtn')
-    ?.addEventListener(
-      'click',
-      () => {
-
-        activeCategory = null;
-
-        document
-          .querySelectorAll(
-            '.category-card'
-          )
-          .forEach(
-            button =>
-              button.classList.remove(
-                'active'
-              )
-          );
-
-        renderArticles();
-
-        $('articles')
-          ?.scrollIntoView({
-            behavior:'smooth'
-          });
-      }
-    );
-
-
   $('coverFile')
     ?.addEventListener(
       'change',
@@ -1739,10 +1791,13 @@ function setupEvents() {
         const file =
           event.target.files?.[0];
 
-        if (!file) return;
+
+        if(!file) return;
+
 
         const reader =
           new FileReader();
+
 
         reader.onload =
           () =>
@@ -1750,7 +1805,9 @@ function setupEvents() {
               reader.result
             );
 
+
         reader.readAsDataURL(file);
+
       }
     );
 
@@ -1760,11 +1817,13 @@ function setupEvents() {
       'click',
       event => {
 
-        if (
+        if(
           event.target ===
           $('auth')
-        ) {
+        ){
+
           closeAuth();
+
         }
 
       }
@@ -1776,11 +1835,13 @@ function setupEvents() {
       'click',
       event => {
 
-        if (
+        if(
           event.target ===
           $('articleView')
-        ) {
+        ){
+
           closeArticle();
+
         }
 
       }
@@ -1789,45 +1850,46 @@ function setupEvents() {
 
   setupSearch();
 
-  setupCategories();
+  setupAllArticles();
 
 
   document.addEventListener(
     'keydown',
     event => {
 
-      if (
+      if(
         event.key === 'Escape'
-      ) {
+      ){
 
-        if (searchOpen) {
+        if(searchOpen){
           closeSearch();
         }
 
-        if (
+        if(
           !$('articleView')
             ?.classList
             .contains('hidden')
-        ) {
+        ){
+
           closeArticle();
+
         }
 
-        if (
+        if(
           !$('auth')
             ?.classList
             .contains('hidden')
-        ) {
+        ){
+
           closeAuth();
+
         }
+
       }
 
     }
   );
 
-
-  /*
-    Aktivní položka horního menu
-  */
 
   document
     .querySelectorAll(
@@ -1853,24 +1915,27 @@ function setupEvents() {
           link.classList.add(
             'active'
           );
+
         }
       );
+
     });
+
 }
 
 
-/* =========================
-   START
-========================= */
+/* =====================================================
+   INIT
+===================================================== */
 
-async function init() {
+async function init(){
 
   console.log(
     'Vireno se spouští...'
   );
 
 
-  if (!initSupabase()) {
+  if(!initSupabase()){
 
     console.error(
       'Supabase se nepodařilo inicializovat.'
@@ -1895,20 +1960,22 @@ async function init() {
   console.log(
     'Vireno je připraveno.'
   );
+
 }
 
 
-if (
+if(
   document.readyState ===
   'loading'
-) {
+){
 
   document.addEventListener(
     'DOMContentLoaded',
     init
   );
 
-} else {
+}else{
 
   init();
+
 }
