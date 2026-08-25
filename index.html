@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
+
   <meta charset="UTF-8">
 
   <meta
@@ -9,97 +10,123 @@
 
   <meta
     name="description"
-    content="Vireno – zdraví, pohyb, výživa a aktivní život pro lidi po čtyřicítce.">
+    content="Vireno – praktické rady pro aktivní život po čtyřicítce. Pohyb, zdraví, výživa, regenerace a energie.">
 
   <meta
     name="theme-color"
-    content="#315c43">
+    content="#159447">
 
   <title>VIRENO – Aktivní život po 40</title>
 
   <link
+    rel="preconnect"
+    href="https://fonts.googleapis.com">
+
+  <link
+    rel="preconnect"
+    href="https://fonts.gstatic.com"
+    crossorigin>
+
+  <link
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap"
+    rel="stylesheet">
+
+  <link
     rel="stylesheet"
     href="style.css">
+
 </head>
 
 <body>
 
-<!-- =========================
-     HLAVIČKA
-========================= -->
+<!-- =====================================================
+     HEADER
+===================================================== -->
 
 <header class="topbar">
 
-  <a href="#home" class="brand">
-    <span class="brand-mark">●</span>
-    VIRENO
-  </a>
-
-  <nav class="desktop-nav">
+  <div class="topbar-inner">
 
     <a
       href="#home"
-      class="active"
-      data-nav="home">
-      DOMŮ
+      class="brand"
+      data-page="home">
+
+      <span class="brand-mark">●</span>
+      VIRENO
+
     </a>
 
-    <a
-      href="#articles"
-      data-nav="articles">
-      ČLÁNKY
-    </a>
 
-    <a
-      href="#about"
-      data-nav="about">
-      O NÁS
-    </a>
+    <nav class="desktop-nav">
 
-  </nav>
+      <a
+        href="#home"
+        data-page="home"
+        class="nav-link active">
+        DOMŮ
+      </a>
 
-  <div class="actions">
+      <a
+        href="#articles"
+        data-page="articles"
+        class="nav-link">
+        ČLÁNKY
+      </a>
 
-    <button
-      type="button"
-      class="icon-btn"
-      id="searchBtn"
-      aria-label="Vyhledat článek">
-      🔍
-    </button>
+      <a
+        href="#about"
+        data-page="about"
+        class="nav-link">
+        O NÁS
+      </a>
 
-    <button
-      type="button"
-      class="login"
-      id="loginBtn">
-      PŘIHLÁSIT SE
-    </button>
+    </nav>
 
-    <button
-      type="button"
-      class="menu-btn"
-      onclick="toggleDrawer()"
-      aria-label="Otevřít menu">
-      ☰
-    </button>
+
+    <div class="actions">
+
+      <button
+        type="button"
+        class="icon-btn"
+        id="searchBtn"
+        aria-label="Vyhledat">
+        🔍
+      </button>
+
+
+      <button
+        type="button"
+        class="login"
+        id="loginBtn">
+        PŘIHLÁSIT SE
+      </button>
+
+
+      <button
+        type="button"
+        class="menu-btn"
+        id="menuBtn"
+        aria-label="Otevřít menu">
+        ☰
+      </button>
+
+    </div>
 
   </div>
 
 </header>
 
 
-<!-- =========================
-     VYHLEDÁVÁNÍ
-========================= -->
+<!-- =====================================================
+     SEARCH
+===================================================== -->
 
 <div
   id="searchOverlay"
-  class="search-overlay hidden"
-  aria-hidden="true">
+  class="search-overlay hidden">
 
-  <div
-    class="search-panel"
-    role="search">
+  <div class="search-panel">
 
     <div class="search-icon">
       🔍
@@ -108,15 +135,13 @@
     <input
       id="searchInput"
       type="search"
-      placeholder="Hledat článek nebo téma..."
-      autocomplete="off"
-      aria-label="Hledat články">
+      placeholder="Hledat článek, téma nebo výraz..."
+      autocomplete="off">
 
     <button
       id="searchClose"
       type="button"
-      class="search-close"
-      aria-label="Zavřít vyhledávání">
+      class="search-close">
       ×
     </button>
 
@@ -125,92 +150,424 @@
 </div>
 
 
-<!-- =========================
-     HERO
-========================= -->
+<!-- =====================================================
+     MOBILE MENU
+===================================================== -->
 
-<section
-  id="home"
-  class="hero">
+<div
+  id="mobileMenu"
+  class="mobile-menu">
 
-  <div class="hero-copy">
+  <div class="mobile-menu-head">
+
+    <div>
+
+      <div class="mobile-label">
+        VIRENO
+      </div>
+
+      <strong>
+        MENU
+      </strong>
+
+    </div>
+
+    <button
+      type="button"
+      id="mobileMenuClose">
+      ×
+    </button>
+
+  </div>
+
+
+  <nav class="mobile-nav">
+
+    <a
+      href="#home"
+      data-page="home">
+      DOMŮ
+    </a>
+
+    <a
+      href="#articles"
+      data-page="articles">
+      ČLÁNKY
+    </a>
+
+    <a
+      href="#about"
+      data-page="about">
+      O NÁS
+    </a>
+
+  </nav>
+
+
+  <div class="mobile-menu-footer">
+
+    <button
+      type="button"
+      id="mobileLoginBtn"
+      class="btn green full">
+      PŘIHLÁSIT SE
+    </button>
+
+  </div>
+
+</div>
+
+
+<div
+  id="mobileBackdrop"
+  class="mobile-backdrop">
+</div>
+
+
+<!-- =====================================================
+     HOME PAGE
+===================================================== -->
+
+<main
+  id="pageHome"
+  class="page">
+
+  <!-- HERO -->
+
+  <section
+    id="home"
+    class="hero">
+
+    <div class="hero-copy">
+
+      <div class="kicker">
+        VIRENO · AKTIVNÍ ŽIVOT 40+
+      </div>
+
+      <h1>
+        ŽIJTE<br>
+        <em>NAPLNO.</em>
+      </h1>
+
+      <p>
+        Praktické rady pro pohyb, zdraví, výživu,
+        regeneraci a energii. Bez extrémů,
+        bez nesmyslných diet a bez zbytečného tlaku.
+      </p>
+
+      <div class="hero-buttons">
+
+        <a
+          href="#articles"
+          data-page="articles"
+          class="btn green">
+          PROHLÉDNOUT ČLÁNKY
+        </a>
+
+        <a
+          href="#about"
+          data-page="about"
+          class="btn light">
+          POZNAT VIRENO
+        </a>
+
+      </div>
+
+      <div class="social-proof">
+
+        <div class="avatars">
+          ● ● ●
+        </div>
+
+        <span>
+          Pro lidi, kteří chtějí být aktivní
+          <b>i po čtyřicítce.</b>
+        </span>
+
+      </div>
+
+    </div>
+
+
+    <div class="hero-visual">
+
+      <div class="hero-orb"></div>
+
+      <div class="hero-card">
+
+        <strong>40+</strong>
+
+        <span>
+          Věk není konec.
+        </span>
+
+        <small>
+          Je to nový začátek.
+        </small>
+
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- TOPIC STRIP -->
+
+  <section class="topic-strip">
+
+    <div class="topic-item">
+
+      <span>🏃</span>
+
+      <div>
+        <strong>POHYB</strong>
+        <small>Kondice a cvičení</small>
+      </div>
+
+    </div>
+
+
+    <div class="topic-item">
+
+      <span>🥗</span>
+
+      <div>
+        <strong>VÝŽIVA</strong>
+        <small>Jídlo a energie</small>
+      </div>
+
+    </div>
+
+
+    <div class="topic-item">
+
+      <span>⚖</span>
+
+      <div>
+        <strong>HUBNUTÍ</strong>
+        <small>Zdravá váha</small>
+      </div>
+
+    </div>
+
+
+    <div class="topic-item">
+
+      <span>😴</span>
+
+      <div>
+        <strong>REGENERACE</strong>
+        <small>Spánek a odpočinek</small>
+      </div>
+
+    </div>
+
+
+    <div class="topic-item">
+
+      <span>❤</span>
+
+      <div>
+        <strong>ZDRAVÍ</strong>
+        <small>Vitalita a prevence</small>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- CONTENT -->
+
+  <section class="content home-content">
+
+    <div class="main-column">
+
+      <div class="section-title">
+
+        <div>
+
+          <div class="kicker">
+            VIRENO
+          </div>
+
+          <h2>
+            NEJNOVĚJŠÍ ČLÁNKY
+          </h2>
+
+        </div>
+
+        <a
+          href="#articles"
+          data-page="articles"
+          class="section-link">
+          VŠECHNY ČLÁNKY →
+        </a>
+
+      </div>
+
+
+      <div
+        id="cards"
+        class="cards">
+
+        <div class="no-results">
+          <strong>Načítám články...</strong>
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <!-- NEWSLETTER -->
+
+    <aside class="subscribe">
+
+      <div class="kicker">
+        VIRENO NEWSLETTER
+      </div>
+
+      <h3>
+        ZŮSTAŇTE<br>
+        V OBRAZE
+      </h3>
+
+      <p>
+        Jednou za čas vám pošleme praktické tipy
+        pro pohyb, výživu, zdraví a lepší kondici
+        po čtyřicítce.
+      </p>
+
+
+      <form id="subscribe">
+
+        <input
+          type="email"
+          placeholder="Váš e-mail"
+          required>
+
+        <button
+          type="submit"
+          class="btn green">
+          PŘIHLÁSIT SE
+        </button>
+
+      </form>
+
+
+      <small>
+        Žádný spam. Jen užitečný obsah.
+      </small>
+
+
+      <div class="follow">
+
+        <b>
+          SLEDUJTE VIRENO
+        </b>
+
+        <span>●</span>
+        <span>●</span>
+        <span>●</span>
+
+      </div>
+
+    </aside>
+
+  </section>
+
+
+  <!-- STATS -->
+
+  <section class="bottom-strip">
+
+    <div>
+
+      <b>40+</b>
+
+      <span>
+        PRO KAŽDÝ VĚK
+      </span>
+
+    </div>
+
+
+    <div>
+
+      <b id="publicArticles">
+        0
+      </b>
+
+      <span>
+        ČLÁNKŮ
+      </span>
+
+    </div>
+
+
+    <div>
+
+      <b>5</b>
+
+      <span>
+        HLAVNÍCH TÉMAT
+      </span>
+
+    </div>
+
+
+    <div>
+
+      <b>100%</b>
+
+      <span>
+        PRAKTICKÝ OBSAH
+      </span>
+
+    </div>
+
+  </section>
+
+</main>
+
+
+<!-- =====================================================
+     ARTICLES PAGE
+===================================================== -->
+
+<main
+  id="pageArticles"
+  class="page page-inner hidden">
+
+  <section class="inner-hero">
 
     <div class="kicker">
-      VIRENO · AKTIVNÍ ŽIVOT 40+
+      VIRENO
     </div>
 
     <h1>
-      ŽIJTE<br>
-      <em>NAPLNO.</em>
+      VŠECHNY<br>
+      <em>ČLÁNKY.</em>
     </h1>
 
     <p>
-      Praktické rady pro pohyb, zdraví, výživu
-      a energii. Bez extrémů, bez nesmyslných
-      diet a bez zbytečného tlaku.
+      Praktické informace pro pohyb, zdraví,
+      výživu, regeneraci a aktivní život po 40.
     </p>
 
-    <div class="hero-buttons">
-
-      <a
-        href="#articles"
-        class="btn green">
-        PROHLÉDNOUT ČLÁNKY
-      </a>
-
-      <a
-        href="#about"
-        class="btn light">
-        O NÁS
-      </a>
-
-    </div>
-
-    <div class="social-proof">
-
-      <div class="avatars">
-        ● ● ●
-      </div>
-
-      <span>
-        Pro lidi, kteří chtějí být aktivní
-        <b>i po čtyřicítce.</b>
-      </span>
-
-    </div>
-
-  </div>
-
-  <div class="hero-athlete">
-
-    <div class="hero-circle"></div>
-
-    <div class="hero-card">
-      <strong>40+</strong>
-      <span>
-        Věk není konec.
-      </span>
-    </div>
-
-  </div>
-
-</section>
+  </section>
 
 
-<!-- =========================
-     HLAVNÍ OBSAH
-========================= -->
+  <section class="articles-page-content">
 
-<main id="articles" class="content">
-
-  <section class="latest">
-
-    <div class="section-title">
+    <div class="articles-toolbar">
 
       <div>
 
         <div class="kicker">
-          VIRENO
+          KNIHOVNA VIRENO
         </div>
 
         <h2>
@@ -219,20 +576,20 @@
 
       </div>
 
-      <span class="article-count-label">
-        AKTUÁLNÍ OBSAH
-      </span>
+
+      <button
+        type="button"
+        id="articlesSearchBtn"
+        class="outline-btn">
+        🔍 HLEDAT
+      </button>
 
     </div>
 
-    <div
-      id="searchStatus"
-      class="search-status hidden">
-    </div>
 
     <div
-      id="cards"
-      class="cards">
+      id="allArticles"
+      class="all-articles">
 
       <div class="no-results">
         <strong>Načítám články...</strong>
@@ -242,172 +599,168 @@
 
   </section>
 
-
-  <!-- =========================
-       NEWSLETTER
-  ========================= -->
-
-  <aside class="subscribe">
-
-    <div class="kicker">
-      VIRENO NEWSLETTER
-    </div>
-
-    <h3>
-      ZŮSTAŇTE<br>
-      V OBRAZE
-    </h3>
-
-    <p>
-      Jednou za čas vám pošleme praktické tipy
-      pro pohyb, výživu, zdraví a lepší kondici
-      po čtyřicítce.
-    </p>
-
-    <form id="subscribe">
-
-      <input
-        type="email"
-        placeholder="Váš e-mail"
-        required>
-
-      <button
-        type="submit"
-        class="btn green">
-        PŘIHLÁSIT SE
-      </button>
-
-    </form>
-
-    <small>
-      Žádný spam. Jen užitečný obsah.
-    </small>
-
-    <div class="follow">
-
-      <b>
-        SLEDUJTE VIRENO
-      </b>
-
-      <span>●</span>
-      <span>●</span>
-      <span>●</span>
-
-    </div>
-
-  </aside>
-
 </main>
 
 
-<!-- =========================
-     O NÁS
-========================= -->
+<!-- =====================================================
+     ABOUT PAGE
+===================================================== -->
 
-<section
-  id="about"
-  class="about-section">
+<main
+  id="pageAbout"
+  class="page page-inner hidden">
 
-  <div class="about-inner">
+  <section class="about-hero">
 
-    <div class="about-copy">
+    <div>
+
+      <div class="kicker">
+        VIRENO
+      </div>
+
+      <h1>
+        ŽIVOT<br>
+        <em>NEKONČÍ VE 40.</em>
+      </h1>
+
+      <p>
+        Věříme, že čtyřicítka není hranice,
+        ale začátek období, kdy člověk může
+        začít lépe rozumět svému tělu,
+        energii i tomu, co opravdu potřebuje.
+      </p>
+
+    </div>
+
+    <div class="about-number">
+      <strong>40+</strong>
+      <span>
+        nový<br>
+        začátek
+      </span>
+    </div>
+
+  </section>
+
+
+  <section class="about-grid">
+
+    <article class="about-card">
+
+      <span>01</span>
+
+      <h2>
+        PRAKTICKY
+      </h2>
+
+      <p>
+        Nechceme vás zahlcovat teorií.
+        Přinášíme informace, které můžete
+        skutečně využít v běžném životě.
+      </p>
+
+    </article>
+
+
+    <article class="about-card">
+
+      <span>02</span>
+
+      <h2>
+        BEZ EXTRÉMŮ
+      </h2>
+
+      <p>
+        Žádné zázračné diety, nesmyslné výzvy
+        ani tlak na dokonalost. Důležitá je
+        dlouhodobá udržitelnost.
+      </p>
+
+    </article>
+
+
+    <article class="about-card">
+
+      <span>03</span>
+
+      <h2>
+        PRO LIDI 40+
+      </h2>
+
+      <p>
+        Obsah stavíme kolem reálného života
+        lidí, kteří chtějí mít energii,
+        sílu a chuť být aktivní.
+      </p>
+
+    </article>
+
+  </section>
+
+
+  <section class="about-story">
+
+    <div class="about-story-label">
+      PROČ VIRENO
+    </div>
+
+    <div>
+
+      <h2>
+        CHCEME, ABYSTE SE<br>
+        VE SVÉM TĚLE CÍTILI DOBŘE.
+      </h2>
+
+      <p>
+        Vireno vzniklo z jednoduché myšlenky:
+        aktivní život nemusí skončit s přibývajícím
+        věkem. Naopak. S dobrými návyky, pravidelným
+        pohybem, rozumnou stravou a dostatkem
+        regenerace může být další etapa života
+        silnější než ta předchozí.
+      </p>
+
+      <p>
+        Proto vytváříme obsah, který je srozumitelný,
+        praktický a použitelný. Bez zbytečného
+        strašení a bez tlaku na perfektní výkon.
+      </p>
+
+    </div>
+
+  </section>
+
+
+  <section class="about-cta">
+
+    <div>
 
       <div class="kicker">
         VIRENO
       </div>
 
       <h2>
-        ŽIVOT PO 40<br>
-        <em>NEMUSÍ ZPOMALIT.</em>
+        TAK POJĎME<br>
+        ZAČÍT.
       </h2>
 
-      <p>
-        Vireno vzniklo pro všechny, kteří chtějí
-        zůstat aktivní, zdraví a plní energie
-        i v dalších dekádách života.
-      </p>
-
-      <p>
-        Přinášíme praktické informace o pohybu,
-        zdraví, výživě, regeneraci a každodenních
-        návycích. Bez zbytečných extrémů a
-        nereálných slibů.
-      </p>
-
-      <div class="about-points">
-
-        <div>
-          <strong>01</strong>
-          <span>Praktické informace</span>
-        </div>
-
-        <div>
-          <strong>02</strong>
-          <span>Žádné nesmyslné extrémy</span>
-        </div>
-
-        <div>
-          <strong>03</strong>
-          <span>Aktivní život v každém věku</span>
-        </div>
-
-      </div>
-
     </div>
 
-    <div class="about-card">
+    <a
+      href="#articles"
+      data-page="articles"
+      class="btn green">
+      PROHLÉDNOUT ČLÁNKY →
+    </a>
 
-      <div class="about-big">
-        40<span>+</span>
-      </div>
+  </section>
 
-      <h3>
-        Věk není překážka.
-      </h3>
-
-      <p>
-        Je to začátek nové etapy.
-      </p>
-
-    </div>
-
-  </div>
-
-</section>
+</main>
 
 
-<!-- =========================
-     STATISTIKY
-========================= -->
-
-<section class="bottom-strip">
-
-  <div>
-    <b>40+</b>
-    <span>PRO KAŽDÝ VĚK</span>
-  </div>
-
-  <div>
-    <b id="publicArticles">0</b>
-    <span>ČLÁNKŮ</span>
-  </div>
-
-  <div>
-    <b>100%</b>
-    <span>PRAKTICKÝ OBSAH</span>
-  </div>
-
-  <div>
-    <b>∞</b>
-    <span>INSPIRACE</span>
-  </div>
-
-</section>
-
-
-<!-- =========================
-     MOBILNÍ MENU
-========================= -->
+<!-- =====================================================
+     MOBILE DRAWER
+===================================================== -->
 
 <aside
   id="drawer"
@@ -422,47 +775,19 @@
       </div>
 
       <h2>
-        MENU
+        POSLEDNÍ ČLÁNKY
       </h2>
 
     </div>
 
     <button
       type="button"
-      onclick="toggleDrawer()"
-      aria-label="Zavřít menu">
+      onclick="toggleDrawer()">
       ×
     </button>
 
   </div>
 
-  <nav class="mobile-nav">
-
-    <a
-      href="#home"
-      onclick="toggleDrawer()">
-      DOMŮ
-    </a>
-
-    <a
-      href="#articles"
-      onclick="toggleDrawer()">
-      ČLÁNKY
-    </a>
-
-    <a
-      href="#about"
-      onclick="toggleDrawer()">
-      O NÁS
-    </a>
-
-  </nav>
-
-  <div class="drawer-divider"></div>
-
-  <div class="drawer-label">
-    POSLEDNÍ ČLÁNKY
-  </div>
 
   <div id="drawerArticles">
 
@@ -472,12 +797,20 @@
 
   </div>
 
+
+  <a
+    href="#articles"
+    data-page="articles"
+    class="drawer-all">
+    ZOBRAZIT VŠECHNY ČLÁNKY →
+  </a>
+
 </aside>
 
 
-<!-- =========================
-     PŘIHLÁŠENÍ
-========================= -->
+<!-- =====================================================
+     AUTH
+===================================================== -->
 
 <div
   id="auth"
@@ -488,8 +821,7 @@
     <button
       type="button"
       class="close"
-      onclick="closeAuth()"
-      aria-label="Zavřít">
+      onclick="closeAuth()">
       ×
     </button>
 
@@ -539,9 +871,9 @@
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
      ADMIN
-========================= -->
+===================================================== -->
 
 <section
   id="admin"
@@ -577,9 +909,29 @@
 
   <div class="admin-editor">
 
-    <h3>
-      NOVÝ ČLÁNEK
-    </h3>
+    <div class="admin-editor-head">
+
+      <div>
+
+        <div class="kicker">
+          EDITOR
+        </div>
+
+        <h3>
+          NOVÝ ČLÁNEK
+        </h3>
+
+      </div>
+
+      <button
+        type="button"
+        id="clearArticleBtn"
+        class="outline-btn">
+        VYČISTIT
+      </button>
+
+    </div>
+
 
     <form id="articleForm">
 
@@ -591,25 +943,11 @@
 
       <select id="category">
 
-        <option value="POHYB">
-          POHYB
-        </option>
-
-        <option value="VÝŽIVA">
-          VÝŽIVA
-        </option>
-
-        <option value="HUBNUTÍ">
-          HUBNUTÍ
-        </option>
-
-        <option value="REGENERACE">
-          REGENERACE
-        </option>
-
-        <option value="ZDRAVÍ">
-          ZDRAVÍ
-        </option>
+        <option value="POHYB">POHYB</option>
+        <option value="VÝŽIVA">VÝŽIVA</option>
+        <option value="HUBNUTÍ">HUBNUTÍ</option>
+        <option value="REGENERACE">REGENERACE</option>
+        <option value="ZDRAVÍ">ZDRAVÍ</option>
 
       </select>
 
@@ -630,6 +968,7 @@
 
       </div>
 
+
       <div
         id="coverPreview"
         class="cover-preview hidden">
@@ -637,9 +976,10 @@
         <img
           id="coverPreviewImg"
           src=""
-          alt="Náhled obrázku">
+          alt="Náhled">
 
       </div>
+
 
       <input
         id="excerpt"
@@ -652,18 +992,12 @@
         placeholder="Obsah článku..."
         required></textarea>
 
+
       <button
         id="articleSubmit"
         type="submit"
         class="btn green">
         PUBLIKOVAT ČLÁNEK
-      </button>
-
-      <button
-        id="clearArticleBtn"
-        type="button"
-        class="btn light">
-        VYČISTIT
       </button>
 
       <p id="articleMsg"></p>
@@ -675,9 +1009,21 @@
 
   <div class="admin-list">
 
-    <h3>
-      ČLÁNKY
-    </h3>
+    <div class="admin-list-head">
+
+      <div>
+
+        <div class="kicker">
+          SPRÁVA
+        </div>
+
+        <h3>
+          PUBLIKOVANÉ ČLÁNKY
+        </h3>
+
+      </div>
+
+    </div>
 
     <div id="adminList">
 
@@ -692,9 +1038,9 @@
 </section>
 
 
-<!-- =========================
-     DETAIL ČLÁNKU
-========================= -->
+<!-- =====================================================
+     ARTICLE DETAIL
+===================================================== -->
 
 <div
   id="articleView"
@@ -705,8 +1051,7 @@
     <button
       type="button"
       class="close"
-      onclick="closeArticle()"
-      aria-label="Zavřít článek">
+      onclick="closeArticle()">
       ×
     </button>
 
@@ -735,13 +1080,111 @@
 </div>
 
 
-<!-- =========================
+<!-- =====================================================
+     FOOTER
+===================================================== -->
+
+<footer class="footer">
+
+  <div class="footer-inner">
+
+    <div class="footer-brand">
+
+      <a
+        href="#home"
+        data-page="home"
+        class="brand">
+        <span>●</span> VIRENO
+      </a>
+
+      <p>
+        Aktivní život po čtyřicítce.
+        Prakticky, rozumně a bez extrémů.
+      </p>
+
+    </div>
+
+
+    <div class="footer-links">
+
+      <strong>
+        NAVIGACE
+      </strong>
+
+      <a
+        href="#home"
+        data-page="home">
+        Domů
+      </a>
+
+      <a
+        href="#articles"
+        data-page="articles">
+        Články
+      </a>
+
+      <a
+        href="#about"
+        data-page="about">
+        O nás
+      </a>
+
+    </div>
+
+
+    <div class="footer-links">
+
+      <strong>
+        VIRENO
+      </strong>
+
+      <span>
+        Pohyb
+      </span>
+
+      <span>
+        Výživa
+      </span>
+
+      <span>
+        Zdraví
+      </span>
+
+      <span>
+        Regenerace
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <div class="footer-bottom">
+
+    <span>
+      © 2026 VIRENO
+    </span>
+
+    <span>
+      AKTIVNÍ ŽIVOT 40+
+    </span>
+
+  </div>
+
+</footer>
+
+
+<!-- =====================================================
      SUPABASE
-========================= -->
+===================================================== -->
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
 
-<script src="app.js"></script>
+<script
+  src="app.js">
+</script>
 
 </body>
 </html>
