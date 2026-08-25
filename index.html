@@ -75,7 +75,24 @@
     <form id="articleForm">
       <input id="title" placeholder="Article title" required>
       <select id="category"><option>TRAINING</option><option>NUTRITION</option><option>MOTIVATION</option><option>FAT LOSS</option><option>HEALTH</option></select>
-      <input id="cover" placeholder="Cover image URL (upload coming next)" type="url">
+<div class="cover-upload">
+  <label for="coverFile">COVER IMAGE</label>
+
+  <div id="coverPreview" class="cover-preview hidden">
+    <img id="coverPreviewImg" src="" alt="Cover preview">
+    <button type="button" class="btn dark" onclick="removeCoverImage()">
+      REMOVE IMAGE
+    </button>
+  </div>
+
+  <input
+    id="coverFile"
+    type="file"
+    accept="image/jpeg,image/png,image/webp"
+  >
+
+  <input id="cover" type="hidden" value="">
+</div>
       <textarea id="excerpt" placeholder="Short description" required></textarea>
       <textarea id="content" rows="10" placeholder="Article content. Basic HTML is allowed." required></textarea>
       <button id="articleSubmit" class="btn red" type="submit">PUBLISH ARTICLE</button>
