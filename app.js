@@ -52,83 +52,127 @@ function initSupabase() {
 
 function setupSearch() {
   const searchButton = document.querySelector('.icon-btn');
+  const searchBox = $('searchBox');
 
-  if (!searchButton) return;
-
-  searchButton.addEventListener('click', toggleSearch);
-}
-
-function toggleSearch() {
-  let searchBox = $('searchBox');
-
-  if (searchBox) {
-    searchBox.classList.toggle('search-visible');
-
-    if (searchBox.classList.contains('search-visible')) {
-      searchBox.focus();
-    } else {
-      searchBox.value = '';
-      filterArticles('');
-    }
-
+  if (!searchButton) {
+    console.warn('Search button .icon-btn was not found.');
     return;
   }
 
-  searchBox = document.createElement('input');
+  searchButton.addEventListener('click', event => {
+    event.preventDefault();
+    event.stopPropagation();
 
-  searchBox.id = 'searchBox';
-  searchBox.type = 'search';
-  searchBox.placeholder = 'Search articles...';
-  searchBox.autocomplete = 'off';
-  searchBox.className = 'search-box search-visible';
-
-  document.body.appendChild(searchBox);
-
-  searchBox.addEventListener('input', () => {
-    filterArticles(searchBox.value);
+    toggleSearch();
   });
 
-  searchBox.addEventListener('keydown', event => {
-    if (event.key === 'Escape') {
-      searchBox.value = '';
-      filterArticles('');
-      searchBox.classList.remove('search-visible');
-    }
-  });
+  if (searchBox) {
 
-  searchBox.focus();
+    searchBox.addEventListener('input', () => {
+      filterArticles(searchBox.value);
+    });
+
+    searchBox.addEventListener('keydown', event => {
+
+      if (event.key === 'Escape') {
+        closeSearch();
+      }
+
+    });
+  }
+}
+
+function toggleSearch() {
+
+  const searchBox = $('searchBox');
+
+  if (!searchBox) {
+    console.error(
+      'Element #searchBox is missing from index.html.'
+    );
+    return;
+  }
+
+  const isOpen =
+    searchBox.classList.contains('search-visible');
+
+  if (isOpen) {
+    closeSearch();
+  } else {
+    openSearch();
+  }
+}
+
+function openSearch() {
+
+  const searchBox = $('searchBox');
+
+  if (!searchBox) return;
+
+  searchBox.classList.remove('hidden');
+  searchBox.classList.add('search-visible');
+
+  setTimeout(() => {
+    searchBox.focus();
+  }, 50);
+}
+
+function closeSearch() {
+
+  const searchBox = $('searchBox');
+
+  if (!searchBox) return;
+
+  searchBox.value = '';
+
+  filterArticles('');
+
+  searchBox.classList.remove('search-visible');
+  searchBox.classList.add('hidden');
+
+  searchBox.blur();
 }
 
 function filterArticles(search = '') {
-  const query = search.trim().toLowerCase();
+
+  const query =
+    String(search)
+      .trim()
+      .toLowerCase();
 
   const cards = $('cards');
 
   if (!cards) return;
 
   if (!query) {
-    cards.innerHTML = articles.length
-      ? articles.slice(0, 4).map(card).join('')
-      : '<p style="color:#888">No articles yet.</p>';
+
+    cards.innerHTML =
+      articles.length
+        ? articles.slice(0, 4).map(card).join('')
+        : '<p style="color:#888">No articles yet.</p>';
 
     return;
   }
 
-  const filtered = articles.filter(article => {
+  const filtered =
+    articles.filter(article => {
 
-    const title =
-      String(article.title || '').toLowerCase();
+      const title =
+        String(article.title || '')
+          .toLowerCase();
 
-    const category =
-      String(article.category || '').toLowerCase();
+      const category =
+        String(article.category || '')
+          .toLowerCase();
 
-    return (
-      title.includes(query) ||
-      category.includes(query)
-    );
-  });
+      return (
+        title.includes(query) ||
+        category.includes(query)
+      );
+    });
 
   if (!filtered.length) {
+
     cards.innerHTML = `
       <p style="
         color:#888;
@@ -151,6 +195,7 @@ function filterArticles(search = '') {
 ========================= */
 
 function openAuth(mode = 'login') {
+
   authMode = mode;
 
   const auth = $('auth');
@@ -197,6 +242,7 @@ function closeAuth() {
 }
 
 function toggleAuthMode() {
+
   openAuth(
     authMode === 'login'
       ? 'signup'
@@ -205,11 +251,14 @@ function toggleAuthMode() {
 }
 
 async function handleAuth(event) {
+
   event.preventDefault();
 
   if (!db) {
+
     $('authMsg').textContent =
       'Supabase is not connected.';
+
     return;
   }
 
@@ -233,8 +282,10 @@ async function handleAuth(event) {
         });
 
       if (error) {
+
         $('authMsg').textContent =
           error.message;
+
         return;
       }
 
@@ -264,12 +315,15 @@ async function handleAuth(event) {
       });
 
     if (error) {
+
       $('authMsg').textContent =
         error.message;
+
       return;
     }
 
     closeAuth();
+
     await updateUserUI();
 
   } catch (error) {
@@ -282,9 +336,11 @@ async function handleAuth(event) {
 }
 
 async function logout() {
+
   if (!db) return;
 
   await db.auth.signOut();
+
   await updateUserUI();
 }
 
@@ -293,6 +349,7 @@ async function logout() {
 ========================= */
 
 async function getProfile(userId) {
+
   if (!db || !userId) return null;
 
   const { data, error } =
@@ -303,7 +360,12 @@ async function getProfile(userId) {
       .maybeSingle();
 
   if (error) {
-    console.error('Profile error:', error);
+
+    console.error(
+      'Profile error:',
+      error
+    );
+
     return null;
   }
 
@@ -311,6 +373,7 @@ async function getProfile(userId) {
 }
 
 async function isAdmin() {
+
   if (!db) return false;
 
   const {
@@ -326,6 +389,7 @@ async function isAdmin() {
 }
 
 async function updateUserUI() {
+
   if (!db) return;
 
   try {
@@ -340,7 +404,10 @@ async function updateUserUI() {
     if (!user) {
 
       if (loginBtn) {
-        loginBtn.textContent = 'LOG IN';
+
+        loginBtn.textContent =
+          'LOG IN';
+
         loginBtn.onclick =
           () => openAuth('login');
       }
@@ -354,8 +421,12 @@ async function updateUserUI() {
       await getProfile(user.id);
 
     if (loginBtn) {
-      loginBtn.textContent = 'LOG OUT';
-      loginBtn.onclick = logout;
+
+      loginBtn.textContent =
+        'LOG OUT';
+
+      loginBtn.onclick =
+        logout;
     }
 
     if (profile?.role === 'admin') {
@@ -370,7 +441,11 @@ async function updateUserUI() {
     }
 
   } catch (error) {
-    console.error('User UI error:', error);
+
+    console.error(
+      'User UI error:',
+      error
+    );
   }
 }
 
@@ -499,6 +574,7 @@ async function loadArticles() {
     );
 
     if ($('cards')) {
+
       $('cards').innerHTML =
         '<p style="color:#f66">Could not load articles.</p>';
     }
@@ -506,7 +582,8 @@ async function loadArticles() {
     return;
   }
 
-  articles = data || [];
+  articles =
+    data || [];
 
   renderArticles();
   renderAdminList();
@@ -559,16 +636,19 @@ async function refreshAdminStats() {
         .maybeSingle();
 
     if ($('subs')) {
+
       $('subs').textContent =
         subscribers ?? 0;
     }
 
     if ($('adminArticles')) {
+
       $('adminArticles').textContent =
         articles.length;
     }
 
     if ($('visits')) {
+
       $('visits').textContent =
         stats?.visits ?? 0;
     }
@@ -597,12 +677,14 @@ async function uploadCoverImage(file) {
   ];
 
   if (!allowed.includes(file.type)) {
+
     throw new Error(
       'Please use JPG, PNG or WEBP.'
     );
   }
 
   if (file.size > 5 * 1024 * 1024) {
+
     throw new Error(
       'Image must be smaller than 5 MB.'
     );
@@ -613,6 +695,7 @@ async function uploadCoverImage(file) {
   } = await db.auth.getUser();
 
   if (!user) {
+
     throw new Error(
       'You must be logged in.'
     );
@@ -654,8 +737,11 @@ async function uploadCoverImage(file) {
 
 function showCoverPreview(url) {
 
-  const preview = $('coverPreview');
-  const image = $('coverPreviewImg');
+  const preview =
+    $('coverPreview');
+
+  const image =
+    $('coverPreviewImg');
 
   if (!preview || !image) return;
 
@@ -668,12 +754,14 @@ function showCoverPreview(url) {
   }
 
   image.src = url;
+
   preview.classList.remove('hidden');
 }
 
 async function removeCoverImage() {
 
-  const cover = $('cover');
+  const cover =
+    $('cover');
 
   const url =
     cover?.value || '';
@@ -740,6 +828,7 @@ async function saveArticle(event) {
     $('articleSubmit');
 
   if (button) {
+
     button.disabled = true;
     button.textContent = 'SAVING...';
   }
@@ -762,11 +851,21 @@ async function saveArticle(event) {
     }
 
     const payload = {
-      title: $('title').value.trim(),
-      excerpt: $('excerpt').value.trim(),
-      content: $('content').value.trim(),
-      cover_url: coverUrl,
-      category: $('category').value
+
+      title:
+        $('title').value.trim(),
+
+      excerpt:
+        $('excerpt').value.trim(),
+
+      content:
+        $('content').value.trim(),
+
+      cover_url:
+        coverUrl,
+
+      category:
+        $('category').value
     };
 
     let result;
@@ -814,6 +913,7 @@ async function saveArticle(event) {
     showCoverPreview(null);
 
     if (button) {
+
       button.textContent =
         'PUBLISH ARTICLE';
     }
@@ -835,9 +935,11 @@ async function saveArticle(event) {
   } finally {
 
     if (button) {
+
       button.disabled = false;
 
       if (!editingId) {
+
         button.textContent =
           'PUBLISH ARTICLE';
       }
@@ -859,7 +961,8 @@ function editArticle(id) {
 
   if (!article) return;
 
-  editingId = article.id;
+  editingId =
+    article.id;
 
   $('title').value =
     article.title || '';
@@ -897,6 +1000,7 @@ async function deleteArticle(id) {
   if (!(await isAdmin())) {
 
     alert('Admin access required.');
+
     return;
   }
 
@@ -919,6 +1023,7 @@ async function deleteArticle(id) {
   if (error) {
 
     alert(error.message);
+
     return;
   }
 
@@ -1094,9 +1199,9 @@ function openArticle(id) {
   $('articleViewContent').innerHTML =
     article.content || '';
 
-  $('articleView').classList.remove(
-    'hidden'
-  );
+  $('articleView')
+    .classList
+    .remove('hidden');
 }
 
 function closeArticle() {
@@ -1127,12 +1232,15 @@ function clearArticleForm() {
   showCoverPreview(null);
 
   if ($('articleSubmit')) {
+
     $('articleSubmit').textContent =
       'PUBLISH ARTICLE';
   }
 
   if ($('articleMsg')) {
-    $('articleMsg').textContent = '';
+
+    $('articleMsg').textContent =
+      '';
   }
 }
 
@@ -1165,6 +1273,8 @@ async function trackVisit() {
 
 function setupEvents() {
 
+  /* LOGIN */
+
   const loginBtn =
     $('loginBtn');
 
@@ -1173,6 +1283,8 @@ function setupEvents() {
     loginBtn.onclick =
       () => openAuth('login');
   }
+
+  /* AUTH */
 
   if ($('authForm')) {
 
@@ -1192,6 +1304,8 @@ function setupEvents() {
       );
   }
 
+  /* NEWSLETTER */
+
   if ($('subscribe')) {
 
     $('subscribe')
@@ -1200,6 +1314,8 @@ function setupEvents() {
         subscribe
       );
   }
+
+  /* ARTICLE FORM */
 
   if ($('articleForm')) {
 
@@ -1210,6 +1326,8 @@ function setupEvents() {
       );
   }
 
+  /* CLEAR ARTICLE */
+
   if ($('clearArticleBtn')) {
 
     $('clearArticleBtn')
@@ -1218,6 +1336,8 @@ function setupEvents() {
         clearArticleForm
       );
   }
+
+  /* IMAGE */
 
   if ($('coverFile')) {
 
@@ -1244,6 +1364,8 @@ function setupEvents() {
       );
   }
 
+  /* AUTH BACKDROP */
+
   if ($('auth')) {
 
     $('auth')
@@ -1260,6 +1382,8 @@ function setupEvents() {
         }
       );
   }
+
+  /* ARTICLE BACKDROP */
 
   if ($('articleView')) {
 
@@ -1278,6 +1402,8 @@ function setupEvents() {
         }
       );
   }
+
+  /* SEARCH */
 
   setupSearch();
 }
