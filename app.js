@@ -1,5 +1,8 @@
-const SUPABASE_URL = 'https://nyanfbaosqshqiqvxesn.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_L2uEZD5AX-AkKEuZ_YKQDw_6uH1FS6O';
+const SUPABASE_URL =
+  'https://nyanfbaosqshqiqvxesn.supabase.co';
+
+const SUPABASE_PUBLISHABLE_KEY =
+  'sb_publishable_L2uEZD5AX-AkKEuZ_YKQDw_6uH1FS6O';
 
 let db = null;
 let articles = [];
@@ -7,43 +10,62 @@ let editingId = null;
 let authMode = 'login';
 let searchOpen = false;
 
-const $ = id => document.getElementById(id);
 
+/* =====================================================
+   HELPERS
+===================================================== */
 
-/* =========================
-   OCHRANA HTML
-========================= */
+const $ = id =>
+  document.getElementById(id);
+
 
 function esc(value = '') {
-  return String(value).replace(/[&<>'"]/g, c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    "'": '&#39;',
-    '"': '&quot;'
-  }[c]));
+
+  return String(value).replace(
+    /[&<>'"]/g,
+    char => ({
+      '&':'&amp;',
+      '<':'&lt;',
+      '>':'&gt;',
+      "'":'&#39;',
+      '"':'&quot;'
+    }[char])
+  );
+
 }
 
-
-/* =========================
-   DATUM
-========================= */
 
 function formatDate(value) {
 
   if (!value) return '';
 
-  return new Date(value).toLocaleDateString('cs-CZ', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
+  return new Date(value).toLocaleDateString(
+    'cs-CZ',
+    {
+      year:'numeric',
+      month:'short',
+      day:'numeric'
+    }
+  );
+
 }
 
 
-/* =========================
+function getImage(article, large = false) {
+
+  return article.cover_url ||
+    (
+      large
+        ? 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80'
+        : 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=80'
+    );
+
+}
+
+
+/* =====================================================
    SUPABASE
-========================= */
+===================================================== */
 
 function initSupabase() {
 
@@ -62,118 +84,323 @@ function initSupabase() {
   );
 
   return true;
+
 }
 
 
-/* =========================
-   VYHLEDÁVÁNÍ
-========================= */
+/* =====================================================
+   NAVIGACE
+===================================================== */
+
+function setupNavigation() {
+
+  document.querySelectorAll(
+    '[data-page]'
+  ).forEach(link => {
+
+    link.addEventListener(
+      'click',
+      event => {
+
+        const page =
+          link.dataset.page;
+
+        if (!page) return;
+
+        event.preventDefault();
+
+        navigateTo(page);
+
+        closeMobileMenu();
+        closeDrawer();
+
+      }
+    );
+
+  });
+
+
+  window.addEventListener(
+    'hashchange',
+    handleHash
+  );
+
+}
+
+
+function navigateTo(page) {
+
+  const validPages = [
+    'home',
+    'articles',
+    'about'
+  ];
+
+  if (!validPages.includes(page)) {
+    page = 'home';
+  }
+
+  const target =
+    `#${page}`;
+
+  if (
+    window.location.hash !== target
+  ) {
+
+    window.location.hash =
+      target;
+
+  } else {
+
+    showPage(page);
+
+  }
+
+}
+
+
+function handleHash() {
+
+  let page =
+    window.location.hash
+      .replace('#','')
+      .trim();
+
+  if (!page) {
+    page = 'home';
+  }
+
+  if (
+    ![
+      'home',
+      'articles',
+      'about'
+    ].includes(page)
+  ) {
+    page = 'home';
+  }
+
+  showPage(page);
+
+}
+
+
+function showPage(page) {
+
+  const pages = {
+    home:$('pageHome'),
+    articles:$('pageArticles'),
+    about:$('pageAbout')
+  };
+
+  Object.keys(pages).forEach(
+    key => {
+
+      if (!pages[key]) return;
+
+      pages[key].classList.toggle(
+        'hidden',
+        key !== page
+      );
+
+    }
+  );
+
+
+  document.querySelectorAll(
+    '.nav-link'
+  ).forEach(link => {
+
+    link.classList.toggle(
+      'active',
+      link.dataset.page === page
+    );
+
+  });
+
+
+  if (page === 'articles') {
+    renderAllArticles();
+  }
+
+
+  window.scrollTo({
+    top:0,
+    behavior:'smooth'
+  });
+
+}
+
+
+/* =====================================================
+   SEARCH
+===================================================== */
 
 function setupSearch() {
 
-  const button = $('searchBtn');
-  const input = $('searchInput');
-  const close = $('searchClose');
-  const overlay = $('searchOverlay');
+  const button =
+    $('searchBtn');
 
-  if (!button || !input || !close || !overlay) {
+  const articlesButton =
+    $('articlesSearchBtn');
+
+  const input =
+    $('searchInput');
+
+  const close =
+    $('searchClose');
+
+  const overlay =
+    $('searchOverlay');
+
+
+  if (
+    !button ||
+    !input ||
+    !close ||
+    !overlay
+  ) {
 
     console.warn(
-      'Vyhledávání: chybí některý HTML prvek.'
+      'Vyhledávání: chybí HTML prvky.'
     );
 
     return;
   }
 
-  button.addEventListener('click', event => {
 
-    event.stopPropagation();
+  button.addEventListener(
+    'click',
+    event => {
 
-    openSearch();
+      event.stopPropagation();
 
-  });
+      openSearch();
 
-  close.addEventListener('click', event => {
-
-    event.stopPropagation();
-
-    closeSearch();
-
-  });
-
-  input.addEventListener('input', () => {
-
-    filterArticles(input.value);
-
-  });
-
-  input.addEventListener('keydown', event => {
-
-    if (event.key === 'Escape') {
-      closeSearch();
     }
+  );
 
-  });
 
-  overlay.addEventListener('click', event => {
+  if (articlesButton) {
 
-    if (event.target === overlay) {
-      closeSearch();
+    articlesButton.addEventListener(
+      'click',
+      openSearch
+    );
+
+  }
+
+
+  close.addEventListener(
+    'click',
+    closeSearch
+  );
+
+
+  input.addEventListener(
+    'input',
+    () => {
+
+      filterArticles(
+        input.value
+      );
+
     }
+  );
 
-  });
+
+  input.addEventListener(
+    'keydown',
+    event => {
+
+      if (
+        event.key === 'Escape'
+      ) {
+
+        closeSearch();
+
+      }
+
+    }
+  );
+
+
+  overlay.addEventListener(
+    'click',
+    event => {
+
+      if (
+        event.target === overlay
+      ) {
+
+        closeSearch();
+
+      }
+
+    }
+  );
+
 }
 
 
 function openSearch() {
 
-  const overlay = $('searchOverlay');
-  const input = $('searchInput');
+  const overlay =
+    $('searchOverlay');
 
-  if (!overlay || !input) return;
+  const input =
+    $('searchInput');
+
+  if (!overlay || !input) {
+    return;
+  }
 
   searchOpen = true;
 
-  overlay.classList.remove('hidden');
-
-  overlay.setAttribute(
-    'aria-hidden',
-    'false'
+  overlay.classList.remove(
+    'hidden'
   );
 
   document.body.classList.add(
     'search-active'
   );
 
-  setTimeout(() => {
-    input.focus();
-  }, 50);
+
+  setTimeout(
+    () => input.focus(),
+    50
+  );
+
 }
 
 
 function closeSearch() {
 
-  const overlay = $('searchOverlay');
-  const input = $('searchInput');
+  const overlay =
+    $('searchOverlay');
 
-  if (!overlay || !input) return;
+  const input =
+    $('searchInput');
+
+  if (!overlay || !input) {
+    return;
+  }
 
   searchOpen = false;
 
   input.value = '';
 
-  overlay.classList.add('hidden');
-
-  overlay.setAttribute(
-    'aria-hidden',
-    'true'
+  overlay.classList.add(
+    'hidden'
   );
 
   document.body.classList.remove(
     'search-active'
   );
 
+
   renderArticles();
+
 }
 
 
@@ -182,23 +409,24 @@ function filterArticles(search = '') {
   const query =
     search.trim().toLowerCase();
 
-  const cards = $('cards');
-
-  const status = $('searchStatus');
-
-  if (!cards) return;
 
   if (!query) {
 
-    if (status) {
-      status.classList.add('hidden');
-      status.textContent = '';
-    }
+    if (
+      window.location.hash === '#articles'
+    ) {
 
-    renderArticles();
+      renderAllArticles();
+
+    } else {
+
+      renderArticles();
+
+    }
 
     return;
   }
+
 
   const filtered =
     articles.filter(article => {
@@ -223,6 +451,7 @@ function filterArticles(search = '') {
           article.content || ''
         ).toLowerCase();
 
+
       return (
         title.includes(query) ||
         category.includes(query) ||
@@ -232,24 +461,113 @@ function filterArticles(search = '') {
 
     });
 
-  if (status) {
 
-    status.classList.remove(
-      'hidden'
-    );
+  const cards =
+    $('cards');
 
-    status.textContent =
-      `Výsledky hledání pro „${search.trim()}“: ${filtered.length}`;
+  const all =
+    $('allArticles');
+
+
+  const html =
+    filtered.length
+      ? filtered.map(card).join('')
+      : `
+        <div class="no-results">
+          <strong>Nic jsme nenašli</strong>
+          <span>
+            Zkuste hledat jiný název,
+            kategorii nebo výraz.
+          </span>
+        </div>
+      `;
+
+
+  if (
+    window.location.hash === '#articles'
+  ) {
+
+    if (all) {
+      all.innerHTML = html;
+    }
+
+  } else {
+
+    if (cards) {
+      cards.innerHTML = html;
+    }
 
   }
 
-  if (!filtered.length) {
+}
+
+
+/* =====================================================
+   ARTICLE CARD
+===================================================== */
+
+function card(article) {
+
+  return `
+    <article class="card">
+
+      <div
+        class="card-img"
+        style="background-image:url('${esc(getImage(article))}')">
+      </div>
+
+      <div class="card-body">
+
+        <span class="tag">
+          ${esc(article.category || 'POHYB')}
+        </span>
+
+        <h3>
+          ${esc(article.title || '')}
+        </h3>
+
+        <p class="card-excerpt">
+          ${esc(article.excerpt || '')}
+        </p>
+
+        <div class="card-meta">
+
+          <span>
+            ${formatDate(article.created_at)}
+          </span>
+
+          <a
+            href="#"
+            data-article-id="${article.id}"
+            class="article-link">
+            ČÍST ČLÁNEK →
+          </a>
+
+        </div>
+
+      </div>
+
+    </article>
+  `;
+
+}
+
+
+function renderArticles() {
+
+  const cards =
+    $('cards');
+
+  if (!cards) return;
+
+
+  if (!articles.length) {
 
     cards.innerHTML = `
       <div class="no-results">
-        <strong>Nic jsme nenašli</strong>
+        <strong>Zatím zde nejsou žádné články.</strong>
         <span>
-          Zkuste hledat jiný název nebo téma.
+          První články se brzy objeví.
         </span>
       </div>
     `;
@@ -257,24 +575,474 @@ function filterArticles(search = '') {
     return;
   }
 
+
   cards.innerHTML =
-    filtered.map(card).join('');
+    articles
+      .slice(0,4)
+      .map(card)
+      .join('');
+
+
+  bindArticleLinks();
+
 }
 
 
-/* =========================
+function renderAllArticles() {
+
+  const all =
+    $('allArticles');
+
+  if (!all) return;
+
+
+  if (!articles.length) {
+
+    all.innerHTML = `
+      <div class="no-results">
+        <strong>Zatím zde nejsou žádné články.</strong>
+      </div>
+    `;
+
+    return;
+  }
+
+
+  all.innerHTML =
+    articles
+      .map(card)
+      .join('');
+
+
+  bindArticleLinks();
+
+}
+
+
+function bindArticleLinks() {
+
+  document.querySelectorAll(
+    '.article-link'
+  ).forEach(link => {
+
+    link.onclick =
+      event => {
+
+        event.preventDefault();
+
+        openArticle(
+          link.dataset.articleId
+        );
+
+      };
+
+  });
+
+}
+
+
+/* =====================================================
+   LOAD ARTICLES
+===================================================== */
+
+async function loadArticles() {
+
+  if (!db) return;
+
+
+  const {
+    data,
+    error
+  } = await db
+    .from('articles')
+    .select('*')
+    .order(
+      'created_at',
+      {
+        ascending:false
+      }
+    );
+
+
+  if (error) {
+
+    console.error(
+      'Články se nepodařilo načíst:',
+      error
+    );
+
+
+    const message = `
+      <div class="no-results">
+        <strong>Články se nepodařilo načíst.</strong>
+        <span>
+          Zkontrolujte připojení k Supabase
+          a nastavení databáze.
+        </span>
+      </div>
+    `;
+
+
+    if ($('cards')) {
+      $('cards').innerHTML =
+        message;
+    }
+
+    if ($('allArticles')) {
+      $('allArticles').innerHTML =
+        message;
+    }
+
+    return;
+  }
+
+
+  articles =
+    data || [];
+
+
+  renderArticles();
+  renderAllArticles();
+  renderDrawerArticles();
+  renderAdminList();
+
+
+  if ($('adminArticles')) {
+
+    $('adminArticles').textContent =
+      articles.length;
+
+  }
+
+
+  if ($('publicArticles')) {
+
+    $('publicArticles').textContent =
+      articles.length;
+
+  }
+
+}
+
+
+/* =====================================================
+   ARTICLE DETAIL
+===================================================== */
+
+function openArticle(id) {
+
+  const article =
+    articles.find(
+      item =>
+        Number(item.id) ===
+        Number(id)
+    );
+
+
+  if (!article) return;
+
+
+  const title =
+    $('articleViewTitle');
+
+  const meta =
+    $('articleViewMeta');
+
+  const image =
+    $('articleViewImage');
+
+  const content =
+    $('articleViewContent');
+
+  const modal =
+    $('articleView');
+
+
+  if (!modal) return;
+
+
+  if (title) {
+    title.textContent =
+      article.title || '';
+  }
+
+
+  if (meta) {
+
+    meta.textContent =
+      `${formatDate(article.created_at)} · ${article.category || 'POHYB'}`;
+
+  }
+
+
+  if (image) {
+
+    image.src =
+      getImage(
+        article,
+        true
+      );
+
+  }
+
+
+  if (content) {
+
+    /*
+      Obsah článku je vložený jako HTML,
+      protože editor může obsahovat
+      například obrázky nebo formátování.
+    */
+    content.innerHTML =
+      article.content || '';
+
+  }
+
+
+  modal.classList.remove(
+    'hidden'
+  );
+
+  document.body.classList.add(
+    'modal-open'
+  );
+
+}
+
+
+function closeArticle() {
+
+  $('articleView')
+    ?.classList
+    .add('hidden');
+
+  document.body.classList.remove(
+    'modal-open'
+  );
+
+}
+
+
+/* =====================================================
+   DRAWER
+===================================================== */
+
+function toggleDrawer() {
+
+  const drawer =
+    $('drawer');
+
+  if (!drawer) return;
+
+  drawer.classList.toggle(
+    'open'
+  );
+
+}
+
+
+function closeDrawer() {
+
+  $('drawer')
+    ?.classList
+    .remove('open');
+
+}
+
+
+function renderDrawerArticles() {
+
+  const drawer =
+    $('drawerArticles');
+
+  if (!drawer) return;
+
+
+  if (!articles.length) {
+
+    drawer.innerHTML =
+      '<p class="muted">Zatím nejsou žádné články.</p>';
+
+    return;
+  }
+
+
+  drawer.innerHTML =
+    articles
+      .slice(0,8)
+      .map(article => `
+
+        <div
+          class="drawer-item"
+          data-drawer-id="${article.id}">
+
+          <img
+            src="${esc(getImage(article))}"
+            alt="">
+
+          <div>
+
+            <b>
+              ${esc(article.title)}
+            </b>
+
+            <small>
+              ${formatDate(article.created_at)}
+              ·
+              ${esc(article.category || 'POHYB')}
+            </small>
+
+          </div>
+
+        </div>
+
+      `)
+      .join('');
+
+
+  document.querySelectorAll(
+    '[data-drawer-id]'
+  ).forEach(item => {
+
+    item.addEventListener(
+      'click',
+      () => {
+
+        openArticle(
+          item.dataset.drawerId
+        );
+
+        closeDrawer();
+
+      }
+    );
+
+  });
+
+}
+
+
+/* =====================================================
+   MOBILE MENU
+===================================================== */
+
+function setupMobileMenu() {
+
+  const menuBtn =
+    $('menuBtn');
+
+  const closeBtn =
+    $('mobileMenuClose');
+
+  const menu =
+    $('mobileMenu');
+
+  const backdrop =
+    $('mobileBackdrop');
+
+
+  if (
+    !menuBtn ||
+    !closeBtn ||
+    !menu ||
+    !backdrop
+  ) {
+    return;
+  }
+
+
+  menuBtn.addEventListener(
+    'click',
+    openMobileMenu
+  );
+
+
+  closeBtn.addEventListener(
+    'click',
+    closeMobileMenu
+  );
+
+
+  backdrop.addEventListener(
+    'click',
+    closeMobileMenu
+  );
+
+
+  document.querySelectorAll(
+    '#mobileMenu [data-page]'
+  ).forEach(link => {
+
+    link.addEventListener(
+      'click',
+      () => {
+
+        closeMobileMenu();
+
+      }
+    );
+
+  });
+
+}
+
+
+function openMobileMenu() {
+
+  $('mobileMenu')
+    ?.classList
+    .add('open');
+
+  $('mobileBackdrop')
+    ?.classList
+    .add('open');
+
+  document.body.classList.add(
+    'menu-open'
+  );
+
+}
+
+
+function closeMobileMenu() {
+
+  $('mobileMenu')
+    ?.classList
+    .remove('open');
+
+  $('mobileBackdrop')
+    ?.classList
+    .remove('open');
+
+  document.body.classList.remove(
+    'menu-open'
+  );
+
+}
+
+
+/* =====================================================
    AUTH
-========================= */
+===================================================== */
 
 function openAuth(mode = 'login') {
 
   authMode = mode;
 
-  const auth = $('auth');
+  const auth =
+    $('auth');
 
   if (!auth) return;
 
-  auth.classList.remove('hidden');
+
+  auth.classList.remove(
+    'hidden'
+  );
+
+  document.body.classList.add(
+    'modal-open'
+  );
+
 
   if ($('authTitle')) {
 
@@ -282,7 +1050,9 @@ function openAuth(mode = 'login') {
       mode === 'signup'
         ? 'VYTVOŘIT ÚČET'
         : 'PŘIHLÁSIT SE';
+
   }
+
 
   if ($('authSubmit')) {
 
@@ -290,7 +1060,9 @@ function openAuth(mode = 'login') {
       mode === 'signup'
         ? 'VYTVOŘIT ÚČET'
         : 'PŘIHLÁSIT SE';
+
   }
+
 
   if ($('authSwitch')) {
 
@@ -298,23 +1070,32 @@ function openAuth(mode = 'login') {
       mode === 'signup'
         ? 'Už máte účet? Přihlaste se'
         : 'Nemáte účet? Vytvořte si ho';
+
   }
+
 
   if ($('authMsg')) {
     $('authMsg').textContent = '';
   }
 
-  setTimeout(() => {
 
-    $('authEmail')?.focus();
+  setTimeout(
+    () => $('authEmail')?.focus(),
+    50
+  );
 
-  }, 50);
 }
 
 
 function closeAuth() {
 
-  $('auth')?.classList.add('hidden');
+  $('auth')
+    ?.classList
+    .add('hidden');
+
+  document.body.classList.remove(
+    'modal-open'
+  );
 
 }
 
@@ -334,6 +1115,7 @@ async function handleAuth(event) {
 
   event.preventDefault();
 
+
   if (!db) {
 
     $('authMsg').textContent =
@@ -342,11 +1124,17 @@ async function handleAuth(event) {
     return;
   }
 
+
   const email =
-    $('authEmail').value.trim();
+    $('authEmail')
+      .value
+      .trim();
+
 
   const password =
-    $('authPassword').value;
+    $('authPassword')
+      .value;
+
 
   if (!email || !password) {
 
@@ -356,12 +1144,16 @@ async function handleAuth(event) {
     return;
   }
 
+
   $('authMsg').textContent =
     'Pracuji...';
 
+
   try {
 
-    if (authMode === 'signup') {
+    if (
+      authMode === 'signup'
+    ) {
 
       const {
         data,
@@ -372,6 +1164,7 @@ async function handleAuth(event) {
           password
         });
 
+
       if (error) {
 
         $('authMsg').textContent =
@@ -380,18 +1173,22 @@ async function handleAuth(event) {
         return;
       }
 
+
       if (data.session) {
 
         $('authMsg').textContent =
           'Účet byl úspěšně vytvořen.';
 
-        setTimeout(() => {
+        setTimeout(
+          async () => {
 
-          closeAuth();
+            closeAuth();
 
-          updateUserUI();
+            await updateUserUI();
 
-        }, 800);
+          },
+          700
+        );
 
       } else {
 
@@ -401,7 +1198,9 @@ async function handleAuth(event) {
       }
 
       return;
+
     }
+
 
     const {
       error
@@ -411,6 +1210,7 @@ async function handleAuth(event) {
         password
       });
 
+
     if (error) {
 
       $('authMsg').textContent =
@@ -419,9 +1219,11 @@ async function handleAuth(event) {
       return;
     }
 
+
     closeAuth();
 
     await updateUserUI();
+
 
   } catch (error) {
 
@@ -433,7 +1235,9 @@ async function handleAuth(event) {
     $('authMsg').textContent =
       error.message ||
       'Přihlášení se nepodařilo.';
+
   }
+
 }
 
 
@@ -444,16 +1248,20 @@ async function logout() {
   await db.auth.signOut();
 
   await updateUserUI();
+
 }
 
 
-/* =========================
-   UŽIVATEL / ADMIN
-========================= */
+/* =====================================================
+   USER / ADMIN
+===================================================== */
 
 async function getProfile(userId) {
 
-  if (!db || !userId) return null;
+  if (!db || !userId) {
+    return null;
+  }
+
 
   const {
     data,
@@ -465,6 +1273,7 @@ async function getProfile(userId) {
       .eq('id', userId)
       .maybeSingle();
 
+
   if (error) {
 
     console.error(
@@ -475,13 +1284,16 @@ async function getProfile(userId) {
     return null;
   }
 
+
   return data;
+
 }
 
 
 async function isAdmin() {
 
   if (!db) return false;
+
 
   const {
     data: {
@@ -490,18 +1302,25 @@ async function isAdmin() {
   } =
     await db.auth.getUser();
 
+
   if (!user) return false;
 
+
   const profile =
-    await getProfile(user.id);
+    await getProfile(
+      user.id
+    );
+
 
   return profile?.role === 'admin';
+
 }
 
 
 async function updateUserUI() {
 
   if (!db) return;
+
 
   try {
 
@@ -512,8 +1331,16 @@ async function updateUserUI() {
     } =
       await db.auth.getUser();
 
-    const loginBtn = $('loginBtn');
-    const admin = $('admin');
+
+    const loginBtn =
+      $('loginBtn');
+
+    const mobileLoginBtn =
+      $('mobileLoginBtn');
+
+    const admin =
+      $('admin');
+
 
     if (!user) {
 
@@ -524,15 +1351,41 @@ async function updateUserUI() {
 
         loginBtn.onclick =
           () => openAuth('login');
+
       }
 
-      admin?.classList.add('hidden');
+
+      if (mobileLoginBtn) {
+
+        mobileLoginBtn.textContent =
+          'PŘIHLÁSIT SE';
+
+        mobileLoginBtn.onclick =
+          () => {
+
+            closeMobileMenu();
+
+            openAuth('login');
+
+          };
+
+      }
+
+
+      admin?.classList.add(
+        'hidden'
+      );
 
       return;
+
     }
 
+
     const profile =
-      await getProfile(user.id);
+      await getProfile(
+        user.id
+      );
+
 
     if (loginBtn) {
 
@@ -541,9 +1394,30 @@ async function updateUserUI() {
 
       loginBtn.onclick =
         logout;
+
     }
 
-    if (profile?.role === 'admin') {
+
+    if (mobileLoginBtn) {
+
+      mobileLoginBtn.textContent =
+        'ODHLÁSIT SE';
+
+      mobileLoginBtn.onclick =
+        () => {
+
+          closeMobileMenu();
+
+          logout();
+
+        };
+
+    }
+
+
+    if (
+      profile?.role === 'admin'
+    ) {
 
       admin?.classList.remove(
         'hidden'
@@ -556,7 +1430,9 @@ async function updateUserUI() {
       admin?.classList.add(
         'hidden'
       );
+
     }
+
 
   } catch (error) {
 
@@ -564,236 +1440,20 @@ async function updateUserUI() {
       'Chyba uživatelského rozhraní:',
       error
     );
+
   }
-}
-
-
-/* =========================
-   KARTA ČLÁNKU
-========================= */
-
-function card(article) {
-
-  const image =
-    article.cover_url ||
-    'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=80';
-
-  return `
-    <article
-      class="card"
-      onclick="openArticle(${Number(article.id)})">
-
-      <div
-        class="card-img"
-        style="background-image:url('${esc(image)}')">
-      </div>
-
-      <div class="card-body">
-
-        <span class="tag">
-          ${esc(article.category || 'POHYB')}
-        </span>
-
-        <h3>
-          ${esc(article.title)}
-        </h3>
-
-        <p class="card-excerpt">
-          ${esc(article.excerpt || '')}
-        </p>
-
-        <div class="card-meta">
-
-          <span>
-            ${formatDate(article.created_at)}
-          </span>
-
-          <a
-            href="#"
-            onclick="event.stopPropagation(); openArticle(${Number(article.id)}); return false;">
-            ČÍST ČLÁNEK →
-          </a>
-
-        </div>
-
-      </div>
-
-    </article>
-  `;
-}
-
-
-/* =========================
-   RENDER ČLÁNKŮ
-========================= */
-
-function renderArticles() {
-
-  const cards = $('cards');
-  const drawer = $('drawerArticles');
-
-  /*
-    DŮLEŽITÉ:
-    Záměrně zde není articles.slice(0, 4).
-    Zobrazují se všechny články.
-  */
-
-  if (cards) {
-
-    cards.innerHTML =
-      articles.length
-        ? articles.map(card).join('')
-        : `
-          <div class="no-results">
-            <strong>
-              Zatím zde nejsou žádné články.
-            </strong>
-
-            <span>
-              První články se zde objeví po publikování.
-            </span>
-          </div>
-        `;
-  }
-
-  if (drawer) {
-
-    drawer.innerHTML =
-      articles.length
-
-        ? articles.map(article => `
-
-          <div
-            class="drawer-item"
-            onclick="openArticle(${Number(article.id)}); toggleDrawer();">
-
-            ${
-              article.cover_url
-                ? `<img
-                    src="${esc(article.cover_url)}"
-                    alt="">`
-                : ''
-            }
-
-            <div>
-
-              <b>
-                ${esc(article.title)}
-              </b>
-
-              <small>
-                ${formatDate(article.created_at)}
-                ·
-                ${esc(article.category || 'POHYB')}
-              </small>
-
-            </div>
-
-          </div>
-
-        `).join('')
-
-        : `
-          <p class="muted">
-            Zatím nejsou žádné články.
-          </p>
-        `;
-  }
-
-  if ($('publicArticles')) {
-
-    $('publicArticles').textContent =
-      articles.length;
-  }
-}
-
-
-/* =========================
-   NAČTENÍ ČLÁNKŮ
-========================= */
-
-async function loadArticles() {
-
-  if (!db) return;
-
-  const {
-    data,
-    error
-  } =
-    await db
-      .from('articles')
-      .select('*')
-      .order('created_at', {
-        ascending: false
-      });
-
-  if (error) {
-
-    console.error(
-      'Články se nepodařilo načíst:',
-      error
-    );
-
-    if ($('cards')) {
-
-      $('cards').innerHTML = `
-        <div class="no-results">
-
-          <strong>
-            Články se nepodařilo načíst.
-          </strong>
-
-          <span>
-            Zkuste stránku obnovit.
-          </span>
-
-        </div>
-      `;
-    }
-
-    return;
-  }
-
-  articles = data || [];
-
-  renderArticles();
-
-  renderAdminList();
-
-  if ($('adminArticles')) {
-
-    $('adminArticles').textContent =
-      articles.length;
-  }
-
-  if ($('publicArticles')) {
-
-    $('publicArticles').textContent =
-      articles.length;
-  }
-}
-
-
-/* =========================
-   DRAWER
-========================= */
-
-function toggleDrawer() {
-
-  $('drawer')?.classList.toggle(
-    'open'
-  );
 
 }
 
 
-/* =========================
-   STATISTIKY
-========================= */
+/* =====================================================
+   ADMIN STATS
+===================================================== */
 
 async function refreshAdminStats() {
 
   if (!db) return;
+
 
   try {
 
@@ -802,10 +1462,14 @@ async function refreshAdminStats() {
     } =
       await db
         .from('subscribers')
-        .select('*', {
-          count: 'exact',
-          head: true
-        });
+        .select(
+          '*',
+          {
+            count:'exact',
+            head:true
+          }
+        );
+
 
     const {
       data: stats
@@ -813,26 +1477,33 @@ async function refreshAdminStats() {
       await db
         .from('site_stats')
         .select('visits')
-        .eq('id', 1)
+        .eq('id',1)
         .maybeSingle();
+
 
     if ($('subs')) {
 
       $('subs').textContent =
         subscribers ?? 0;
+
     }
+
 
     if ($('adminArticles')) {
 
       $('adminArticles').textContent =
         articles.length;
+
     }
+
 
     if ($('visits')) {
 
       $('visits').textContent =
         stats?.visits ?? 0;
+
     }
+
 
   } catch (error) {
 
@@ -840,17 +1511,20 @@ async function refreshAdminStats() {
       'Chyba statistik:',
       error
     );
+
   }
+
 }
 
 
-/* =========================
-   UPLOAD OBRÁZKU
-========================= */
+/* =====================================================
+   IMAGE UPLOAD
+===================================================== */
 
 async function uploadCoverImage(file) {
 
   if (!file) return null;
+
 
   const allowed = [
     'image/jpeg',
@@ -858,33 +1532,44 @@ async function uploadCoverImage(file) {
     'image/webp'
   ];
 
+
   if (!allowed.includes(file.type)) {
 
     throw new Error(
       'Použijte JPG, PNG nebo WEBP.'
     );
+
   }
 
-  if (file.size > 5 * 1024 * 1024) {
+
+  if (
+    file.size >
+    5 * 1024 * 1024
+  ) {
 
     throw new Error(
       'Obrázek musí být menší než 5 MB.'
     );
+
   }
 
+
   const {
-    data: {
+    data:{
       user
     }
   } =
     await db.auth.getUser();
+
 
   if (!user) {
 
     throw new Error(
       'Musíte být přihlášeni.'
     );
+
   }
+
 
   const extension =
     file.name
@@ -892,8 +1577,10 @@ async function uploadCoverImage(file) {
       .pop()
       .toLowerCase();
 
+
   const filename =
     `${user.id}/${crypto.randomUUID()}.${extension}`;
+
 
   const {
     error
@@ -904,24 +1591,30 @@ async function uploadCoverImage(file) {
         filename,
         file,
         {
-          cacheControl: '3600',
-          upsert: false,
-          contentType: file.type
+          cacheControl:'3600',
+          upsert:false,
+          contentType:file.type
         }
       );
+
 
   if (error) {
     throw error;
   }
+
 
   const {
     data
   } =
     db.storage
       .from('article-images')
-      .getPublicUrl(filename);
+      .getPublicUrl(
+        filename
+      );
+
 
   return data.publicUrl;
+
 }
 
 
@@ -933,7 +1626,11 @@ function showCoverPreview(url) {
   const image =
     $('coverPreviewImg');
 
-  if (!preview || !image) return;
+
+  if (!preview || !image) {
+    return;
+  }
+
 
   if (!url) {
 
@@ -946,21 +1643,24 @@ function showCoverPreview(url) {
     return;
   }
 
+
   image.src = url;
 
   preview.classList.remove(
     'hidden'
   );
+
 }
 
 
-/* =========================
-   ULOŽIT ČLÁNEK
-========================= */
+/* =====================================================
+   SAVE ARTICLE
+===================================================== */
 
 async function saveArticle(event) {
 
   event.preventDefault();
+
 
   if (!(await isAdmin())) {
 
@@ -968,10 +1668,13 @@ async function saveArticle(event) {
       'Přístup mají pouze administrátoři.';
 
     return;
+
   }
+
 
   const button =
     $('articleSubmit');
+
 
   if (button) {
 
@@ -979,7 +1682,9 @@ async function saveArticle(event) {
 
     button.textContent =
       'UKLÁDÁM...';
+
   }
+
 
   try {
 
@@ -987,8 +1692,11 @@ async function saveArticle(event) {
       $('cover')?.value.trim() ||
       null;
 
+
     const file =
-      $('coverFile')?.files?.[0];
+      $('coverFile')
+        ?.files?.[0];
+
 
     if (file) {
 
@@ -996,28 +1704,42 @@ async function saveArticle(event) {
         'Nahrávám obrázek...';
 
       coverUrl =
-        await uploadCoverImage(file);
+        await uploadCoverImage(
+          file
+        );
+
     }
+
 
     const payload = {
 
       title:
-        $('title').value.trim(),
+        $('title')
+          .value
+          .trim(),
 
       excerpt:
-        $('excerpt').value.trim(),
+        $('excerpt')
+          .value
+          .trim(),
 
       content:
-        $('content').value.trim(),
+        $('content')
+          .value
+          .trim(),
 
       cover_url:
         coverUrl,
 
       category:
-        $('category').value
+        $('category')
+          .value
+
     };
 
+
     let result;
+
 
     if (editingId) {
 
@@ -1025,58 +1747,51 @@ async function saveArticle(event) {
         await db
           .from('articles')
           .update(payload)
-          .eq('id', editingId);
+          .eq(
+            'id',
+            editingId
+          );
 
     } else {
 
       const {
-        data: {
+        data:{
           user
         }
       } =
         await db.auth.getUser();
+
 
       result =
         await db
           .from('articles')
           .insert({
             ...payload,
-            author_id: user.id
+            author_id:user.id
           });
+
     }
+
 
     if (result.error) {
       throw result.error;
     }
+
 
     $('articleMsg').textContent =
       editingId
         ? 'Článek byl úspěšně upraven.'
         : 'Článek byl úspěšně publikován.';
 
+
     editingId = null;
 
-    $('articleForm').reset();
-
-    if ($('cover')) {
-      $('cover').value = '';
-    }
-
-    if ($('coverFile')) {
-      $('coverFile').value = '';
-    }
-
-    showCoverPreview(null);
-
-    if (button) {
-
-      button.textContent =
-        'PUBLIKOVAT ČLÁNEK';
-    }
+    clearArticleForm(false);
 
     await loadArticles();
 
     await refreshAdminStats();
+
 
   } catch (error) {
 
@@ -1089,70 +1804,83 @@ async function saveArticle(event) {
       error.message ||
       'Něco se nepodařilo.';
 
+
   } finally {
 
     if (button) {
 
       button.disabled = false;
 
-      if (!editingId) {
+      button.textContent =
+        'PUBLIKOVAT ČLÁNEK';
 
-        button.textContent =
-          'PUBLIKOVAT ČLÁNEK';
-      }
     }
+
   }
+
 }
 
 
-/* =========================
-   EDITACE
-========================= */
+/* =====================================================
+   EDIT ARTICLE
+===================================================== */
 
 function editArticle(id) {
 
   const article =
     articles.find(
       item =>
-        Number(item.id) === Number(id)
+        Number(item.id) ===
+        Number(id)
     );
 
+
   if (!article) return;
+
 
   editingId =
     article.id;
 
+
   $('title').value =
     article.title || '';
+
 
   $('category').value =
     article.category || 'POHYB';
 
+
   $('cover').value =
     article.cover_url || '';
+
 
   $('excerpt').value =
     article.excerpt || '';
 
+
   $('content').value =
     article.content || '';
+
 
   showCoverPreview(
     article.cover_url || null
   );
 
+
   $('articleSubmit').textContent =
     'ULOŽIT ZMĚNY';
 
+
   $('admin').scrollIntoView({
-    behavior: 'smooth'
+    behavior:'smooth'
   });
+
 }
 
 
-/* =========================
-   SMAZÁNÍ
-========================= */
+/* =====================================================
+   DELETE ARTICLE
+===================================================== */
 
 async function deleteArticle(id) {
 
@@ -1163,20 +1891,28 @@ async function deleteArticle(id) {
     );
 
     return;
+
   }
 
-  if (!confirm(
-    'Opravdu chcete tento článek smazat?'
-  )) {
+
+  if (
+    !confirm(
+      'Opravdu chcete tento článek smazat?'
+    )
+  ) {
 
     return;
+
   }
+
 
   const article =
     articles.find(
       item =>
-        Number(item.id) === Number(id)
+        Number(item.id) ===
+        Number(id)
     );
+
 
   const {
     error
@@ -1184,24 +1920,34 @@ async function deleteArticle(id) {
     await db
       .from('articles')
       .delete()
-      .eq('id', id);
+      .eq(
+        'id',
+        id
+      );
+
 
   if (error) {
 
-    alert(error.message);
+    alert(
+      error.message
+    );
 
     return;
+
   }
+
 
   if (article?.cover_url) {
 
     const marker =
       '/storage/v1/object/public/article-images/';
 
+
     const index =
       article.cover_url.indexOf(
         marker
       );
+
 
     if (index !== -1) {
 
@@ -1210,11 +1956,14 @@ async function deleteArticle(id) {
           index + marker.length
         );
 
+
       try {
 
         await db.storage
           .from('article-images')
-          .remove([path]);
+          .remove([
+            path
+          ]);
 
       } catch (error) {
 
@@ -1222,26 +1971,33 @@ async function deleteArticle(id) {
           'Obrázek se nepodařilo odstranit:',
           error
         );
+
       }
+
     }
+
   }
+
 
   await loadArticles();
 
   await refreshAdminStats();
+
 }
 
 
-/* =========================
+/* =====================================================
    ADMIN LIST
-========================= */
+===================================================== */
 
 function renderAdminList() {
 
   const box =
     $('adminList');
 
+
   if (!box) return;
+
 
   if (!articles.length) {
 
@@ -1249,71 +2005,165 @@ function renderAdminList() {
       '<p class="muted">Zatím nejsou žádné články.</p>';
 
     return;
+
   }
 
+
   box.innerHTML =
-    articles.map(article => `
+    articles.map(
+      article => `
 
-      <div class="admin-row">
+        <div class="admin-row">
 
-        <div>
+          <div>
 
-          <b>
-            ${esc(article.title)}
-          </b>
+            <b>
+              ${esc(article.title)}
+            </b>
 
-          <small>
-            ${formatDate(article.created_at)}
-            ·
-            ${esc(article.category || 'POHYB')}
-          </small>
+            <small>
+              ${formatDate(article.created_at)}
+              ·
+              ${esc(article.category || 'POHYB')}
+            </small>
+
+          </div>
+
+          <div>
+
+            <button
+              type="button"
+              data-edit-id="${article.id}">
+              UPRAVIT
+            </button>
+
+            <button
+              type="button"
+              class="danger"
+              data-delete-id="${article.id}">
+              SMAZAT
+            </button>
+
+          </div>
 
         </div>
 
-        <div>
+      `
+    ).join('');
 
-          <button
-            type="button"
-            onclick="editArticle(${Number(article.id)})">
-            UPRAVIT
-          </button>
 
-          <button
-            type="button"
-            class="danger"
-            onclick="deleteArticle(${Number(article.id)})">
-            SMAZAT
-          </button>
+  box.querySelectorAll(
+    '[data-edit-id]'
+  ).forEach(button => {
 
-        </div>
+    button.addEventListener(
+      'click',
+      () => {
 
-      </div>
+        editArticle(
+          button.dataset.editId
+        );
 
-    `).join('');
+      }
+    );
+
+  });
+
+
+  box.querySelectorAll(
+    '[data-delete-id]'
+  ).forEach(button => {
+
+    button.addEventListener(
+      'click',
+      () => {
+
+        deleteArticle(
+          button.dataset.deleteId
+        );
+
+      }
+    );
+
+  });
+
 }
 
 
-/* =========================
+/* =====================================================
+   CLEAR FORM
+===================================================== */
+
+function clearArticleForm(
+  showMessage = true
+) {
+
+  editingId = null;
+
+
+  $('articleForm')
+    ?.reset();
+
+
+  if ($('cover')) {
+    $('cover').value = '';
+  }
+
+
+  if ($('coverFile')) {
+    $('coverFile').value = '';
+  }
+
+
+  showCoverPreview(null);
+
+
+  if ($('articleSubmit')) {
+
+    $('articleSubmit').textContent =
+      'PUBLIKOVAT ČLÁNEK';
+
+  }
+
+
+  if (
+    showMessage &&
+    $('articleMsg')
+  ) {
+
+    $('articleMsg').textContent = '';
+
+  }
+
+}
+
+
+/* =====================================================
    NEWSLETTER
-========================= */
+===================================================== */
 
 async function subscribe(event) {
 
   event.preventDefault();
 
+
   if (!db) return;
+
 
   const input =
     event.target.querySelector(
       'input[type=email]'
     );
 
+
   const email =
     input.value
       .trim()
       .toLowerCase();
 
+
   if (!email) return;
+
 
   const {
     error
@@ -1323,6 +2173,7 @@ async function subscribe(event) {
       .insert({
         email
       });
+
 
   if (
     error &&
@@ -1337,113 +2188,29 @@ async function subscribe(event) {
       </b>`;
 
     return;
+
   }
+
 
   event.target.innerHTML =
     `<b class="success-text">
       Jste přihlášeni. Vítejte ve Vireno!
     </b>`;
 
+
   await refreshAdminStats();
+
 }
 
 
-/* =========================
-   DETAIL ČLÁNKU
-========================= */
-
-function openArticle(id) {
-
-  const article =
-    articles.find(
-      item =>
-        Number(item.id) === Number(id)
-    );
-
-  if (!article) return;
-
-  $('articleViewTitle').textContent =
-    article.title || '';
-
-  $('articleViewMeta').textContent =
-    `${formatDate(article.created_at)} · ${article.category || 'POHYB'}`;
-
-  $('articleViewImage').src =
-    article.cover_url ||
-    'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80';
-
-  /*
-    Obsah článku se stejně jako dříve
-    vykresluje jako HTML.
-    To umožňuje používat v článku například
-    odstavce a obrázky.
-  */
-
-  $('articleViewContent').innerHTML =
-    article.content || '';
-
-  $('articleView').classList.remove(
-    'hidden'
-  );
-
-  document.body.classList.add(
-    'search-active'
-  );
-}
-
-
-function closeArticle() {
-
-  $('articleView')
-    ?.classList
-    .add('hidden');
-
-  document.body.classList.remove(
-    'search-active'
-  );
-}
-
-
-/* =========================
-   FORMULÁŘ
-========================= */
-
-function clearArticleForm() {
-
-  editingId = null;
-
-  $('articleForm')?.reset();
-
-  if ($('cover')) {
-    $('cover').value = '';
-  }
-
-  if ($('coverFile')) {
-    $('coverFile').value = '';
-  }
-
-  showCoverPreview(null);
-
-  if ($('articleSubmit')) {
-
-    $('articleSubmit').textContent =
-      'PUBLIKOVAT ČLÁNEK';
-  }
-
-  if ($('articleMsg')) {
-
-    $('articleMsg').textContent = '';
-  }
-}
-
-
-/* =========================
-   NÁVŠTĚVY
-========================= */
+/* =====================================================
+   VISITS
+===================================================== */
 
 async function trackVisit() {
 
   if (!db) return;
+
 
   try {
 
@@ -1457,129 +2224,24 @@ async function trackVisit() {
       'Sledování návštěvy selhalo:',
       error
     );
+
   }
+
 }
 
 
-/* =========================
-   NAVIGACE
-========================= */
-
-function setupNavigation() {
-
-  const links =
-    document.querySelectorAll(
-      '.desktop-nav a'
-    );
-
-  links.forEach(link => {
-
-    link.addEventListener(
-      'click',
-      () => {
-
-        links.forEach(item => {
-          item.classList.remove(
-            'active'
-          );
-        });
-
-        link.classList.add(
-          'active'
-        );
-      }
-    );
-  });
-
-  window.addEventListener(
-    'scroll',
-    updateActiveNavigation,
-    {
-      passive: true
-    }
-  );
-
-  updateActiveNavigation();
-}
-
-
-function updateActiveNavigation() {
-
-  const sections = [
-    {
-      id: 'home',
-      nav: '[data-nav="home"]'
-    },
-    {
-      id: 'articles',
-      nav: '[data-nav="articles"]'
-    },
-    {
-      id: 'about',
-      nav: '[data-nav="about"]'
-    }
-  ];
-
-  let current =
-    'home';
-
-  const position =
-    window.scrollY + 180;
-
-  sections.forEach(section => {
-
-    const element =
-      document.getElementById(
-        section.id
-      );
-
-    if (
-      element &&
-      element.offsetTop <= position
-    ) {
-
-      current =
-        section.id;
-    }
-  });
-
-  document
-    .querySelectorAll(
-      '.desktop-nav a'
-    )
-    .forEach(link => {
-
-      link.classList.remove(
-        'active'
-      );
-
-    });
-
-  const active =
-    document.querySelector(
-      `[data-nav="${current}"]`
-    );
-
-  active?.classList.add(
-    'active'
-  );
-}
-
-
-/* =========================
-   UDÁLOSTI
-========================= */
+/* =====================================================
+   EVENTS
+===================================================== */
 
 function setupEvents() {
 
-  const loginBtn =
-    $('loginBtn');
+  setupNavigation();
 
-  if (loginBtn) {
+  setupSearch();
 
-    loginBtn.onclick =
-      () => openAuth('login');
-  }
+  setupMobileMenu();
+
 
   if ($('authForm')) {
 
@@ -1588,7 +2250,9 @@ function setupEvents() {
         'submit',
         handleAuth
       );
+
   }
+
 
   if ($('authSwitch')) {
 
@@ -1597,7 +2261,9 @@ function setupEvents() {
         'click',
         toggleAuthMode
       );
+
   }
+
 
   if ($('subscribe')) {
 
@@ -1606,7 +2272,9 @@ function setupEvents() {
         'submit',
         subscribe
       );
+
   }
+
 
   if ($('articleForm')) {
 
@@ -1615,16 +2283,20 @@ function setupEvents() {
         'submit',
         saveArticle
       );
+
   }
+
 
   if ($('clearArticleBtn')) {
 
     $('clearArticleBtn')
       .addEventListener(
         'click',
-        clearArticleForm
+        () => clearArticleForm(true)
       );
+
   }
+
 
   if ($('coverFile')) {
 
@@ -1634,24 +2306,36 @@ function setupEvents() {
         event => {
 
           const file =
-            event.target.files?.[0];
+            event.target
+              .files?.[0];
+
 
           if (!file) return;
+
 
           const reader =
             new FileReader();
 
+
           reader.onload =
-            () =>
+            () => {
+
               showCoverPreview(
                 reader.result
               );
 
-          reader.readAsDataURL(file);
+            };
+
+
+          reader.readAsDataURL(
+            file
+          );
 
         }
       );
+
   }
+
 
   if ($('auth')) {
 
@@ -1666,11 +2350,14 @@ function setupEvents() {
           ) {
 
             closeAuth();
+
           }
 
         }
       );
+
   }
+
 
   if ($('articleView')) {
 
@@ -1685,50 +2372,49 @@ function setupEvents() {
           ) {
 
             closeArticle();
+
           }
 
         }
       );
+
   }
 
-  setupSearch();
-
-  setupNavigation();
 
   document.addEventListener(
     'keydown',
     event => {
 
       if (
-        event.key === 'Escape' &&
-        searchOpen
+        event.key === 'Escape'
       ) {
 
-        closeSearch();
-      }
+        if (searchOpen) {
+          closeSearch();
+        }
 
-      if (
-        event.key === 'Escape' &&
-        !$('articleView')?.classList.contains('hidden')
-      ) {
-
+        closeMobileMenu();
         closeArticle();
+        closeAuth();
+
       }
 
     }
   );
+
 }
 
 
-/* =========================
+/* =====================================================
    START
-========================= */
+===================================================== */
 
 async function init() {
 
   console.log(
     'Vireno se spouští...'
   );
+
 
   if (!initSupabase()) {
 
@@ -1737,9 +2423,12 @@ async function init() {
     );
 
     return;
+
   }
 
+
   setupEvents();
+
 
   await loadArticles();
 
@@ -1747,14 +2436,24 @@ async function init() {
 
   await updateUserUI();
 
+
+  handleHash();
+
+
   console.log(
     'Vireno je připraveno.'
   );
+
 }
 
 
+/* =====================================================
+   DOM READY
+===================================================== */
+
 if (
-  document.readyState === 'loading'
+  document.readyState ===
+  'loading'
 ) {
 
   document.addEventListener(
@@ -1765,4 +2464,5 @@ if (
 } else {
 
   init();
+
 }
