@@ -10,9 +10,13 @@
 
   <meta
     name="description"
-    content="Vireno – pohyb, zdraví, výživa a kondice pro život po čtyřicítce.">
+    content="Vireno – zdraví, pohyb, výživa a aktivní život pro lidi po čtyřicítce.">
 
-  <title>Vireno – Aktivní život po 40</title>
+  <meta
+    name="theme-color"
+    content="#1f8f55">
+
+  <title>VIRENO – Aktivní život po 40</title>
 
   <link
     rel="stylesheet"
@@ -23,19 +27,20 @@
 <body>
 
 <!-- =========================
-     HEADER
+     HLAVIČKA
 ========================= -->
 
 <header class="topbar">
 
   <a
-    href="#"
+    href="#home"
     class="brand">
 
-    <span>●</span>
+    <span class="brand-mark">●</span>
     VIRENO
 
   </a>
+
 
   <nav class="desktop-nav">
 
@@ -49,8 +54,8 @@
       ČLÁNKY
     </a>
 
-    <a href="#movement">
-      POHYB
+    <a href="#categories">
+      TÉMATA
     </a>
 
     <a href="#nutrition">
@@ -63,15 +68,21 @@
 
   </nav>
 
+
   <div class="actions">
+
+    <!-- LUPA -->
 
     <button
       type="button"
       class="icon-btn"
       id="searchBtn"
-      aria-label="Vyhledávání">
+      aria-label="Vyhledat článek">
       🔍
     </button>
+
+
+    <!-- PŘIHLÁŠENÍ -->
 
     <button
       type="button"
@@ -80,11 +91,14 @@
       PŘIHLÁSIT SE
     </button>
 
+
+    <!-- MOBILNÍ MENU -->
+
     <button
       type="button"
       class="menu-btn"
       onclick="toggleDrawer()"
-      aria-label="Menu">
+      aria-label="Otevřít menu">
       ☰
     </button>
 
@@ -94,22 +108,28 @@
 
 
 <!-- =========================
-     SEARCH
+     VYHLEDÁVÁNÍ
 ========================= -->
 
 <div
   id="searchOverlay"
-  class="search-overlay hidden">
+  class="search-overlay hidden"
+  aria-hidden="true">
 
   <div
     class="search-panel"
     role="search">
 
+    <div class="search-icon">
+      🔍
+    </div>
+
     <input
       id="searchInput"
       type="search"
-      placeholder="Hledat články..."
-      autocomplete="off">
+      placeholder="Hledat článek nebo téma..."
+      autocomplete="off"
+      aria-label="Hledat články">
 
     <button
       id="searchClose"
@@ -139,14 +159,14 @@
     </div>
 
     <h1>
-      ŽIVOT<br>
-      V <em>KONDICI.</em>
+      ŽIJTE<br>
+      <em>NAPLNO.</em>
     </h1>
 
     <p>
       Praktické rady pro pohyb, zdraví, výživu
-      a energii. Bez extrémů a bez nesmyslných
-      diet. Prostě lepší kondice pro každý den.
+      a energii. Bez extrémů, bez nesmyslných
+      diet a bez zbytečného tlaku.
     </p>
 
     <div class="hero-buttons">
@@ -159,8 +179,8 @@
 
       <a
         href="#categories"
-        class="btn dark">
-        OBJEVIT VIRENO
+        class="btn light">
+        OBJEVIT TÉMATA
       </a>
 
     </div>
@@ -168,24 +188,40 @@
     <div class="social-proof">
 
       <div class="avatars">
-        ●●●
+        ● ● ●
       </div>
 
       <span>
-        Obsah pro aktivní život <b>po 40</b>
+        Pro lidi, kteří chtějí být aktivní
+        <b>i po čtyřicítce.</b>
       </span>
 
     </div>
 
   </div>
 
-  <div class="hero-athlete"></div>
+
+  <div class="hero-athlete">
+
+    <div class="hero-circle"></div>
+
+    <div class="hero-card">
+
+      <strong>40+</strong>
+
+      <span>
+        Věk není konec.
+      </span>
+
+    </div>
+
+  </div>
 
 </section>
 
 
 <!-- =========================
-     KATEGORIE
+     TÉMATA
 ========================= -->
 
 <section
@@ -203,6 +239,7 @@
 
   </a>
 
+
   <a href="#articles">
 
     <strong>🥗</strong>
@@ -213,6 +250,7 @@
     </div>
 
   </a>
+
 
   <a href="#articles">
 
@@ -225,6 +263,7 @@
 
   </a>
 
+
   <a href="#articles">
 
     <strong>😴</strong>
@@ -235,6 +274,7 @@
     </div>
 
   </a>
+
 
   <a href="#articles">
 
@@ -251,12 +291,15 @@
 
 
 <!-- =========================
-     CONTENT
+     HLAVNÍ OBSAH
 ========================= -->
 
 <main
   id="articles"
   class="content">
+
+
+  <!-- ČLÁNKY -->
 
   <section class="latest">
 
@@ -279,6 +322,13 @@
       </a>
 
     </div>
+
+
+    <div
+      id="searchStatus"
+      class="search-status hidden">
+    </div>
+
 
     <div
       id="cards"
@@ -316,6 +366,7 @@
       po čtyřicítce.
     </p>
 
+
     <form id="subscribe">
 
       <input
@@ -331,9 +382,11 @@
 
     </form>
 
+
     <small>
       Žádný spam. Jen užitečný obsah.
     </small>
+
 
     <div class="follow">
 
@@ -353,36 +406,61 @@
 
 
 <!-- =========================
-     BOTTOM STATS
+     STATISTIKY
 ========================= -->
 
 <section class="bottom-strip">
 
   <div>
+
     <b>40+</b>
-    <span>VĚK NENÍ LIMIT</span>
+
+    <span>
+      PRO KAŽDÝ VĚK
+    </span>
+
   </div>
 
-  <div>
-    <b id="publicArticles">0</b>
-    <span>ČLÁNKŮ</span>
-  </div>
 
   <div>
+
+    <b id="publicArticles">
+      0
+    </b>
+
+    <span>
+      ČLÁNKŮ
+    </span>
+
+  </div>
+
+
+  <div>
+
     <b>5</b>
-    <span>HLAVNÍCH TÉMAT</span>
+
+    <span>
+      HLAVNÍCH TÉMAT
+    </span>
+
   </div>
 
+
   <div>
+
     <b>100%</b>
-    <span>PRAKTICKÝ OBSAH</span>
+
+    <span>
+      PRAKTICKÝ OBSAH
+    </span>
+
   </div>
 
 </section>
 
 
 <!-- =========================
-     DRAWER
+     MOBILNÍ MENU
 ========================= -->
 
 <aside
@@ -391,9 +469,17 @@
 
   <div class="drawer-head">
 
-    <h2>
-      VIRENO
-    </h2>
+    <div>
+
+      <div class="drawer-label">
+        VIRENO
+      </div>
+
+      <h2>
+        ČLÁNKY
+      </h2>
+
+    </div>
 
     <button
       type="button"
@@ -404,6 +490,7 @@
 
   </div>
 
+
   <div
     id="drawerArticles">
 
@@ -413,18 +500,19 @@
 
   </div>
 
+
   <a
     href="#articles"
     class="drawer-all"
     onclick="toggleDrawer()">
-    ZOBRAZIT ČLÁNKY
+    ZOBRAZIT VŠECHNY ČLÁNKY
   </a>
 
 </aside>
 
 
 <!-- =========================
-     AUTH MODAL
+     PŘIHLÁŠENÍ
 ========================= -->
 
 <div
@@ -441,13 +529,16 @@
       ×
     </button>
 
+
     <div class="kicker">
       VIRENO
     </div>
 
+
     <h2 id="authTitle">
       PŘIHLÁSIT SE
     </h2>
+
 
     <form id="authForm">
 
@@ -457,12 +548,14 @@
         placeholder="E-mail"
         required>
 
+
       <input
         id="authPassword"
         type="password"
         placeholder="Heslo"
         minlength="6"
         required>
+
 
       <button
         id="authSubmit"
@@ -473,9 +566,9 @@
 
     </form>
 
-    <p
-      id="authMsg">
-    </p>
+
+    <p id="authMsg"></p>
+
 
     <button
       id="authSwitch"
@@ -501,25 +594,50 @@
     VIRENO ADMIN
   </div>
 
+
   <h2>
     SPRÁVA WEBU
   </h2>
 
+
   <div class="admin-stats">
 
     <div>
-      <b id="adminArticles">0</b>
-      <span>ČLÁNKŮ</span>
+
+      <b id="adminArticles">
+        0
+      </b>
+
+      <span>
+        ČLÁNKŮ
+      </span>
+
     </div>
 
-    <div>
-      <b id="subs">0</b>
-      <span>ODBĚRATELŮ</span>
-    </div>
 
     <div>
-      <b id="visits">0</b>
-      <span>NÁVŠTĚV</span>
+
+      <b id="subs">
+        0
+      </b>
+
+      <span>
+        ODBĚRATELŮ
+      </span>
+
+    </div>
+
+
+    <div>
+
+      <b id="visits">
+        0
+      </b>
+
+      <span>
+        NÁVŠTĚV
+      </span>
+
     </div>
 
   </div>
@@ -533,6 +651,7 @@
       NOVÝ ČLÁNEK
     </h3>
 
+
     <form id="articleForm">
 
       <input
@@ -540,6 +659,7 @@
         type="text"
         placeholder="Název článku"
         required>
+
 
       <select id="category">
 
@@ -565,9 +685,11 @@
 
       </select>
 
+
       <input
         id="cover"
         type="hidden">
+
 
       <div class="cover-upload">
 
@@ -582,6 +704,7 @@
 
       </div>
 
+
       <div
         id="coverPreview"
         class="cover-preview hidden">
@@ -593,16 +716,19 @@
 
       </div>
 
+
       <input
         id="excerpt"
         type="text"
         placeholder="Krátký popis článku"
         required>
 
+
       <textarea
         id="content"
         placeholder="Obsah článku..."
         required></textarea>
+
 
       <button
         id="articleSubmit"
@@ -611,12 +737,14 @@
         PUBLIKOVAT ČLÁNEK
       </button>
 
+
       <button
         id="clearArticleBtn"
         type="button"
-        class="btn dark">
+        class="btn light">
         VYČISTIT
       </button>
+
 
       <p id="articleMsg"></p>
 
@@ -625,13 +753,14 @@
   </div>
 
 
-  <!-- ARTICLE LIST -->
+  <!-- SEZNAM ČLÁNKŮ -->
 
   <div class="admin-list">
 
     <h3>
       ČLÁNKY
     </h3>
+
 
     <div id="adminList">
 
@@ -647,7 +776,7 @@
 
 
 <!-- =========================
-     ARTICLE VIEW
+     DETAIL ČLÁNKU
 ========================= -->
 
 <div
@@ -664,21 +793,26 @@
       ×
     </button>
 
+
     <img
       id="articleViewImage"
       src=""
       alt="Obrázek článku">
 
+
     <div class="kicker">
       VIRENO
     </div>
 
+
     <h2 id="articleViewTitle"></h2>
+
 
     <div
       id="articleViewMeta"
       class="muted">
     </div>
+
 
     <div
       id="articleViewContent">
@@ -696,6 +830,7 @@
 <script
   src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
 </script>
+
 
 <script
   src="app.js">
