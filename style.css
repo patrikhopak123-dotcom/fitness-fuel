@@ -16,6 +16,13 @@ body{
   overflow-x:hidden;
 }
 
+button,
+input,
+textarea,
+select{
+  font-family:inherit;
+}
+
 .topbar{
   height:64px;
   width:100%;
@@ -85,6 +92,11 @@ body{
 
 .icon-btn{
   font-size:27px;
+  width:40px;
+  height:40px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .menu-btn{
@@ -107,6 +119,83 @@ body{
   white-space:nowrap;
 }
 
+/* =========================
+   SEARCH
+========================= */
+
+.search-box{
+  position:fixed;
+  top:64px;
+  left:0;
+  right:0;
+  z-index:9998;
+  background:#0c0d0e;
+  border-bottom:1px solid #3a3b3c;
+  box-shadow:0 15px 35px #000b;
+  padding:15px 5%;
+}
+
+.search-inner{
+  max-width:900px;
+  margin:auto;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+
+.search-inner input{
+  flex:1;
+  width:100%;
+  height:48px;
+  background:#181a1b;
+  color:#fff;
+  border:1px solid #444;
+  border-radius:3px;
+  padding:0 15px;
+  outline:none;
+  font-size:14px;
+}
+
+.search-inner input:focus{
+  border-color:#ff2929;
+}
+
+.search-inner input::placeholder{
+  color:#777;
+}
+
+.search-inner button{
+  width:48px;
+  height:48px;
+  background:#222;
+  color:#fff;
+  border:1px solid #444;
+  cursor:pointer;
+  font-size:26px;
+}
+
+.search-results{
+  max-width:900px;
+  margin:10px auto 0;
+}
+
+.search-count{
+  color:#ff3030;
+  font-size:10px;
+  font-weight:800;
+  letter-spacing:1px;
+}
+
+.search-empty{
+  color:#888;
+  font-size:11px;
+  padding:8px 0;
+}
+
+/* =========================
+   BUTTONS
+========================= */
+
 .btn{
   border:0;
   font-weight:900;
@@ -125,6 +214,10 @@ body{
   background:#111;
   border:1px solid #777;
 }
+
+/* =========================
+   HERO
+========================= */
 
 .hero{
   min-height:450px;
@@ -211,6 +304,10 @@ body{
   color:white;
 }
 
+/* =========================
+   CATEGORIES
+========================= */
+
 .categories{
   display:grid;
   grid-template-columns:repeat(5,1fr);
@@ -247,6 +344,10 @@ body{
   font:400 10px Inter;
   margin-top:3px;
 }
+
+/* =========================
+   CONTENT
+========================= */
 
 .content{
   max-width:1400px;
@@ -383,6 +484,10 @@ body{
   margin-right:auto;
 }
 
+/* =========================
+   STATS
+========================= */
+
 .bottom-strip{
   max-width:880px;
   margin:14px auto 0;
@@ -408,6 +513,10 @@ body{
   font-size:9px;
 }
 
+/* =========================
+   DRAWER
+========================= */
+
 .drawer{
   position:fixed;
   right:-410px;
@@ -420,6 +529,7 @@ body{
   padding:22px;
   transition:.25s;
   box-shadow:-20px 0 60px #0008;
+  overflow-y:auto;
 }
 
 .drawer.open{
@@ -483,6 +593,10 @@ body{
   font-weight:800;
 }
 
+/* =========================
+   MODALS
+========================= */
+
 .modal{
   position:fixed;
   inset:0;
@@ -537,7 +651,9 @@ body{
   display:none !important;
 }
 
-/* ADMIN */
+/* =========================
+   ADMIN
+========================= */
 
 .admin-panel{
   max-width:1400px;
@@ -658,6 +774,10 @@ body{
   border:1px solid #444;
 }
 
+/* =========================
+   ARTICLE VIEW
+========================= */
+
 .article-view{
   width:min(900px,94%);
   max-height:90vh;
@@ -696,7 +816,9 @@ body{
   z-index:2;
 }
 
-/* TABLET */
+/* =========================
+   TABLET
+========================= */
 
 @media(max-width:1050px){
 
@@ -721,7 +843,9 @@ body{
   }
 }
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media(max-width:700px){
 
@@ -747,13 +871,18 @@ body{
     display:flex !important;
     align-items:center;
     justify-content:flex-end;
-    gap:6px;
+    gap:5px;
     margin-left:auto;
     flex-shrink:0;
   }
 
   .icon-btn{
-    display:none !important;
+    display:flex !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    width:36px;
+    height:36px;
+    font-size:25px;
   }
 
   .login{
@@ -774,6 +903,27 @@ body{
     font-size:25px !important;
     padding:4px !important;
     margin:0 !important;
+  }
+
+  /* SEARCH MOBILE */
+
+  .search-box{
+    top:60px;
+    padding:10px;
+  }
+
+  .search-inner{
+    width:100%;
+  }
+
+  .search-inner input{
+    height:44px;
+    font-size:13px;
+  }
+
+  .search-inner button{
+    width:44px;
+    height:44px;
   }
 
   .hero{
@@ -912,7 +1062,9 @@ body{
   }
 }
 
-/* EXTRA SMALL MOBILE */
+/* =========================
+   EXTRA SMALL MOBILE
+========================= */
 
 @media(max-width:380px){
 
@@ -922,6 +1074,16 @@ body{
 
   .brand{
     font-size:14px;
+  }
+
+  .actions{
+    gap:3px;
+  }
+
+  .icon-btn{
+    width:32px;
+    height:32px;
+    font-size:23px;
   }
 
   .login{
