@@ -4,12 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <meta
-    name="description"
-    content="Vireno – praktické články o pohybu, zdraví, výživě a aktivním životě po čtyřicítce."
-  >
-
-  <meta name="theme-color" content="#159447">
+  <meta name="description" content="Vireno – aktivní život, pohyb, výživa a zdraví po čtyřicítce.">
+  <meta name="theme-color" content="#1f7a4d">
 
   <title>VIRENO – Aktivní život po 40</title>
 
@@ -18,8 +14,7 @@
 
   <link
     href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap"
-    rel="stylesheet"
-  >
+    rel="stylesheet">
 
   <link rel="stylesheet" href="style.css">
 </head>
@@ -44,7 +39,7 @@
       type="button"
       class="icon-btn"
       id="searchBtn"
-      aria-label="Vyhledat">
+      aria-label="Vyhledávání">
       🔍
     </button>
 
@@ -59,7 +54,7 @@
       type="button"
       class="menu-btn"
       onclick="toggleDrawer()"
-      aria-label="Otevřít menu">
+      aria-label="Menu">
       ☰
     </button>
 
@@ -74,14 +69,13 @@
 
   <div class="search-panel">
 
-    <span>🔍</span>
+    <span class="search-icon">⌕</span>
 
     <input
       id="searchInput"
       type="search"
       placeholder="Hledat článek..."
-      autocomplete="off"
-    >
+      autocomplete="off">
 
     <button
       id="searchClose"
@@ -112,7 +106,8 @@
 
     <p>
       Praktické rady pro pohyb, zdraví, výživu
-      a energii. Bez extrémů a bez zbytečného tlaku.
+      a energii. Bez extrémů, bez nesmyslných
+      diet a bez zbytečného tlaku.
     </p>
 
     <div class="hero-buttons">
@@ -128,8 +123,7 @@
     </div>
 
     <div class="social-proof">
-      <div class="avatars">● ● ●</div>
-
+      <span class="proof-dots">● ● ●</span>
       <span>
         Pro lidi, kteří chtějí být aktivní
         <b>i po čtyřicítce.</b>
@@ -138,13 +132,15 @@
 
   </div>
 
-  <div class="hero-athlete">
+  <div class="hero-visual">
+
     <div class="hero-circle"></div>
 
     <div class="hero-card">
       <strong>40+</strong>
       <span>Věk není konec.</span>
     </div>
+
   </div>
 
 </section>
@@ -152,47 +148,47 @@
 
 <!-- TÉMATA -->
 
-<section class="categories">
+<section id="categories" class="categories">
 
-  <a href="#articles" data-category="POHYB">
-    <strong>🏃</strong>
-    <div>
-      <span>POHYB</span>
+  <button class="category-card" data-category="POHYB">
+    <span class="category-icon">🏃</span>
+    <span>
+      <b>POHYB</b>
       <small>Kondice a cvičení</small>
-    </div>
-  </a>
+    </span>
+  </button>
 
-  <a href="#articles" data-category="VÝŽIVA">
-    <strong>🥗</strong>
-    <div>
-      <span>VÝŽIVA</span>
+  <button class="category-card" data-category="VÝŽIVA">
+    <span class="category-icon">🥗</span>
+    <span>
+      <b>VÝŽIVA</b>
       <small>Jídlo a energie</small>
-    </div>
-  </a>
+    </span>
+  </button>
 
-  <a href="#articles" data-category="HUBNUTÍ">
-    <strong>⚖</strong>
-    <div>
-      <span>HUBNUTÍ</span>
+  <button class="category-card" data-category="HUBNUTÍ">
+    <span class="category-icon">⚖</span>
+    <span>
+      <b>HUBNUTÍ</b>
       <small>Zdravá váha</small>
-    </div>
-  </a>
+    </span>
+  </button>
 
-  <a href="#articles" data-category="REGENERACE">
-    <strong>😴</strong>
-    <div>
-      <span>REGENERACE</span>
+  <button class="category-card" data-category="REGENERACE">
+    <span class="category-icon">😴</span>
+    <span>
+      <b>REGENERACE</b>
       <small>Spánek a odpočinek</small>
-    </div>
-  </a>
+    </span>
+  </button>
 
-  <a href="#articles" data-category="ZDRAVÍ">
-    <strong>❤</strong>
-    <div>
-      <span>ZDRAVÍ</span>
+  <button class="category-card" data-category="ZDRAVÍ">
+    <span class="category-icon">♥</span>
+    <span>
+      <b>ZDRAVÍ</b>
       <small>Vitalita a prevence</small>
-    </div>
-  </a>
+    </span>
+  </button>
 
 </section>
 
@@ -207,22 +203,19 @@
 
       <div>
         <div class="kicker">VIRENO</div>
-
-        <h2 id="articlesHeading">
-          NEJNOVĚJŠÍ ČLÁNKY
-        </h2>
+        <h2>ČLÁNKY</h2>
       </div>
 
       <button
-        type="button"
         id="showAllBtn"
-        class="section-link">
+        class="outline-btn"
+        type="button">
         VŠECHNY ČLÁNKY
       </button>
 
     </div>
 
-    <div id="searchStatus" class="search-status hidden"></div>
+    <div id="activeFilter" class="active-filter hidden"></div>
 
     <div id="cards" class="cards">
 
@@ -258,8 +251,7 @@
       <input
         type="email"
         placeholder="Váš e-mail"
-        required
-      >
+        required>
 
       <button
         type="submit"
@@ -287,35 +279,30 @@
 
 <!-- O NÁS -->
 
-<section id="about" class="about-section">
+<section id="about" class="about">
 
   <div class="about-inner">
 
     <div class="kicker">
-      VIRENO
+      O PROJEKTU VIRENO
     </div>
 
     <h2>
       AKTIVNÍ ŽIVOT<br>
-      <em>V KAŽDÉM VĚKU.</em>
+      <em>BEZ ZBYTEČNÝCH EXTRÉMŮ.</em>
     </h2>
 
     <p>
-      Vireno vzniklo pro všechny, kteří chtějí mít
-      více energie, lépe se hýbat a starat se o své
-      zdraví bez zbytečných extrémů.
+      Vireno vzniklo pro lidi, kteří chtějí zůstat
+      aktivní, cítit se dobře a pečovat o své zdraví
+      i po čtyřicítce.
     </p>
 
     <p>
-      Přinášíme praktické články o pohybu, výživě,
-      regeneraci, hubnutí a zdraví. Jednoduše,
-      srozumitelně a tak, aby se rady daly opravdu
-      používat v běžném životě.
+      Přinášíme jednoduché a praktické informace
+      o pohybu, výživě, regeneraci a zdravém životním
+      stylu. Bez zázračných řešení a bez zbytečného tlaku.
     </p>
-
-    <a href="#articles" class="btn green">
-      PROHLÉDNOUT ČLÁNKY
-    </a>
 
   </div>
 
@@ -374,7 +361,7 @@
       DOMŮ
     </a>
 
-    <a href="#articles" onclick="showAllArticles(); toggleDrawer()">
+    <a href="#articles" onclick="toggleDrawer()">
       ČLÁNKY
     </a>
 
@@ -386,9 +373,7 @@
 
   <div class="drawer-divider"></div>
 
-  <div class="drawer-label">
-    NEJNOVĚJŠÍ
-  </div>
+  <h3>POSLEDNÍ ČLÁNKY</h3>
 
   <div id="drawerArticles">
     <p class="muted">Načítám články...</p>
@@ -422,16 +407,14 @@
         id="authEmail"
         type="email"
         placeholder="E-mail"
-        required
-      >
+        required>
 
       <input
         id="authPassword"
         type="password"
         placeholder="Heslo"
         minlength="6"
-        required
-      >
+        required>
 
       <button
         id="authSubmit"
@@ -460,9 +443,7 @@
 
 <section id="admin" class="admin-panel hidden">
 
-  <div class="kicker">
-    VIRENO ADMIN
-  </div>
+  <div class="kicker">VIRENO ADMIN</div>
 
   <h2>SPRÁVA WEBU</h2>
 
@@ -496,8 +477,7 @@
         id="title"
         type="text"
         placeholder="Název článku"
-        required
-      >
+        required>
 
       <select id="category">
 
@@ -518,18 +498,18 @@
         <input
           id="coverFile"
           type="file"
-          accept="image/jpeg,image/png,image/webp"
-        >
+          accept="image/jpeg,image/png,image/webp">
 
       </div>
 
-      <div id="coverPreview" class="cover-preview hidden">
+      <div
+        id="coverPreview"
+        class="cover-preview hidden">
 
         <img
           id="coverPreviewImg"
           src=""
-          alt="Náhled"
-        >
+          alt="Náhled">
 
       </div>
 
@@ -537,14 +517,12 @@
         id="excerpt"
         type="text"
         placeholder="Krátký popis článku"
-        required
-      >
+        required>
 
       <textarea
         id="content"
         placeholder="Obsah článku..."
-        required
-      ></textarea>
+        required></textarea>
 
       <button
         id="articleSubmit"
@@ -596,14 +574,16 @@
     <img
       id="articleViewImage"
       src=""
-      alt="Obrázek článku"
-    >
+      alt="Obrázek článku">
 
     <div class="kicker">VIRENO</div>
 
     <h2 id="articleViewTitle"></h2>
 
-    <div id="articleViewMeta" class="muted"></div>
+    <div
+      id="articleViewMeta"
+      class="muted">
+    </div>
 
     <div id="articleViewContent"></div>
 
