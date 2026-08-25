@@ -13,10 +13,12 @@ body{
   background:#0b0c0d;
   color:#f5f5f5;
   font-family:Inter,Arial,sans-serif;
+  overflow-x:hidden;
 }
 
 .topbar{
   height:64px;
+  width:100%;
   background:#050505;
   border-bottom:1px solid #242526;
   display:flex;
@@ -24,7 +26,7 @@ body{
   padding:0 3.5%;
   position:sticky;
   top:0;
-  z-index:20;
+  z-index:9999;
 }
 
 .brand{
@@ -70,6 +72,7 @@ body{
   display:flex;
   align-items:center;
   gap:12px;
+  margin-left:auto;
 }
 
 .icon-btn,
@@ -77,24 +80,50 @@ body{
   background:none;
   border:0;
   color:#fff;
-  font-size:27px;
   cursor:pointer;
 }
 
-.login,
+.icon-btn{
+  font-size:27px;
+}
+
+.menu-btn{
+  font-size:27px;
+}
+
+.login{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
+  position:relative;
+  z-index:10000;
+  background:#ef2828 !important;
+  color:#fff !important;
+  border:0;
+  padding:12px 22px;
+  border-radius:3px;
+  font-weight:900;
+  cursor:pointer;
+  white-space:nowrap;
+}
+
 .btn{
   border:0;
   font-weight:900;
   cursor:pointer;
+  padding:14px 22px;
+  color:#fff;
+  font-size:12px;
+  letter-spacing:.4px;
 }
 
-.login{
-  display:block;
-  background:#ef2828;
-  color:white;
-  padding:12px 22px;
-  border-radius:3px;
-  white-space:nowrap;
+.btn.red{
+  background:#f12828;
+}
+
+.btn.dark{
+  background:#111;
+  border:1px solid #777;
 }
 
 .hero{
@@ -148,22 +177,6 @@ body{
   display:flex;
   gap:14px;
   margin:25px 0;
-}
-
-.btn{
-  padding:14px 22px;
-  color:#fff;
-  font-size:12px;
-  letter-spacing:.4px;
-}
-
-.btn.red{
-  background:#f12828;
-}
-
-.btn.dark{
-  background:#111;
-  border:1px solid #777;
 }
 
 .hero-athlete{
@@ -403,7 +416,7 @@ body{
   height:calc(100vh - 64px);
   background:#151718;
   border-left:1px solid #3b3c3d;
-  z-index:30;
+  z-index:10000;
   padding:22px;
   transition:.25s;
   box-shadow:-20px 0 60px #0008;
@@ -474,7 +487,7 @@ body{
   position:fixed;
   inset:0;
   background:#000b;
-  z-index:50;
+  z-index:50000;
   display:grid;
   place-items:center;
   padding:20px;
@@ -521,7 +534,7 @@ body{
 }
 
 .hidden{
-  display:none;
+  display:none !important;
 }
 
 /* ADMIN */
@@ -620,7 +633,30 @@ body{
   color:#ff5555;
 }
 
-/* ARTICLE VIEW */
+.cover-upload{
+  margin-bottom:10px;
+}
+
+.cover-upload label{
+  display:block;
+  color:#aaa;
+  font-size:10px;
+  font-weight:800;
+  margin-bottom:8px;
+}
+
+.cover-preview{
+  margin-bottom:10px;
+}
+
+.cover-preview img{
+  display:block;
+  width:100%;
+  max-height:300px;
+  object-fit:cover;
+  margin-bottom:8px;
+  border:1px solid #444;
+}
 
 .article-view{
   width:min(900px,94%);
@@ -660,34 +696,6 @@ body{
   z-index:2;
 }
 
-/* COVER IMAGE UPLOAD */
-
-.cover-upload{
-  margin-bottom:10px;
-}
-
-.cover-upload label{
-  display:block;
-  color:#aaa;
-  font-size:10px;
-  font-weight:800;
-  margin-bottom:8px;
-  letter-spacing:.8px;
-}
-
-.cover-preview{
-  margin-bottom:10px;
-}
-
-.cover-preview img{
-  display:block;
-  width:100%;
-  max-height:300px;
-  object-fit:cover;
-  margin-bottom:8px;
-  border:1px solid #444;
-}
-
 /* TABLET */
 
 @media(max-width:1050px){
@@ -708,10 +716,6 @@ body{
     grid-template-columns:repeat(2,1fr);
   }
 
-  .subscribe{
-    max-width:none;
-  }
-
   .categories{
     grid-template-columns:repeat(3,1fr);
   }
@@ -723,52 +727,68 @@ body{
 
   .topbar{
     height:60px;
-    padding:0 12px;
+    min-height:60px;
+    padding:0 10px;
   }
 
   .brand{
-    font-size:17px;
+    font-size:16px;
+  }
+
+  .brand span{
+    margin-right:4px;
   }
 
   .desktop-nav{
-    display:none;
+    display:none !important;
   }
 
   .actions{
+    display:flex !important;
+    align-items:center;
+    justify-content:flex-end;
+    gap:6px;
     margin-left:auto;
-    gap:7px;
+    flex-shrink:0;
   }
 
   .icon-btn{
-    display:none;
+    display:none !important;
   }
 
-  /* LOG IN JE NA MOBILU VIDITELNÝ */
   .login{
     display:block !important;
-    padding:9px 12px;
-    font-size:10px;
+    visibility:visible !important;
+    opacity:1 !important;
+    width:auto !important;
+    height:auto !important;
+    padding:9px 11px !important;
+    margin:0 !important;
+    font-size:10px !important;
   }
 
   .menu-btn{
-    display:block;
-    font-size:25px;
-    padding:4px;
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    font-size:25px !important;
+    padding:4px !important;
+    margin:0 !important;
   }
 
   .hero{
-    padding:50px 6%;
     min-height:500px;
+    padding:50px 6%;
   }
 
   .hero-athlete{
-    opacity:.35;
-    width:80%;
-    right:-20%;
+    opacity:.3;
+    width:85%;
+    right:-25%;
   }
 
   .hero h1{
-    font-size:70px;
+    font-size:68px;
   }
 
   .hero p{
@@ -778,10 +798,6 @@ body{
   .hero-buttons{
     flex-direction:column;
     align-items:flex-start;
-  }
-
-  .hero-buttons .btn{
-    width:auto;
   }
 
   .categories{
@@ -896,25 +912,29 @@ body{
   }
 }
 
-/* VERY SMALL PHONES */
+/* EXTRA SMALL MOBILE */
 
 @media(max-width:380px){
 
+  .topbar{
+    padding:0 7px;
+  }
+
   .brand{
-    font-size:15px;
+    font-size:14px;
   }
 
   .login{
-    padding:8px 9px;
-    font-size:9px;
+    padding:8px 9px !important;
+    font-size:9px !important;
   }
 
   .menu-btn{
-    font-size:23px;
+    font-size:23px !important;
   }
 
   .hero h1{
-    font-size:60px;
+    font-size:58px;
   }
 
   .cards{
