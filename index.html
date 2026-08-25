@@ -1,112 +1,1166 @@
-<!doctype html>
-<html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="description" content="Fitness Fuel — training, nutrition, motivation and health.">
-<meta property="og:title" content="Fitness Fuel">
-<meta property="og:description" content="Push your limits with practical fitness advice.">
-<title>Fitness Fuel — Push Your Limits</title>
-<link rel="stylesheet" href="style.css">
-</head>
-<body>
-<header class="topbar">
-  <a class="brand" href="#"><span>⚡</span> FITNESS <b>FUEL</b></a>
-  <nav class="desktop-nav">
-    <a class="active" href="#home">HOME</a><a href="#articles">ARTICLES</a><a href="#training">TRAINING</a>
-    <a href="#nutrition">NUTRITION</a><a href="#motivation">MOTIVATION</a><a href="#about">ABOUT US</a>
-  </nav>
-  <div class="actions">
-    <button class="icon-btn" aria-label="Search">⌕</button>
-    <button id="loginBtn" class="login" onclick="openAuth('login')">LOG IN</button>
-    <button class="menu-btn" onclick="toggleDrawer()" aria-label="Open articles">☰</button>
-  </div>
-</header>
+const SUPABASE_URL = 'https://nyanfbaosqshqiqvxesn.supabase.co';
+const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_L2uEZD5AX-AkKEuZ_YKQDw_6uH1FS6O';
 
-<aside id="drawer" class="drawer">
-  <div class="drawer-head"><h2>ALL ARTICLES</h2><button onclick="toggleDrawer()">×</button></div>
-  <div id="drawerArticles"></div>
-  <a class="drawer-all" href="#articles" onclick="toggleDrawer()">VIEW ALL ARTICLES</a>
-</aside>
+const db = window.supabase.createClient(
+  SUPABASE_URL,
+  SUPABASE_PUBLISHABLE_KEY
+);
 
-<main>
-<section id="home" class="hero">
-  <div class="hero-copy">
-    <div class="kicker">TRAINING • NUTRITION • MINDSET</div>
-    <h1>PUSH YOUR<br><em>LIMITS</em></h1>
-    <p>Practical tips, training plans and motivation to help you become the strongest version of yourself.</p>
-    <div class="hero-buttons"><a class="btn red" href="#articles">LATEST ARTICLES</a><a class="btn dark" href="#training">TRAINING PLANS</a></div>
-    <div class="social-proof"><div class="avatars">● ● ● ●</div><span>Join <b>3,247+</b> people<br>getting better every day.</span></div>
-  </div>
-  <div class="hero-athlete" aria-hidden="true"></div>
-</section>
+let articles = [];
+let editingId = null;
+let authMode = 'login';
+let currentCoverUrl = '';
 
-<section class="categories">
-  <a href="#training"><strong>⚡</strong><span>TRAINING<small>Tips & workout plans</small></span></a>
-  <a href="#nutrition"><strong>♧</strong><span>NUTRITION<small>Food & supplementation</small></span></a>
-  <a href="#articles"><strong>◉</strong><span>FAT LOSS<small>Guides for getting lean</small></span></a>
-  <a href="#motivation"><strong>♢</strong><span>MOTIVATION<small>Mindset & discipline</small></span></a>
-  <a href="#about"><strong>♡</strong><span>HEALTH<small>Recovery & wellbeing</small></span></a>
-</section>
+const $ = (id) => document.getElementById(id);
 
-<section id="articles" class="content">
-  <div class="latest">
-    <div class="section-title"><div><div class="kicker">THE LATEST</div><h2>LATEST ARTICLES</h2></div><a href="#">VIEW ALL</a></div>
-    <div id="cards" class="cards"></div>
-  </div>
-  <aside class="subscribe">
-    <div class="kicker">NEWSLETTER</div><h3>GET NEW ARTICLES<br>IN YOUR INBOX.</h3>
-    <p>Subscribe and get the latest training, nutrition and motivation articles by email.</p>
-    <form id="subscribe"><input type="email" placeholder="Your email" required><button class="btn red">SUBSCRIBE</button></form>
-    <small>No spam. Unsubscribe anytime.</small>
-    <div class="follow"><b>FOLLOW US</b><span>◎</span><span>▶</span><span>f</span></div>
-  </aside>
-</section>
+function esc(value = '') {
+  return String(value).replace(/[&<>'"]/g, (c) => ({
+    '&': '&amp;',
+    '<': '&lt;',
+    '>': '&gt;',
+    "'": '&#39;',
+    '"': '&quot;'
+  }[c]));
+}
 
-<section class="bottom-strip">
-  <div><b id="publicArticles">—</b><span>ARTICLES</span></div><div><b>REGULAR</b><span>NEW ARTICLES</span></div><div><b>2</b><span>ADMINISTRATORS</span></div><div><b>FITNESS</b><span>COMMUNITY</span></div>
-</section>
-</main>
-<section id="admin" class="admin-panel hidden">
-  <div class="section-title"><div><div class="kicker">ADMIN</div><h2>ADMIN DASHBOARD</h2></div></div>
-  <div class="admin-stats"><div><b id="visits">—</b><span>TOTAL VISITS</span></div><div><b id="subs">—</b><span>SUBSCRIBERS</span></div><div><b id="adminArticles">—</b><span>ARTICLES</span></div></div>
-  <div class="admin-editor">
-    <div class="kicker">ARTICLE EDITOR</div><h3>ADD / EDIT ARTICLE</h3>
-    <form id="articleForm">
-      <input id="title" placeholder="Article title" required>
-      <select id="category"><option>TRAINING</option><option>NUTRITION</option><option>MOTIVATION</option><option>FAT LOSS</option><option>HEALTH</option></select>
-<div class="cover-upload">
-  <label for="coverFile">COVER IMAGE</label>
+function formatDate(value) {
+  if (!value) return '';
 
-  <div id="coverPreview" class="cover-preview hidden">
-    <img id="coverPreviewImg" src="" alt="Cover preview">
-    <button type="button" class="btn dark" onclick="removeCoverImage()">
-      REMOVE IMAGE
-    </button>
-  </div>
+  return new Date(value).toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'short',
+    day: 'numeric'
+  });
+}
 
-  <input
-    id="coverFile"
-    type="file"
-    accept="image/jpeg,image/png,image/webp"
-  >
+/* =========================
+   ARTICLES
+========================= */
 
-  <input id="cover" type="hidden" value="">
-</div>
-      <textarea id="excerpt" placeholder="Short description" required></textarea>
-      <textarea id="content" rows="10" placeholder="Article content. Basic HTML is allowed." required></textarea>
-      <button id="articleSubmit" class="btn red" type="submit">PUBLISH ARTICLE</button>
-      <button class="btn dark" type="button" onclick="document.getElementById('articleForm').reset();editingId=null;document.getElementById('articleSubmit').textContent='PUBLISH ARTICLE'">CLEAR</button>
-      <p id="articleMsg"></p>
-    </form>
-  </div>
-  <div class="admin-list"><div class="kicker">MANAGE ARTICLES</div><div id="adminList"></div></div>
-</section>
+function card(a) {
+  const image =
+    a.cover_url ||
+    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=700&q=80';
 
-<div id="auth" class="modal hidden"><div class="modal-box"><button class="close" onclick="closeAuth()">×</button><div class="kicker">YOUR ACCOUNT</div><h2 id="authTitle">LOG IN</h2><form id="authForm"><input id="authEmail" type="email" placeholder="Email" required><input id="authPassword" type="password" placeholder="Password (min. 6 characters)" minlength="6" required><button id="authSubmit" class="btn red full" type="submit">LOG IN</button><p id="authMsg"></p></form><button id="authSwitch" class="auth-switch" type="button">Don't have an account? Sign up</button></div></div>
+  return `
+    <article class="card">
+      <div
+        class="card-img"
+        style="background-image:url('${esc(image)}')">
+      </div>
 
-<div id="articleView" class="modal hidden"><div class="article-view"><button class="close" onclick="closeArticle()">×</button><img id="articleViewImage" src="" alt=""><div class="kicker" id="articleViewMeta"></div><h2 id="articleViewTitle"></h2><div id="articleViewContent"></div></div></div>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script src="app.js"></script>
-</body>
-</html>
+      <div class="card-body">
+        <span class="tag">
+          ${esc(a.category || 'TRAINING')}
+        </span>
+
+        <h3>${esc(a.title)}</h3>
+
+        <p class="card-excerpt">
+          ${esc(a.excerpt || '')}
+        </p>
+
+        <div class="card-meta">
+          <span>${formatDate(a.created_at)}</span>
+
+          <a
+            href="#"
+            onclick="openArticle(${a.id});return false;">
+            READ MORE →
+          </a>
+        </div>
+      </div>
+    </article>
+  `;
+}
+
+function renderArticles() {
+
+  if ($('cards')) {
+    $('cards').innerHTML = articles.length
+      ? articles.slice(0, 4).map(card).join('')
+      : '<p style="color:#888">No articles yet.</p>';
+  }
+
+  if ($('drawerArticles')) {
+
+    $('drawerArticles').innerHTML = articles.length
+      ? articles.map(a => {
+
+          const image =
+            a.cover_url ||
+            'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=300&q=80';
+
+          return `
+            <div
+              class="drawer-item"
+              onclick="openArticle(${a.id});toggleDrawer();"
+              style="cursor:pointer">
+
+              <img
+                src="${esc(image)}"
+                alt=""
+                onerror="this.style.display='none'">
+
+              <div>
+                <b>${esc(a.title)}</b>
+                <small>
+                  ${formatDate(a.created_at)} ·
+                  ${esc(a.category || 'TRAINING')}
+                </small>
+              </div>
+            </div>
+          `;
+
+        }).join('')
+      : '<p style="color:#888">No articles yet.</p>';
+  }
+}
+
+async function loadArticles() {
+
+  const {
+    data,
+    error
+  } = await db
+    .from('articles')
+    .select('*')
+    .order('created_at', {
+      ascending: false
+    });
+
+  if (error) {
+
+    console.error('LOAD ARTICLES ERROR:', error);
+
+    if ($('cards')) {
+      $('cards').innerHTML =
+        '<p style="color:#f66">Could not load articles.</p>';
+    }
+
+    return;
+  }
+
+  articles = data || [];
+
+  renderArticles();
+  renderAdminList();
+
+  if ($('adminArticles')) {
+    $('adminArticles').textContent = articles.length;
+  }
+
+  if ($('publicArticles')) {
+    $('publicArticles').textContent = articles.length;
+  }
+}
+
+/* =========================
+   IMAGE UPLOAD
+========================= */
+
+async function uploadCoverImage(file) {
+
+  if (!file) return null;
+
+  const allowedTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/webp'
+  ];
+
+  if (!allowedTypes.includes(file.type)) {
+    throw new Error(
+      'Please upload a JPG, PNG or WEBP image.'
+    );
+  }
+
+  const maxSize = 5 * 1024 * 1024;
+
+  if (file.size > maxSize) {
+    throw new Error(
+      'Image is too large. Maximum size is 5 MB.'
+    );
+  }
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
+  if (!user) {
+    throw new Error('You must be logged in.');
+  }
+
+  const extension =
+    file.name.split('.').pop().toLowerCase();
+
+  const fileName =
+    `${user.id}/${Date.now()}-${Math.random()
+      .toString(36)
+      .substring(2)}.${extension}`;
+
+  const {
+    error
+  } = await db.storage
+    .from('article-images')
+    .upload(fileName, file, {
+      cacheControl: '3600',
+      upsert: false
+    });
+
+  if (error) {
+    console.error('UPLOAD ERROR:', error);
+    throw error;
+  }
+
+  const {
+    data: publicData
+  } = db.storage
+    .from('article-images')
+    .getPublicUrl(fileName);
+
+  return publicData.publicUrl;
+}
+
+/* =========================
+   IMAGE PREVIEW
+========================= */
+
+function showCoverPreview(url) {
+
+  if (!url) {
+    removeCoverPreviewOnly();
+    return;
+  }
+
+  currentCoverUrl = url;
+
+  if ($('cover')) {
+    $('cover').value = url;
+  }
+
+  if ($('coverPreviewImg')) {
+    $('coverPreviewImg').src = url;
+  }
+
+  if ($('coverPreview')) {
+    $('coverPreview').classList.remove('hidden');
+  }
+}
+
+function removeCoverPreviewOnly() {
+
+  currentCoverUrl = '';
+
+  if ($('cover')) {
+    $('cover').value = '';
+  }
+
+  if ($('coverPreviewImg')) {
+    $('coverPreviewImg').src = '';
+  }
+
+  if ($('coverPreview')) {
+    $('coverPreview').classList.add('hidden');
+  }
+
+  if ($('coverFile')) {
+    $('coverFile').value = '';
+  }
+}
+
+/*
+  Removes the image from the current article
+  and attempts to delete the file from Storage.
+*/
+async function removeCoverImage() {
+
+  const url =
+    currentCoverUrl ||
+    ($('cover') ? $('cover').value : '');
+
+  if (!url) {
+    removeCoverPreviewOnly();
+    return;
+  }
+
+  try {
+
+    const marker = '/storage/v1/object/public/article-images/';
+
+    if (url.includes(marker)) {
+
+      const filePath =
+        decodeURIComponent(
+          url.split(marker)[1].split('?')[0]
+        );
+
+      const {
+        error
+      } = await db.storage
+        .from('article-images')
+        .remove([filePath]);
+
+      if (error) {
+        console.warn(
+          'Storage delete failed:',
+          error
+        );
+      }
+    }
+
+  } catch (error) {
+
+    console.warn(
+      'Could not delete old image:',
+      error
+    );
+  }
+
+  removeCoverPreviewOnly();
+
+  if ($('articleMsg')) {
+    $('articleMsg').textContent =
+      'Cover image removed.';
+  }
+}
+
+/* =========================
+   FILE INPUT
+========================= */
+
+function setupCoverUpload() {
+
+  const input = $('coverFile');
+
+  if (!input) return;
+
+  input.addEventListener('change', async () => {
+
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    if ($('articleMsg')) {
+      $('articleMsg').textContent =
+        'Uploading image...';
+    }
+
+    try {
+
+      const url =
+        await uploadCoverImage(file);
+
+      showCoverPreview(url);
+
+      if ($('articleMsg')) {
+        $('articleMsg').textContent =
+          'Image uploaded successfully.';
+      }
+
+    } catch (error) {
+
+      console.error(error);
+
+      if ($('articleMsg')) {
+        $('articleMsg').textContent =
+          error.message ||
+          'Image upload failed.';
+      }
+
+      input.value = '';
+    }
+  });
+}
+
+/* =========================
+   AUTH
+========================= */
+
+function toggleDrawer() {
+
+  if ($('drawer')) {
+    $('drawer').classList.toggle('open');
+  }
+}
+
+function closeAuth() {
+
+  if ($('auth')) {
+    $('auth').classList.add('hidden');
+  }
+}
+
+function openAuth(mode = 'login') {
+
+  authMode = mode;
+
+  if ($('auth')) {
+    $('auth').classList.remove('hidden');
+  }
+
+  if ($('authTitle')) {
+    $('authTitle').textContent =
+      mode === 'signup'
+        ? 'CREATE ACCOUNT'
+        : 'LOG IN';
+  }
+
+  if ($('authSubmit')) {
+    $('authSubmit').textContent =
+      mode === 'signup'
+        ? 'SIGN UP'
+        : 'LOG IN';
+  }
+
+  if ($('authSwitch')) {
+    $('authSwitch').textContent =
+      mode === 'signup'
+        ? 'Already have an account? Log in'
+        : "Don't have an account? Sign up";
+  }
+
+  if ($('authMsg')) {
+    $('authMsg').textContent = '';
+  }
+}
+
+function toggleAuthMode() {
+
+  openAuth(
+    authMode === 'login'
+      ? 'signup'
+      : 'login'
+  );
+}
+
+async function handleAuth(e) {
+
+  e.preventDefault();
+
+  const email =
+    $('authEmail').value.trim();
+
+  const password =
+    $('authPassword').value;
+
+  $('authMsg').textContent =
+    'Please wait...';
+
+  if (authMode === 'signup') {
+
+    const {
+      data,
+      error
+    } = await db.auth.signUp({
+      email,
+      password
+    });
+
+    if (error) {
+      $('authMsg').textContent =
+        error.message;
+      return;
+    }
+
+    if (data.session) {
+
+      $('authMsg').textContent =
+        'Account created. You are now logged in.';
+
+      setTimeout(() => {
+        closeAuth();
+      }, 1000);
+
+    } else {
+
+      $('authMsg').textContent =
+        'Account created. Check your email to confirm your account.';
+    }
+
+  } else {
+
+    const {
+      error
+    } = await db.auth.signInWithPassword({
+      email,
+      password
+    });
+
+    if (error) {
+
+      $('authMsg').textContent =
+        error.message;
+
+      return;
+    }
+
+    closeAuth();
+
+    await updateUserUI();
+  }
+}
+
+async function logout() {
+
+  await db.auth.signOut();
+
+  await updateUserUI();
+}
+
+/* =========================
+   PROFILE / ADMIN
+========================= */
+
+async function getProfile(userId) {
+
+  const {
+    data,
+    error
+  } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .maybeSingle();
+
+  if (error) {
+    console.error(
+      'PROFILE ERROR:',
+      error
+    );
+  }
+
+  return data;
+}
+
+async function isAdmin() {
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
+  if (!user) return false;
+
+  const profile =
+    await getProfile(user.id);
+
+  return profile?.role === 'admin';
+}
+
+async function updateUserUI() {
+
+  const {
+    data: { user }
+  } = await db.auth.getUser();
+
+  const loginBtn =
+    $('loginBtn');
+
+  if (!user) {
+
+    if (loginBtn) {
+      loginBtn.textContent =
+        'LOG IN';
+
+      loginBtn.onclick =
+        () => openAuth('login');
+    }
+
+    if ($('admin')) {
+      $('admin').classList.add('hidden');
+    }
+
+    return;
+  }
+
+  const profile =
+    await getProfile(user.id);
+
+  if (loginBtn) {
+
+    loginBtn.textContent =
+      'LOG OUT';
+
+    loginBtn.onclick =
+      logout;
+  }
+
+  if (profile?.role === 'admin') {
+
+    if ($('admin')) {
+      $('admin').classList.remove('hidden');
+    }
+
+    await refreshAdminStats();
+
+  } else {
+
+    if ($('admin')) {
+      $('admin').classList.add('hidden');
+    }
+  }
+}
+
+/* =========================
+   ADMIN STATS
+========================= */
+
+async function refreshAdminStats() {
+
+  const {
+    count: subs
+  } = await db
+    .from('subscribers')
+    .select('*', {
+      count: 'exact',
+      head: true
+    });
+
+  const {
+    data: stats
+  } = await db
+    .from('site_stats')
+    .select('visits')
+    .eq('id', 1)
+    .maybeSingle();
+
+  if ($('subs')) {
+    $('subs').textContent =
+      subs ?? 0;
+  }
+
+  if ($('adminArticles')) {
+    $('adminArticles').textContent =
+      articles.length;
+  }
+
+  if ($('visits')) {
+    $('visits').textContent =
+      stats?.visits ?? 0;
+  }
+}
+
+/* =========================
+   SAVE ARTICLE
+========================= */
+
+async function saveArticle(e) {
+
+  e.preventDefault();
+
+  if (!(await isAdmin())) {
+
+    $('articleMsg').textContent =
+      'Admin access required.';
+
+    return;
+  }
+
+  const payload = {
+
+    title:
+      $('title').value.trim(),
+
+    excerpt:
+      $('excerpt').value.trim(),
+
+    content:
+      $('content').value.trim(),
+
+    cover_url:
+      $('cover').value.trim() || null,
+
+    category:
+      $('category').value
+  };
+
+  if (!payload.title) {
+    $('articleMsg').textContent =
+      'Please enter an article title.';
+    return;
+  }
+
+  if (!payload.excerpt) {
+    $('articleMsg').textContent =
+      'Please enter an excerpt.';
+    return;
+  }
+
+  if (!payload.content) {
+    $('articleMsg').textContent =
+      'Please enter article content.';
+    return;
+  }
+
+  let result;
+
+  if (editingId) {
+
+    result =
+      await db
+        .from('articles')
+        .update(payload)
+        .eq('id', editingId);
+
+  } else {
+
+    const {
+      data: { user }
+    } = await db.auth.getUser();
+
+    result =
+      await db
+        .from('articles')
+        .insert({
+          ...payload,
+          author_id: user.id
+        });
+  }
+
+  if (result.error) {
+
+    console.error(
+      'SAVE ARTICLE ERROR:',
+      result.error
+    );
+
+    $('articleMsg').textContent =
+      result.error.message;
+
+    return;
+  }
+
+  $('articleMsg').textContent =
+    editingId
+      ? 'Article updated successfully.'
+      : 'Article published successfully.';
+
+  editingId = null;
+
+  $('articleForm').reset();
+
+  removeCoverPreviewOnly();
+
+  $('articleSubmit').textContent =
+    'PUBLISH ARTICLE';
+
+  await loadArticles();
+  await refreshAdminStats();
+}
+
+/* =========================
+   DELETE ARTICLE
+========================= */
+
+async function deleteArticle(id) {
+
+  if (!(await isAdmin())) {
+
+    alert(
+      'Admin access required.'
+    );
+
+    return;
+  }
+
+  const article =
+    articles.find(
+      x => Number(x.id) === Number(id)
+    );
+
+  if (!article) return;
+
+  if (!confirm(
+    `Delete "${article.title}"?`
+  )) {
+    return;
+  }
+
+  /*
+    First delete article from database.
+  */
+
+  const {
+    error
+  } = await db
+    .from('articles')
+    .delete()
+    .eq('id', id);
+
+  if (error) {
+
+    alert(error.message);
+
+    return;
+  }
+
+  /*
+    Then try to delete its image
+    from Storage.
+  */
+
+  if (article.cover_url) {
+
+    try {
+
+      const marker =
+        '/storage/v1/object/public/article-images/';
+
+      if (
+        article.cover_url.includes(marker)
+      ) {
+
+        const filePath =
+          decodeURIComponent(
+            article.cover_url
+              .split(marker)[1]
+              .split('?')[0]
+          );
+
+        await db.storage
+          .from('article-images')
+          .remove([filePath]);
+      }
+
+    } catch (e) {
+
+      console.warn(
+        'Image deletion failed:',
+        e
+      );
+    }
+  }
+
+  await loadArticles();
+  await refreshAdminStats();
+  renderAdminList();
+}
+
+/* =========================
+   EDIT ARTICLE
+========================= */
+
+function editArticle(id) {
+
+  const a =
+    articles.find(
+      x => Number(x.id) === Number(id)
+    );
+
+  if (!a) return;
+
+  editingId = a.id;
+
+  $('title').value =
+    a.title || '';
+
+  $('category').value =
+    a.category || 'TRAINING';
+
+  $('excerpt').value =
+    a.excerpt || '';
+
+  $('content').value =
+    a.content || '';
+
+  showCoverPreview(
+    a.cover_url || ''
+  );
+
+  $('articleSubmit').textContent =
+    'SAVE CHANGES';
+
+  $('articleMsg').textContent =
+    'Editing article...';
+
+  $('admin').scrollIntoView({
+    behavior: 'smooth'
+  });
+}
+
+/* =========================
+   CLEAR FORM
+========================= */
+
+function clearArticleForm() {
+
+  editingId = null;
+
+  if ($('articleForm')) {
+    $('articleForm').reset();
+  }
+
+  removeCoverPreviewOnly();
+
+  if ($('articleSubmit')) {
+    $('articleSubmit').textContent =
+      'PUBLISH ARTICLE';
+  }
+
+  if ($('articleMsg')) {
+    $('articleMsg').textContent = '';
+  }
+}
+
+/* =========================
+   ADMIN ARTICLE LIST
+========================= */
+
+function renderAdminList() {
+
+  const box =
+    $('adminList');
+
+  if (!box) return;
+
+  if (!articles.length) {
+
+    box.innerHTML =
+      '<p style="color:#888">No articles yet.</p>';
+
+    return;
+  }
+
+  box.innerHTML =
+    articles.map(a => {
+
+      return `
+        <div class="admin-row">
+
+          <div>
+            <b>${esc(a.title)}</b>
+
+            <small>
+              ${formatDate(a.created_at)}
+              ·
+              ${esc(a.category || 'TRAINING')}
+            </small>
+          </div>
+
+          <div>
+
+            <button
+              onclick="editArticle(${a.id})">
+              EDIT
+            </button>
+
+            <button
+              class="danger"
+              onclick="deleteArticle(${a.id})">
+              DELETE
+            </button>
+
+          </div>
+
+        </div>
+      `;
+
+    }).join('');
+}
+
+/* =========================
+   NEWSLETTER
+========================= */
+
+async function subscribe(e) {
+
+  e.preventDefault();
+
+  const email =
+    e.target
+      .querySelector('input[type=email]')
+      .value
+      .trim()
+      .toLowerCase();
+
+  const {
+    error
+  } = await db
+    .from('subscribers')
+    .insert({
+      email
+    });
+
+  if (
+    error &&
+    !String(error.message)
+      .toLowerCase()
+      .includes('duplicate')
+  ) {
+
+    e.target.innerHTML =
+      `<b style="color:#ff6b6b">
+        ${esc(error.message)}
+      </b>`;
+
+    return;
+  }
+
+  e.target.innerHTML =
+    "<b style='color:#58c66a'>You're subscribed. Welcome to Fitness Fuel! 💪</b>";
+
+  await refreshAdminStats();
+}
+
+/* =========================
+   ARTICLE VIEW
+========================= */
+
+function openArticle(id) {
+
+  const a =
+    articles.find(
+      x => Number(x.id) === Number(id)
+    );
+
+  if (!a) return;
+
+  $('articleViewTitle').textContent =
+    a.title;
+
+  $('articleViewMeta').textContent =
+    `${formatDate(a.created_at)} · ${a.category || 'TRAINING'}`;
+
+  $('articleViewImage').src =
+    a.cover_url ||
+    'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80';
+
+  /*
+    Content intentionally supports
+    basic HTML as your editor says.
+  */
+
+  $('articleViewContent').innerHTML =
+    a.content || '';
+
+  $('articleView').classList.remove(
+    'hidden'
+  );
+}
+
+function closeArticle() {
+
+  $('articleView')
+    .classList.add('hidden');
+}
+
+/* =========================
+   VISIT TRACKING
+========================= */
+
+async function trackVisit() {
+
+  try {
+
+    await db.rpc(
+      'track_page_view'
+    );
+
+  } catch (e) {
+
+    console.warn(
+      'Visit tracking failed:',
+      e
+    );
+  }
+}
+
+/* =========================
+   EVENT LISTENERS
+========================= */
+
+function setupEvents() {
+
+  if ($('authForm')) {
+    $('authForm')
+      .addEventListener(
+        'submit',
+        handleAuth
+      );
+  }
+
+  if ($('authSwitch')) {
+    $('authSwitch')
+      .addEventListener(
+        'click',
+        toggleAuthMode
+      );
+  }
+
+  if ($('subscribe')) {
+    $('subscribe')
+      .addEventListener(
+        'submit',
+        subscribe
+      );
+  }
+
+  if ($('articleForm')) {
+    $('articleForm')
+      .addEventListener(
+        'submit',
+        saveArticle
+      );
+  }
+
+  if ($('coverFile')) {
+    setupCoverUpload();
+  }
+
+  if ($('auth')) {
+
+    $('auth')
+      .addEventListener('click', e => {
+
+        if (
+          e.target === $('auth')
+        ) {
+          closeAuth();
+        }
+
+      });
+  }
+
+  if ($('articleView')) {
+
+    $('articleView')
+      .addEventListener('click', e => {
+
+        if (
+          e.target ===
+          $('articleView')
+        ) {
+          closeArticle();
+        }
+
+      });
+  }
+}
+
+/* =========================
+   AUTH STATE
+========================= */
+
+db.auth.onAuthStateChange(
+  async () => {
+
+    await updateUserUI();
+
+  }
+);
+
+/* =========================
+   INITIALIZATION
+========================= */
+
+(async function init() {
+
+  setupEvents();
+
+  await loadArticles();
+
+  await trackVisit();
+
+  await updateUserUI();
+
+})();
