@@ -1,175 +1,303 @@
-const SUPABASE_URL = 'https://nyanfbaosqshqiqvxesn.supabase.co';
-const SUPABASE_PUBLISHABLE_KEY = 'sb_publishable_L2uEZD5AX-AkKEuZ_YKQDw_6uH1FS6O';
+const SUPABASE_URL =
+  'https://nyanfbaosqshqiqvxesn.supabase.co';
+
+const SUPABASE_PUBLISHABLE_KEY =
+  'sb_publishable_L2uEZD5AX-AkKEuZ_YKQDw_6uH1FS6O';
+
 
 let db = null;
 let articles = [];
 let editingId = null;
 let authMode = 'login';
 
-const $ = id => document.getElementById(id);
+
+const $ = id =>
+  document.getElementById(id);
+
+
+/* =========================
+   HELPERS
+========================= */
 
 function esc(value = '') {
-  return String(value).replace(/[&<>'"]/g, c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    "'": '&#39;',
-    '"': '&quot;'
-  }[c]));
+
+  return String(value).replace(
+    /[&<>'"]/g,
+    c => ({
+      '&': '&amp;',
+      '<': '&lt;',
+      '>': '&gt;',
+      "'": '&#39;',
+      '"': '&quot;'
+    }[c])
+  );
+
 }
+
 
 function formatDate(value) {
+
   if (!value) return '';
 
-  return new Date(value).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
-  });
+  return new Date(value).toLocaleDateString(
+    'en-US',
+    {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric'
+    }
+  );
+
 }
+
 
 /* =========================
    SUPABASE
 ========================= */
 
 function initSupabase() {
+
   if (!window.supabase) {
-    console.error('Supabase library was not loaded.');
+
+    console.error(
+      'Supabase library was not loaded.'
+    );
+
     return false;
   }
 
-  db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
+  db =
+    window.supabase.createClient(
+      SUPABASE_URL,
+      SUPABASE_PUBLISHABLE_KEY
+    );
 
   return true;
 }
+
 
 /* =========================
    SEARCH
 ========================= */
 
 function setupSearch() {
-  const searchButton = document.querySelector('.icon-btn');
-  const searchBox = $('searchBox');
 
-  if (!searchButton) {
-    console.warn('Search button .icon-btn was not found.');
+  const searchButton =
+    $('searchBtn');
+
+  const searchPanel =
+    $('searchPanel');
+
+  const searchBox =
+    $('searchBox');
+
+  const searchClose =
+    $('searchClose');
+
+
+  if (
+    !searchButton ||
+    !searchPanel ||
+    !searchBox
+  ) {
+
+    console.error(
+      'Search HTML elements are missing.'
+    );
+
     return;
   }
 
-  searchButton.addEventListener('click', event => {
-    event.preventDefault();
-    event.stopPropagation();
 
-    toggleSearch();
-  });
+  /*
+    OPEN SEARCH
+  */
 
-  if (searchBox) {
+  searchButton.addEventListener(
+    'click',
+    event => {
 
-    searchBox.addEventListener('input', () => {
-      filterArticles(searchBox.value);
-    });
+      event.preventDefault();
+      event.stopPropagation();
 
-    searchBox.addEventListener('keydown', event => {
+      searchPanel.classList.remove(
+        'hidden'
+      );
 
-      if (event.key === 'Escape') {
+      setTimeout(() => {
+
+        searchBox.focus();
+
+      }, 50);
+
+    }
+  );
+
+
+  /*
+    LIVE FILTER
+  */
+
+  searchBox.addEventListener(
+    'input',
+    () => {
+
+      filterArticles(
+        searchBox.value
+      );
+
+    }
+  );
+
+
+  /*
+    CLOSE BUTTON
+  */
+
+  if (searchClose) {
+
+    searchClose.addEventListener(
+      'click',
+      event => {
+
+        event.preventDefault();
+        event.stopPropagation();
+
         closeSearch();
+
+      }
+    );
+
+  }
+
+
+  /*
+    ESC
+  */
+
+  searchBox.addEventListener(
+    'keydown',
+    event => {
+
+      if (
+        event.key === 'Escape'
+      ) {
+
+        closeSearch();
+
       }
 
-    });
-  }
+    }
+  );
+
 }
 
-function toggleSearch() {
 
-  const searchBox = $('searchBox');
-
-  if (!searchBox) {
-    console.error(
-      'Element #searchBox is missing from index.html.'
-    );
-    return;
-  }
-
-  const isOpen =
-    searchBox.classList.contains('search-visible');
-
-  if (isOpen) {
-    closeSearch();
-  } else {
-    openSearch();
-  }
-}
-
-function openSearch() {
-
-  const searchBox = $('searchBox');
-
-  if (!searchBox) return;
-
-  searchBox.classList.remove('hidden');
-  searchBox.classList.add('search-visible');
-
-  setTimeout(() => {
-    searchBox.focus();
-  }, 50);
-}
+/*
+   CLOSE SEARCH
+*/
 
 function closeSearch() {
 
-  const searchBox = $('searchBox');
+  const searchPanel =
+    $('searchPanel');
 
-  if (!searchBox) return;
+  const searchBox =
+    $('searchBox');
 
-  searchBox.value = '';
+
+  if (!searchPanel) return;
+
+
+  searchPanel.classList.add(
+    'hidden'
+  );
+
+
+  if (searchBox) {
+    searchBox.value = '';
+  }
+
 
   filterArticles('');
 
-  searchBox.classList.remove('search-visible');
-  searchBox.classList.add('hidden');
-
-  searchBox.blur();
 }
+
+
+/*
+   FILTER
+*/
 
 function filterArticles(search = '') {
 
   const query =
-    String(search)
+    search
       .trim()
       .toLowerCase();
 
-  const cards = $('cards');
+
+  const cards =
+    $('cards');
+
 
   if (!cards) return;
+
+
+  /*
+    SEARCH EMPTY
+  */
 
   if (!query) {
 
     cards.innerHTML =
       articles.length
-        ? articles.slice(0, 4).map(card).join('')
-        : '<p style="color:#888">No articles yet.</p>';
+
+        ? articles
+            .slice(0, 4)
+            .map(card)
+            .join('')
+
+        : `
+          <p style="color:#888">
+            No articles yet.
+          </p>
+        `;
 
     return;
   }
 
+
+  /*
+    FILTER TITLE + CATEGORY
+  */
+
   const filtered =
-    articles.filter(article => {
+    articles.filter(
+      article => {
 
-      const title =
-        String(article.title || '')
-          .toLowerCase();
+        const title =
+          String(
+            article.title || ''
+          ).toLowerCase();
 
-      const category =
-        String(article.category || '')
-          .toLowerCase();
+        const category =
+          String(
+            article.category || ''
+          ).toLowerCase();
 
-      return (
-        title.includes(query) ||
-        category.includes(query)
-      );
-    });
+
+        return (
+          title.includes(query) ||
+          category.includes(query)
+        );
+
+      }
+    );
+
+
+  /*
+    NOTHING FOUND
+  */
 
   if (!filtered.length) {
 
@@ -186,60 +314,105 @@ function filterArticles(search = '') {
     return;
   }
 
+
+  /*
+    RESULTS
+  */
+
   cards.innerHTML =
-    filtered.map(card).join('');
+    filtered
+      .map(card)
+      .join('');
+
 }
 
+
 /* =========================
-   AUTH MODAL
+   AUTH
 ========================= */
 
-function openAuth(mode = 'login') {
+function openAuth(
+  mode = 'login'
+) {
 
   authMode = mode;
 
-  const auth = $('auth');
+
+  const auth =
+    $('auth');
+
 
   if (!auth) {
-    console.error('Element #auth was not found.');
+
+    console.error(
+      'Element #auth was not found.'
+    );
+
     return;
   }
 
-  auth.classList.remove('hidden');
+
+  auth.classList.remove(
+    'hidden'
+  );
+
 
   if ($('authTitle')) {
+
     $('authTitle').textContent =
       mode === 'signup'
         ? 'CREATE ACCOUNT'
         : 'LOG IN';
+
   }
 
+
   if ($('authSubmit')) {
+
     $('authSubmit').textContent =
       mode === 'signup'
         ? 'SIGN UP'
         : 'LOG IN';
+
   }
+
 
   if ($('authSwitch')) {
+
     $('authSwitch').textContent =
       mode === 'signup'
+
         ? 'Already have an account? Log in'
+
         : "Don't have an account? Sign up";
+
   }
+
 
   if ($('authMsg')) {
+
     $('authMsg').textContent = '';
+
   }
 
+
   setTimeout(() => {
+
     $('authEmail')?.focus();
+
   }, 50);
+
 }
 
+
 function closeAuth() {
-  $('auth')?.classList.add('hidden');
+
+  $('auth')?.classList.add(
+    'hidden'
+  );
+
 }
+
 
 function toggleAuthMode() {
 
@@ -248,11 +421,20 @@ function toggleAuthMode() {
       ? 'signup'
       : 'login'
   );
+
 }
 
-async function handleAuth(event) {
+
+/* =========================
+   AUTH HANDLER
+========================= */
+
+async function handleAuth(
+  event
+) {
 
   event.preventDefault();
+
 
   if (!db) {
 
@@ -262,24 +444,41 @@ async function handleAuth(event) {
     return;
   }
 
+
   const email =
-    $('authEmail').value.trim();
+    $('authEmail')
+      .value
+      .trim();
+
 
   const password =
-    $('authPassword').value;
+    $('authPassword')
+      .value;
+
 
   $('authMsg').textContent =
     'Please wait...';
 
+
   try {
 
-    if (authMode === 'signup') {
+    /*
+      SIGN UP
+    */
 
-      const { data, error } =
+    if (
+      authMode === 'signup'
+    ) {
+
+      const {
+        data,
+        error
+      } =
         await db.auth.signUp({
           email,
           password
         });
+
 
       if (error) {
 
@@ -289,30 +488,44 @@ async function handleAuth(event) {
         return;
       }
 
+
       if (data.session) {
 
         $('authMsg').textContent =
           'Account created successfully.';
 
+
         setTimeout(() => {
+
           closeAuth();
           updateUserUI();
+
         }, 1000);
 
       } else {
 
         $('authMsg').textContent =
           'Account created. Check your email to confirm your account.';
+
       }
+
 
       return;
     }
 
-    const { error } =
+
+    /*
+      LOGIN
+    */
+
+    const {
+      error
+    } =
       await db.auth.signInWithPassword({
         email,
         password
       });
+
 
     if (error) {
 
@@ -322,18 +535,32 @@ async function handleAuth(event) {
       return;
     }
 
+
     closeAuth();
 
     await updateUserUI();
 
+
   } catch (error) {
 
-    console.error('Login error:', error);
+    console.error(
+      'Login error:',
+      error
+    );
+
 
     $('authMsg').textContent =
-      error.message || 'Login failed.';
+      error.message ||
+      'Login failed.';
+
   }
+
 }
+
+
+/* =========================
+   LOGOUT
+========================= */
 
 async function logout() {
 
@@ -342,22 +569,36 @@ async function logout() {
   await db.auth.signOut();
 
   await updateUserUI();
+
 }
 
+
 /* =========================
-   USER / ADMIN
+   PROFILE
 ========================= */
 
-async function getProfile(userId) {
+async function getProfile(
+  userId
+) {
 
-  if (!db || !userId) return null;
+  if (
+    !db ||
+    !userId
+  ) {
+    return null;
+  }
 
-  const { data, error } =
+
+  const {
+    data,
+    error
+  } =
     await db
       .from('profiles')
       .select('role')
       .eq('id', userId)
       .maybeSingle();
+
 
   if (error) {
 
@@ -369,37 +610,74 @@ async function getProfile(userId) {
     return null;
   }
 
+
   return data;
+
 }
+
+
+/* =========================
+   ADMIN CHECK
+========================= */
 
 async function isAdmin() {
 
   if (!db) return false;
 
+
   const {
-    data: { user }
-  } = await db.auth.getUser();
+    data: {
+      user
+    }
+  } =
+    await db.auth.getUser();
+
 
   if (!user) return false;
 
-  const profile =
-    await getProfile(user.id);
 
-  return profile?.role === 'admin';
+  const profile =
+    await getProfile(
+      user.id
+    );
+
+
+  return (
+    profile?.role === 'admin'
+  );
+
 }
+
+
+/* =========================
+   USER UI
+========================= */
 
 async function updateUserUI() {
 
   if (!db) return;
 
+
   try {
 
     const {
-      data: { user }
-    } = await db.auth.getUser();
+      data: {
+        user
+      }
+    } =
+      await db.auth.getUser();
 
-    const loginBtn = $('loginBtn');
-    const admin = $('admin');
+
+    const loginBtn =
+      $('loginBtn');
+
+    const admin =
+      $('admin');
+
+
+    /*
+      LOGGED OUT
+    */
 
     if (!user) {
 
@@ -410,15 +688,28 @@ async function updateUserUI() {
 
         loginBtn.onclick =
           () => openAuth('login');
+
       }
 
-      admin?.classList.add('hidden');
+
+      admin?.classList.add(
+        'hidden'
+      );
+
 
       return;
     }
 
+
+    /*
+      LOGGED IN
+    */
+
     const profile =
-      await getProfile(user.id);
+      await getProfile(
+        user.id
+      );
+
 
     if (loginBtn) {
 
@@ -427,18 +718,32 @@ async function updateUserUI() {
 
       loginBtn.onclick =
         logout;
+
     }
 
-    if (profile?.role === 'admin') {
 
-      admin?.classList.remove('hidden');
+    /*
+      ADMIN
+    */
+
+    if (
+      profile?.role === 'admin'
+    ) {
+
+      admin?.classList.remove(
+        'hidden'
+      );
 
       await refreshAdminStats();
 
     } else {
 
-      admin?.classList.add('hidden');
+      admin?.classList.add(
+        'hidden'
+      );
+
     }
+
 
   } catch (error) {
 
@@ -446,18 +751,23 @@ async function updateUserUI() {
       'User UI error:',
       error
     );
+
   }
+
 }
 
+
 /* =========================
-   ARTICLES
+   ARTICLE CARD
 ========================= */
 
 function card(article) {
 
   const image =
     article.cover_url ||
+
     'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=700&q=80';
+
 
   return `
     <article class="card">
@@ -470,27 +780,42 @@ function card(article) {
       <div class="card-body">
 
         <span class="tag">
-          ${esc(article.category || 'TRAINING')}
+          ${esc(
+            article.category ||
+            'TRAINING'
+          )}
         </span>
 
         <h3>
-          ${esc(article.title)}
+          ${esc(
+            article.title
+          )}
         </h3>
 
         <p class="card-excerpt">
-          ${esc(article.excerpt || '')}
+          ${esc(
+            article.excerpt ||
+            ''
+          )}
         </p>
 
         <div class="card-meta">
 
           <span>
-            ${formatDate(article.created_at)}
+            ${formatDate(
+              article.created_at
+            )}
           </span>
 
           <a
             href="#"
-            onclick="openArticle(${article.id}); return false;">
+            onclick="
+              openArticle(${article.id});
+              return false;
+            ">
+
             READ MORE →
+
           </a>
 
         </div>
@@ -499,72 +824,142 @@ function card(article) {
 
     </article>
   `;
+
 }
+
+
+/* =========================
+   RENDER ARTICLES
+========================= */
 
 function renderArticles() {
 
-  const cards = $('cards');
-  const drawer = $('drawerArticles');
+  const cards =
+    $('cards');
+
+  const drawer =
+    $('drawerArticles');
+
+
+  /*
+    PUBLIC CARDS
+  */
 
   if (cards) {
 
     cards.innerHTML =
       articles.length
-        ? articles.slice(0, 4).map(card).join('')
-        : '<p style="color:#888">No articles yet.</p>';
+
+        ? articles
+            .slice(0, 4)
+            .map(card)
+            .join('')
+
+        : `
+          <p style="color:#888">
+            No articles yet.
+          </p>
+        `;
+
   }
+
+
+  /*
+    DRAWER
+  */
 
   if (drawer) {
 
     drawer.innerHTML =
       articles.length
 
-        ? articles.map(article => `
+        ? articles
+            .map(
+              article => `
 
-          <div
-            class="drawer-item"
-            onclick="openArticle(${article.id}); toggleDrawer();"
-            style="cursor:pointer">
+              <div
+                class="drawer-item"
+                onclick="
+                  openArticle(${article.id});
+                  toggleDrawer();
+                "
+                style="cursor:pointer">
 
-            ${
-              article.cover_url
-                ? `<img src="${esc(article.cover_url)}">`
-                : ''
-            }
+                ${
+                  article.cover_url
 
-            <div>
+                    ? `
+                      <img
+                        src="${esc(
+                          article.cover_url
+                        )}"
+                        alt="">
+                    `
 
-              <b>
-                ${esc(article.title)}
-              </b>
+                    : ''
+                }
 
-              <small>
-                ${formatDate(article.created_at)}
-                ·
-                ${esc(article.category || 'TRAINING')}
-              </small>
+                <div>
 
-            </div>
+                  <b>
+                    ${esc(
+                      article.title
+                    )}
+                  </b>
 
-          </div>
+                  <small>
+                    ${formatDate(
+                      article.created_at
+                    )}
+                    ·
+                    ${esc(
+                      article.category ||
+                      'TRAINING'
+                    )}
+                  </small>
 
-        `).join('')
+                </div>
 
-        : '<p style="color:#888">No articles yet.</p>';
+              </div>
+
+            `
+            )
+            .join('')
+
+        : `
+          <p style="color:#888">
+            No articles yet.
+          </p>
+        `;
+
   }
+
 }
+
+
+/* =========================
+   LOAD ARTICLES
+========================= */
 
 async function loadArticles() {
 
   if (!db) return;
 
-  const { data, error } =
+
+  const {
+    data,
+    error
+  } =
     await db
       .from('articles')
       .select('*')
-      .order('created_at', {
-        ascending: false
-      });
+      .order(
+        'created_at',
+        {
+          ascending:false
+        }
+      );
+
 
   if (error) {
 
@@ -573,31 +968,51 @@ async function loadArticles() {
       error
     );
 
+
     if ($('cards')) {
 
       $('cards').innerHTML =
-        '<p style="color:#f66">Could not load articles.</p>';
+        `
+          <p style="color:#f66">
+            Could not load articles.
+          </p>
+        `;
+
     }
+
 
     return;
   }
 
+
   articles =
     data || [];
 
+
   renderArticles();
+
   renderAdminList();
 
+
   if ($('adminArticles')) {
-    $('adminArticles').textContent =
+
+    $('adminArticles')
+      .textContent =
       articles.length;
+
   }
 
+
   if ($('publicArticles')) {
-    $('publicArticles').textContent =
+
+    $('publicArticles')
+      .textContent =
       articles.length;
+
   }
+
 }
+
 
 /* =========================
    DRAWER
@@ -605,10 +1020,12 @@ async function loadArticles() {
 
 function toggleDrawer() {
 
-  const drawer = $('drawer');
+  $('drawer')
+    ?.classList
+    .toggle('open');
 
-  drawer?.classList.toggle('open');
 }
+
 
 /* =========================
    ADMIN STATS
@@ -618,40 +1035,57 @@ async function refreshAdminStats() {
 
   if (!db) return;
 
+
   try {
 
-    const { count: subscribers } =
+    const {
+      count: subscribers
+    } =
       await db
         .from('subscribers')
-        .select('*', {
-          count: 'exact',
-          head: true
-        });
+        .select(
+          '*',
+          {
+            count:'exact',
+            head:true
+          }
+        );
 
-    const { data: stats } =
+
+    const {
+      data: stats
+    } =
       await db
         .from('site_stats')
         .select('visits')
-        .eq('id', 1)
+        .eq('id',1)
         .maybeSingle();
+
 
     if ($('subs')) {
 
       $('subs').textContent =
         subscribers ?? 0;
+
     }
+
 
     if ($('adminArticles')) {
 
-      $('adminArticles').textContent =
+      $('adminArticles')
+        .textContent =
         articles.length;
+
     }
+
 
     if ($('visits')) {
 
       $('visits').textContent =
         stats?.visits ?? 0;
+
     }
+
 
   } catch (error) {
 
@@ -659,16 +1093,22 @@ async function refreshAdminStats() {
       'Admin stats error:',
       error
     );
+
   }
+
 }
+
 
 /* =========================
    IMAGE UPLOAD
 ========================= */
 
-async function uploadCoverImage(file) {
+async function uploadCoverImage(
+  file
+) {
 
   if (!file) return null;
+
 
   const allowed = [
     'image/jpeg',
@@ -676,30 +1116,48 @@ async function uploadCoverImage(file) {
     'image/webp'
   ];
 
-  if (!allowed.includes(file.type)) {
+
+  if (
+    !allowed.includes(
+      file.type
+    )
+  ) {
 
     throw new Error(
       'Please use JPG, PNG or WEBP.'
     );
+
   }
 
-  if (file.size > 5 * 1024 * 1024) {
+
+  if (
+    file.size >
+    5 * 1024 * 1024
+  ) {
 
     throw new Error(
       'Image must be smaller than 5 MB.'
     );
+
   }
 
+
   const {
-    data: { user }
-  } = await db.auth.getUser();
+    data: {
+      user
+    }
+  } =
+    await db.auth.getUser();
+
 
   if (!user) {
 
     throw new Error(
       'You must be logged in.'
     );
+
   }
+
 
   const extension =
     file.name
@@ -707,35 +1165,54 @@ async function uploadCoverImage(file) {
       .pop()
       .toLowerCase();
 
+
   const filename =
     `${user.id}/${crypto.randomUUID()}.${extension}`;
 
-  const { error } =
+
+  const {
+    error
+  } =
     await db.storage
       .from('article-images')
       .upload(
         filename,
         file,
         {
-          cacheControl: '3600',
-          upsert: false,
-          contentType: file.type
+          cacheControl:'3600',
+          upsert:false,
+          contentType:file.type
         }
       );
+
 
   if (error) {
     throw error;
   }
 
-  const { data } =
+
+  const {
+    data
+  } =
     db.storage
       .from('article-images')
-      .getPublicUrl(filename);
+      .getPublicUrl(
+        filename
+      );
+
 
   return data.publicUrl;
+
 }
 
-function showCoverPreview(url) {
+
+/* =========================
+   COVER PREVIEW
+========================= */
+
+function showCoverPreview(
+  url
+) {
 
   const preview =
     $('coverPreview');
@@ -743,36 +1220,59 @@ function showCoverPreview(url) {
   const image =
     $('coverPreviewImg');
 
-  if (!preview || !image) return;
+
+  if (
+    !preview ||
+    !image
+  ) {
+    return;
+  }
+
 
   if (!url) {
 
-    preview.classList.add('hidden');
+    preview.classList.add(
+      'hidden'
+    );
+
     image.src = '';
 
     return;
   }
 
+
   image.src = url;
 
-  preview.classList.remove('hidden');
+  preview.classList.remove(
+    'hidden'
+  );
+
 }
+
+
+/* =========================
+   REMOVE COVER
+========================= */
 
 async function removeCoverImage() {
 
   const cover =
     $('cover');
 
+
   const url =
     cover?.value || '';
+
 
   if (url) {
 
     const marker =
       '/storage/v1/object/public/article-images/';
 
+
     const index =
       url.indexOf(marker);
+
 
     if (index !== -1) {
 
@@ -780,6 +1280,7 @@ async function removeCoverImage() {
         url.substring(
           index + marker.length
         );
+
 
       try {
 
@@ -793,30 +1294,43 @@ async function removeCoverImage() {
           'Could not delete image:',
           error
         );
+
       }
+
     }
+
   }
+
 
   if (cover) {
     cover.value = '';
   }
 
+
   if ($('coverFile')) {
     $('coverFile').value = '';
   }
 
+
   showCoverPreview(null);
+
 }
+
 
 /* =========================
    SAVE ARTICLE
 ========================= */
 
-async function saveArticle(event) {
+async function saveArticle(
+  event
+) {
 
   event.preventDefault();
 
-  if (!(await isAdmin())) {
+
+  if (
+    !(await isAdmin())
+  ) {
 
     $('articleMsg').textContent =
       'Admin access required.';
@@ -824,51 +1338,82 @@ async function saveArticle(event) {
     return;
   }
 
+
   const button =
     $('articleSubmit');
+
 
   if (button) {
 
     button.disabled = true;
-    button.textContent = 'SAVING...';
+
+    button.textContent =
+      'SAVING...';
+
   }
+
 
   try {
 
     let coverUrl =
-      $('cover')?.value.trim() || null;
+      $('cover')
+        ?.value
+        .trim() ||
+      null;
+
 
     const file =
-      $('coverFile')?.files?.[0];
+      $('coverFile')
+        ?.files?.[0];
+
 
     if (file) {
 
       $('articleMsg').textContent =
         'Uploading image...';
 
+
       coverUrl =
-        await uploadCoverImage(file);
+        await uploadCoverImage(
+          file
+        );
+
     }
+
 
     const payload = {
 
       title:
-        $('title').value.trim(),
+        $('title')
+          .value
+          .trim(),
 
       excerpt:
-        $('excerpt').value.trim(),
+        $('excerpt')
+          .value
+          .trim(),
 
       content:
-        $('content').value.trim(),
+        $('content')
+          .value
+          .trim(),
 
       cover_url:
         coverUrl,
 
       category:
-        $('category').value
+        $('category')
+          .value
+
     };
 
+
     let result;
+
+
+    /*
+      UPDATE
+    */
 
     if (editingId) {
 
@@ -876,50 +1421,84 @@ async function saveArticle(event) {
         await db
           .from('articles')
           .update(payload)
-          .eq('id', editingId);
+          .eq(
+            'id',
+            editingId
+          );
 
-    } else {
+    }
+
+
+    /*
+      INSERT
+    */
+
+    else {
 
       const {
-        data: { user }
-      } = await db.auth.getUser();
+        data: {
+          user
+        }
+      } =
+        await db.auth.getUser();
+
 
       result =
         await db
           .from('articles')
           .insert({
+
             ...payload,
-            author_id: user.id
+
+            author_id:
+              user.id
+
           });
+
     }
+
 
     if (result.error) {
       throw result.error;
     }
 
-    $('articleMsg').textContent =
+
+    $('articleMsg')
+      .textContent =
       editingId
+
         ? 'Article updated successfully.'
+
         : 'Article published successfully.';
+
 
     editingId = null;
 
-    $('articleForm').reset();
+
+    $('articleForm')
+      .reset();
+
 
     if ($('cover')) {
       $('cover').value = '';
     }
 
+
     showCoverPreview(null);
+
 
     if (button) {
 
       button.textContent =
         'PUBLISH ARTICLE';
+
     }
 
+
     await loadArticles();
+
     await refreshAdminStats();
+
 
   } catch (error) {
 
@@ -928,9 +1507,12 @@ async function saveArticle(event) {
       error
     );
 
-    $('articleMsg').textContent =
+
+    $('articleMsg')
+      .textContent =
       error.message ||
       'Something went wrong.';
+
 
   } finally {
 
@@ -942,10 +1524,15 @@ async function saveArticle(event) {
 
         button.textContent =
           'PUBLISH ARTICLE';
+
       }
+
     }
+
   }
+
 }
+
 
 /* =========================
    EDIT ARTICLE
@@ -956,91 +1543,134 @@ function editArticle(id) {
   const article =
     articles.find(
       item =>
-        Number(item.id) === Number(id)
+        Number(item.id) ===
+        Number(id)
     );
 
+
   if (!article) return;
+
 
   editingId =
     article.id;
 
+
   $('title').value =
     article.title || '';
 
+
   $('category').value =
-    article.category || 'TRAINING';
+    article.category ||
+    'TRAINING';
+
 
   $('cover').value =
     article.cover_url || '';
 
+
   $('excerpt').value =
     article.excerpt || '';
+
 
   $('content').value =
     article.content || '';
 
+
   showCoverPreview(
-    article.cover_url || null
+    article.cover_url ||
+    null
   );
 
-  $('articleSubmit').textContent =
+
+  $('articleSubmit')
+    .textContent =
     'SAVE CHANGES';
 
-  $('admin').scrollIntoView({
-    behavior: 'smooth'
-  });
+
+  $('admin')
+    ?.scrollIntoView({
+      behavior:'smooth'
+    });
+
 }
+
 
 /* =========================
    DELETE ARTICLE
 ========================= */
 
-async function deleteArticle(id) {
+async function deleteArticle(
+  id
+) {
 
-  if (!(await isAdmin())) {
+  if (
+    !(await isAdmin())
+  ) {
 
-    alert('Admin access required.');
+    alert(
+      'Admin access required.'
+    );
 
     return;
   }
 
-  if (!confirm('Delete this article?')) {
+
+  if (
+    !confirm(
+      'Delete this article?'
+    )
+  ) {
     return;
   }
+
 
   const article =
     articles.find(
       item =>
-        Number(item.id) === Number(id)
+        Number(item.id) ===
+        Number(id)
     );
 
-  const { error } =
+
+  const {
+    error
+  } =
     await db
       .from('articles')
       .delete()
-      .eq('id', id);
+      .eq('id',id);
+
 
   if (error) {
 
-    alert(error.message);
+    alert(
+      error.message
+    );
 
     return;
   }
+
 
   if (article?.cover_url) {
 
     const marker =
       '/storage/v1/object/public/article-images/';
 
+
     const index =
-      article.cover_url.indexOf(marker);
+      article.cover_url
+        .indexOf(marker);
+
 
     if (index !== -1) {
 
       const path =
-        article.cover_url.substring(
-          index + marker.length
-        );
+        article.cover_url
+          .substring(
+            index +
+            marker.length
+          );
+
 
       try {
 
@@ -1054,13 +1684,20 @@ async function deleteArticle(id) {
           'Could not remove image:',
           error
         );
+
       }
+
     }
+
   }
 
+
   await loadArticles();
+
   await refreshAdminStats();
+
 }
+
 
 /* =========================
    ADMIN LIST
@@ -1071,106 +1708,162 @@ function renderAdminList() {
   const box =
     $('adminList');
 
+
   if (!box) return;
+
 
   if (!articles.length) {
 
     box.innerHTML =
-      '<p style="color:#888">No articles yet.</p>';
+      `
+        <p style="color:#888">
+          No articles yet.
+        </p>
+      `;
 
     return;
   }
 
+
   box.innerHTML =
-    articles.map(article => `
+    articles
+      .map(
+        article => `
 
-      <div class="admin-row">
+        <div class="admin-row">
 
-        <div>
+          <div>
 
-          <b>
-            ${esc(article.title)}
-          </b>
+            <b>
+              ${esc(
+                article.title
+              )}
+            </b>
 
-          <small>
-            ${formatDate(article.created_at)}
-            ·
-            ${esc(article.category || 'TRAINING')}
-          </small>
+            <small>
+              ${formatDate(
+                article.created_at
+              )}
+              ·
+              ${esc(
+                article.category ||
+                'TRAINING'
+              )}
+            </small>
+
+          </div>
+
+          <div>
+
+            <button
+              type="button"
+              onclick="
+                editArticle(
+                  ${article.id}
+                )
+              ">
+
+              EDIT
+
+            </button>
+
+            <button
+              type="button"
+              class="danger"
+              onclick="
+                deleteArticle(
+                  ${article.id}
+                )
+              ">
+
+              DELETE
+
+            </button>
+
+          </div>
 
         </div>
 
-        <div>
+      `
+      )
+      .join('');
 
-          <button
-            type="button"
-            onclick="editArticle(${article.id})">
-            EDIT
-          </button>
-
-          <button
-            type="button"
-            class="danger"
-            onclick="deleteArticle(${article.id})">
-            DELETE
-          </button>
-
-        </div>
-
-      </div>
-
-    `).join('');
 }
+
 
 /* =========================
    NEWSLETTER
 ========================= */
 
-async function subscribe(event) {
+async function subscribe(
+  event
+) {
 
   event.preventDefault();
 
+
   if (!db) return;
+
 
   const input =
     event.target.querySelector(
       'input[type=email]'
     );
 
+
   const email =
     input.value
       .trim()
       .toLowerCase();
 
-  const { error } =
+
+  const {
+    error
+  } =
     await db
       .from('subscribers')
       .insert({
         email
       });
 
+
   if (
     error &&
-    !String(error.message)
+    !String(
+      error.message
+    )
       .toLowerCase()
-      .includes('duplicate')
+      .includes(
+        'duplicate'
+      )
   ) {
 
     event.target.innerHTML =
-      `<b style="color:#ff6b6b">
-        ${esc(error.message)}
-      </b>`;
+      `
+        <b style="color:#ff6b6b">
+          ${esc(
+            error.message
+          )}
+        </b>
+      `;
 
     return;
   }
 
+
   event.target.innerHTML =
-    `<b style="color:#58c66a">
-      You're subscribed. Welcome to Fitness Fuel! 💪
-    </b>`;
+    `
+      <b style="color:#58c66a">
+        You're subscribed.
+        Welcome to Fitness Fuel! 💪
+      </b>
+    `;
+
 
   await refreshAdminStats();
+
 }
+
 
 /* =========================
    ARTICLE VIEW
@@ -1181,35 +1874,56 @@ function openArticle(id) {
   const article =
     articles.find(
       item =>
-        Number(item.id) === Number(id)
+        Number(item.id) ===
+        Number(id)
     );
+
 
   if (!article) return;
 
-  $('articleViewTitle').textContent =
+
+  $('articleViewTitle')
+    .textContent =
     article.title || '';
 
-  $('articleViewMeta').textContent =
-    `${formatDate(article.created_at)} · ${article.category || 'TRAINING'}`;
 
-  $('articleViewImage').src =
+  $('articleViewMeta')
+    .textContent =
+    `${formatDate(
+      article.created_at
+    )} · ${
+      article.category ||
+      'TRAINING'
+    }`;
+
+
+  $('articleViewImage')
+    .src =
     article.cover_url ||
+
     'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=1200&q=80';
 
-  $('articleViewContent').innerHTML =
+
+  $('articleViewContent')
+    .innerHTML =
     article.content || '';
+
 
   $('articleView')
     .classList
     .remove('hidden');
+
 }
+
 
 function closeArticle() {
 
   $('articleView')
     ?.classList
     .add('hidden');
+
 }
+
 
 /* =========================
    CLEAR ARTICLE
@@ -1219,30 +1933,42 @@ function clearArticleForm() {
 
   editingId = null;
 
-  $('articleForm')?.reset();
+
+  $('articleForm')
+    ?.reset();
+
 
   if ($('cover')) {
     $('cover').value = '';
   }
 
+
   if ($('coverFile')) {
     $('coverFile').value = '';
   }
 
+
   showCoverPreview(null);
+
 
   if ($('articleSubmit')) {
 
-    $('articleSubmit').textContent =
+    $('articleSubmit')
+      .textContent =
       'PUBLISH ARTICLE';
+
   }
+
 
   if ($('articleMsg')) {
 
-    $('articleMsg').textContent =
-      '';
+    $('articleMsg')
+      .textContent = '';
+
   }
+
 }
+
 
 /* =========================
    VISITS
@@ -1251,6 +1977,7 @@ function clearArticleForm() {
 async function trackVisit() {
 
   if (!db) return;
+
 
   try {
 
@@ -1264,8 +1991,11 @@ async function trackVisit() {
       'Visit tracking failed:',
       error
     );
+
   }
+
 }
+
 
 /* =========================
    EVENTS
@@ -1273,18 +2003,25 @@ async function trackVisit() {
 
 function setupEvents() {
 
-  /* LOGIN */
+  /*
+    LOGIN
+  */
 
   const loginBtn =
     $('loginBtn');
+
 
   if (loginBtn) {
 
     loginBtn.onclick =
       () => openAuth('login');
+
   }
 
-  /* AUTH */
+
+  /*
+    AUTH FORM
+  */
 
   if ($('authForm')) {
 
@@ -1293,7 +2030,13 @@ function setupEvents() {
         'submit',
         handleAuth
       );
+
   }
+
+
+  /*
+    AUTH SWITCH
+  */
 
   if ($('authSwitch')) {
 
@@ -1302,20 +2045,35 @@ function setupEvents() {
         'click',
         toggleAuthMode
       );
+
   }
 
-  /* NEWSLETTER */
 
-  if ($('subscribe')) {
+  /*
+    NEWSLETTER
+  */
 
-    $('subscribe')
+  const subscribeForm =
+    $('subscribe');
+
+
+  if (
+    subscribeForm &&
+    subscribeForm.tagName === 'FORM'
+  ) {
+
+    subscribeForm
       .addEventListener(
         'submit',
         subscribe
       );
+
   }
 
-  /* ARTICLE FORM */
+
+  /*
+    ARTICLE FORM
+  */
 
   if ($('articleForm')) {
 
@@ -1324,9 +2082,13 @@ function setupEvents() {
         'submit',
         saveArticle
       );
+
   }
 
-  /* CLEAR ARTICLE */
+
+  /*
+    CLEAR ARTICLE
+  */
 
   if ($('clearArticleBtn')) {
 
@@ -1335,9 +2097,13 @@ function setupEvents() {
         'click',
         clearArticleForm
       );
+
   }
 
-  /* IMAGE */
+
+  /*
+    IMAGE
+  */
 
   if ($('coverFile')) {
 
@@ -1347,24 +2113,37 @@ function setupEvents() {
         event => {
 
           const file =
-            event.target.files?.[0];
+            event.target
+              .files?.[0];
+
 
           if (!file) return;
+
 
           const reader =
             new FileReader();
 
-          reader.onload =
-            () => showCoverPreview(
-              reader.result
-            );
 
-          reader.readAsDataURL(file);
+          reader.onload =
+            () =>
+              showCoverPreview(
+                reader.result
+              );
+
+
+          reader.readAsDataURL(
+            file
+          );
+
         }
       );
+
   }
 
-  /* AUTH BACKDROP */
+
+  /*
+    AUTH BACKDROP
+  */
 
   if ($('auth')) {
 
@@ -1374,16 +2153,23 @@ function setupEvents() {
         event => {
 
           if (
-            event.target === $('auth')
+            event.target ===
+            $('auth')
           ) {
+
             closeAuth();
+
           }
 
         }
       );
+
   }
 
-  /* ARTICLE BACKDROP */
+
+  /*
+    ARTICLE BACKDROP
+  */
 
   if ($('articleView')) {
 
@@ -1396,17 +2182,25 @@ function setupEvents() {
             event.target ===
             $('articleView')
           ) {
+
             closeArticle();
+
           }
 
         }
       );
+
   }
 
-  /* SEARCH */
+
+  /*
+    SEARCH
+  */
 
   setupSearch();
+
 }
+
 
 /* =========================
    INIT
@@ -1418,7 +2212,10 @@ async function init() {
     'Fitness Fuel starting...'
   );
 
-  if (!initSupabase()) {
+
+  if (
+    !initSupabase()
+  ) {
 
     console.error(
       'Supabase could not be initialized.'
@@ -1427,25 +2224,33 @@ async function init() {
     return;
   }
 
+
   setupEvents();
+
 
   await loadArticles();
 
+
   await trackVisit();
 
+
   await updateUserUI();
+
 
   console.log(
     'Fitness Fuel ready.'
   );
+
 }
+
 
 /* =========================
    START
 ========================= */
 
 if (
-  document.readyState === 'loading'
+  document.readyState ===
+  'loading'
 ) {
 
   document.addEventListener(
@@ -1456,4 +2261,5 @@ if (
 } else {
 
   init();
+
 }
