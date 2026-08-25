@@ -23,6 +23,10 @@ select{
   font-family:inherit;
 }
 
+/* =========================
+   HEADER
+========================= */
+
 .topbar{
   height:64px;
   background:#050505;
@@ -32,7 +36,7 @@ select{
   padding:0 3.5%;
   position:sticky;
   top:0;
-  z-index:20;
+  z-index:100;
 }
 
 .brand{
@@ -77,7 +81,8 @@ select{
 .actions{
   display:flex;
   align-items:center;
-  gap:18px;
+  gap:12px;
+  margin-left:auto;
 }
 
 .icon-btn,
@@ -85,23 +90,35 @@ select{
   background:none;
   border:0;
   color:#fff;
-  font-size:27px;
   cursor:pointer;
 }
 
-.login,
-.btn{
-  border:0;
-  font-weight:900;
-  cursor:pointer;
+.icon-btn{
+  font-size:27px;
+}
+
+.menu-btn{
+  font-size:27px;
+  padding:5px;
 }
 
 .login{
+  display:block !important;
+  visibility:visible !important;
+  opacity:1 !important;
   background:#ef2828;
-  color:white;
+  color:#fff;
+  border:0;
   padding:12px 22px;
   border-radius:3px;
+  font-weight:900;
+  cursor:pointer;
+  white-space:nowrap;
 }
+
+/* =========================
+   HERO
+========================= */
 
 .hero{
   min-height:450px;
@@ -171,6 +188,9 @@ select{
   color:#fff;
   font-size:12px;
   letter-spacing:.4px;
+  border:0;
+  font-weight:900;
+  cursor:pointer;
 }
 
 .btn.red{
@@ -227,6 +247,10 @@ select{
   color:white;
 }
 
+/* =========================
+   CATEGORIES
+========================= */
+
 .categories{
   display:grid;
   grid-template-columns:repeat(5,1fr);
@@ -263,6 +287,10 @@ select{
   font:400 10px Inter;
   margin-top:3px;
 }
+
+/* =========================
+   CONTENT
+========================= */
 
 .content{
   max-width:1400px;
@@ -356,6 +384,10 @@ select{
   white-space:nowrap;
 }
 
+/* =========================
+   NEWSLETTER
+========================= */
+
 .subscribe h3{
   font:800 25px/1 'Barlow Condensed';
   margin:8px 0 12px;
@@ -402,6 +434,10 @@ select{
   margin-right:auto;
 }
 
+/* =========================
+   BOTTOM STRIP
+========================= */
+
 .bottom-strip{
   max-width:880px;
   margin:14px auto 0;
@@ -427,7 +463,9 @@ select{
   font-size:9px;
 }
 
-/* DRAWER */
+/* =========================
+   DRAWER
+========================= */
 
 .drawer{
   position:fixed;
@@ -437,7 +475,7 @@ select{
   height:calc(100vh - 64px);
   background:#151718;
   border-left:1px solid #3b3c3d;
-  z-index:30;
+  z-index:200;
   padding:22px;
   transition:.25s;
   box-shadow:-20px 0 60px #0008;
@@ -506,13 +544,15 @@ select{
   font-weight:800;
 }
 
-/* MODAL */
+/* =========================
+   MODALS
+========================= */
 
 .modal{
   position:fixed;
   inset:0;
   background:#000b;
-  z-index:50;
+  z-index:500;
   display:grid;
   place-items:center;
   padding:20px;
@@ -559,10 +599,12 @@ select{
 }
 
 .hidden{
-  display:none!important;
+  display:none !important;
 }
 
-/* ADMIN */
+/* =========================
+   ADMIN
+========================= */
 
 .admin-panel{
   max-width:1400px;
@@ -664,7 +706,9 @@ select{
   color:#ff5555;
 }
 
-/* IMAGE UPLOAD */
+/* =========================
+   IMAGE UPLOAD
+========================= */
 
 .cover-upload{
   border:1px solid #303233;
@@ -701,11 +745,9 @@ select{
   margin-bottom:10px;
 }
 
-.cover-preview .btn{
-  width:auto;
-}
-
-/* ARTICLE */
+/* =========================
+   ARTICLE VIEW
+========================= */
 
 .article-view{
   width:min(900px,100%);
@@ -746,7 +788,9 @@ select{
   z-index:2;
 }
 
-/* TABLET */
+/* =========================
+   TABLET
+========================= */
 
 @media(max-width:1050px){
 
@@ -775,17 +819,23 @@ select{
   }
 }
 
-/* MOBILE */
+/* =========================
+   MOBILE
+========================= */
 
 @media(max-width:700px){
 
   .topbar{
     height:58px;
-    padding:0 15px;
+    padding:0 12px;
   }
 
   .brand{
-    font-size:17px;
+    font-size:16px;
+  }
+
+  .brand span{
+    margin-right:5px;
   }
 
   .desktop-nav{
@@ -793,25 +843,33 @@ select{
   }
 
   .actions{
+    display:flex !important;
+    align-items:center;
+    gap:7px;
     margin-left:auto;
-    gap:8px;
+  }
+
+  /* DŮLEŽITÉ:
+     LOGIN JE NA MOBILU VIDITELNÝ */
+
+  .login{
+    display:block !important;
+    visibility:visible !important;
+    opacity:1 !important;
+    padding:9px 12px !important;
+    font-size:10px !important;
+    background:#ef2828 !important;
+    color:#fff !important;
   }
 
   .icon-btn{
     display:none;
   }
 
-  /* LOGIN ZŮSTANE VIDITELNÝ */
-
-  .login{
-    display:block;
-    padding:9px 13px;
-    font-size:10px;
-  }
-
   .menu-btn{
-    font-size:25px;
-    padding:5px;
+    display:block !important;
+    font-size:24px;
+    padding:4px;
   }
 
   .hero{
@@ -945,10 +1003,6 @@ select{
     border-left:0;
   }
 
-  .bottom-strip b{
-    font-size:20px;
-  }
-
   /* DRAWER */
 
   .drawer{
@@ -963,7 +1017,7 @@ select{
     right:0;
   }
 
-  /* MODAL */
+  /* LOGIN MODAL */
 
   .modal{
     padding:12px;
@@ -1022,7 +1076,7 @@ select{
     max-height:220px;
   }
 
-  /* ARTICLE VIEW */
+  /* ARTICLE */
 
   .article-view{
     width:100%;
@@ -1043,17 +1097,19 @@ select{
   }
 }
 
-/* VERY SMALL PHONES */
+/* =========================
+   VERY SMALL PHONES
+========================= */
 
 @media(max-width:380px){
 
   .brand{
-    font-size:15px;
+    font-size:14px;
   }
 
   .login{
-    padding:8px 10px;
-    font-size:9px;
+    padding:8px 10px !important;
+    font-size:9px !important;
   }
 
   .hero{
