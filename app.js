@@ -5,6 +5,7 @@ let db = null;
 let articles = [];
 let editingId = null;
 let authMode = 'login';
+let searchOpen = false;
 
 const $ = id => document.getElementById(id);
 
@@ -20,6 +21,7 @@ function esc(value = '') {
 
 function formatDate(value) {
   if (!value) return '';
+
   return new Date(value).toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'short',
@@ -46,10 +48,206 @@ function initSupabase() {
 }
 
 /* =========================
+   SEARCH
+========================= */
+
+function createSearchBox() {
+
+  if (document.getElementById('searchBox')) {
+    return;
+  }
+
+  const topbar = document.querySelector('.topbar');
+
+  if (!topbar) return;
+
+  const searchBox = document.createElement('div');
+
+  searchBox.id = 'searchBox';
+
+  searchBox.innerHTML = `
+    <input
+      id="searchInput"
+      type="search"
+      placeholder="Search articles..."
+      autocomplete="off"
+    >
+
+    <button
+      type="button"
+      id="searchClose"
+      aria-label="Close search">
+      ×
+    </button>
+
+    <div id="searchResults"></div>
+  `;
+
+  topbar.appendChild(searchBox);
+
+  const input = $('searchInput');
+  const close = $('searchClose');
+
+  input.addEventListener('input', () => {
+    performSearch(input.value);
+  });
+
+  close.addEventListener('click', closeSearch);
+
+  input.addEventListener('keydown', event => {
+
+    if (event.key === 'Escape') {
+      closeSearch();
+    }
+
+  });
+}
+
+function openSearch() {
+
+  createSearchBox();
+
+  const searchBox = $('searchBox');
+  const input = $('searchInput');
+
+  if (!searchBox) return;
+
+  searchOpen = true;
+
+  searchBox.classList.add('open');
+
+  setTimeout(() => {
+
+    if (input) {
+      input.focus();
+    }
+
+  }, 50);
+}
+
+function closeSearch() {
+
+  const searchBox = $('searchBox');
+  const input = $('searchInput');
+  const results = $('searchResults');
+
+  searchOpen = false;
+
+  if (input) {
+    input.value = '';
+  }
+
+  if (results) {
+    results.innerHTML = '';
+  }
+
+  if (searchBox) {
+    searchBox.classList.remove('open');
+  }
+}
+
+function performSearch(query) {
+
+  const results = $('searchResults');
+
+  if (!results) return;
+
+  const text = String(query || '').trim().toLowerCase();
+
+  if (!text) {
+    results.innerHTML = '';
+    return;
+  }
+
+  const matches = articles.filter(article => {
+
+    const title =
+      String(article.title || '').toLowerCase();
+
+    const excerpt =
+      String(article.excerpt || '').toLowerCase();
+
+    const category =
+      String(article.category || '').toLowerCase();
+
+    const content =
+      String(article.content || '').toLowerCase();
+
+    return (
+      title.includes(text) ||
+      excerpt.includes(text) ||
+      category.includes(text) ||
+      content.includes(text)
+    );
+
+  });
+
+  if (!matches.length) {
+
+    results.innerHTML = `
+      <div class="search-empty">
+        No articles found.
+      </div>
+    `;
+
+    return;
+  }
+
+  results.innerHTML = matches
+    .slice(0, 8)
+    .map(article => {
+
+      const image =
+        article.cover_url ||
+        'https://images.unsplash.com/photo-1534438327276-14e5300c3a48?auto=format&fit=crop&w=300&q=80';
+
+      return `
+        <button
+          type="button"
+          class="search-result"
+          onclick="openSearchArticle(${article.id})">
+
+          <img
+            src="${esc(image)}"
+            alt=""
+          >
+
+          <span>
+
+            <b>
+              ${esc(article.title)}
+            </b>
+
+            <small>
+              ${esc(article.category || 'TRAINING')}
+              ·
+              ${formatDate(article.created_at)}
+            </small>
+
+          </span>
+
+        </button>
+      `;
+
+    })
+    .join('');
+}
+
+function openSearchArticle(id) {
+
+  closeSearch();
+
+  setTimeout(() => {
+    openArticle(id);
+  }, 100);
+}
+
+/* =========================
    AUTH MODAL
 ========================= */
 
 function openAuth(mode = 'login') {
+
   authMode = mode;
 
   const auth = $('auth');
@@ -62,20 +260,30 @@ function openAuth(mode = 'login') {
   auth.classList.remove('hidden');
 
   if ($('authTitle')) {
+
     $('authTitle').textContent =
-      mode === 'signup' ? 'CREATE ACCOUNT' : 'LOG IN';
+      mode === 'signup'
+        ? 'CREATE ACCOUNT'
+        : 'LOG IN';
+
   }
 
   if ($('authSubmit')) {
+
     $('authSubmit').textContent =
-      mode === 'signup' ? 'SIGN UP' : 'LOG IN';
+      mode === 'signup'
+        ? 'SIGN UP'
+        : 'LOG IN';
+
   }
 
   if ($('authSwitch')) {
+
     $('authSwitch').textContent =
       mode === 'signup'
         ? 'Already have an account? Log in'
         : "Don't have an account? Sign up";
+
   }
 
   if ($('authMsg')) {
@@ -83,11 +291,16 @@ function openAuth(mode = 'login') {
   }
 
   if ($('authEmail')) {
-    setTimeout(() => $('authEmail').focus(), 50);
+
+    setTimeout(() => {
+      $('authEmail').focus();
+    }, 50);
+
   }
 }
 
 function closeAuth() {
+
   const auth = $('auth');
 
   if (auth) {
@@ -96,6 +309,7 @@ function closeAuth() {
 }
 
 function toggleAuthMode() {
+
   openAuth(
     authMode === 'login'
       ? 'signup'
@@ -104,46 +318,63 @@ function toggleAuthMode() {
 }
 
 async function handleAuth(event) {
+
   event.preventDefault();
 
   if (!db) {
+
     $('authMsg').textContent =
       'Supabase is not connected.';
+
     return;
   }
 
-  const email = $('authEmail').value.trim();
-  const password = $('authPassword').value;
+  const email =
+    $('authEmail').value.trim();
 
-  $('authMsg').textContent = 'Please wait...';
+  const password =
+    $('authPassword').value;
+
+  $('authMsg').textContent =
+    'Please wait...';
 
   try {
 
     if (authMode === 'signup') {
 
-      const { data, error } =
-        await db.auth.signUp({
-          email,
-          password
-        });
+      const {
+        data,
+        error
+      } = await db.auth.signUp({
+        email,
+        password
+      });
 
       if (error) {
-        $('authMsg').textContent = error.message;
+
+        $('authMsg').textContent =
+          error.message;
+
         return;
       }
 
       if (data.session) {
+
         $('authMsg').textContent =
           'Account created successfully.';
 
         setTimeout(() => {
+
           closeAuth();
           updateUserUI();
+
         }, 1000);
 
       } else {
+
         $('authMsg').textContent =
           'Account created. Check your email to confirm your account.';
+
       }
 
       return;
@@ -156,25 +387,36 @@ async function handleAuth(event) {
       });
 
     if (error) {
-      $('authMsg').textContent = error.message;
+
+      $('authMsg').textContent =
+        error.message;
+
       return;
     }
 
     closeAuth();
+
     await updateUserUI();
 
   } catch (error) {
-    console.error('Login error:', error);
+
+    console.error(
+      'Login error:',
+      error
+    );
 
     $('authMsg').textContent =
-      error.message || 'Login failed.';
+      error.message ||
+      'Login failed.';
   }
 }
 
 async function logout() {
+
   if (!db) return;
 
   await db.auth.signOut();
+
   await updateUserUI();
 }
 
@@ -183,17 +425,27 @@ async function logout() {
 ========================= */
 
 async function getProfile(userId) {
-  if (!db || !userId) return null;
 
-  const { data, error } =
-    await db
-      .from('profiles')
-      .select('role')
-      .eq('id', userId)
-      .maybeSingle();
+  if (!db || !userId) {
+    return null;
+  }
+
+  const {
+    data,
+    error
+  } = await db
+    .from('profiles')
+    .select('role')
+    .eq('id', userId)
+    .maybeSingle();
 
   if (error) {
-    console.error('Profile error:', error);
+
+    console.error(
+      'Profile error:',
+      error
+    );
+
     return null;
   }
 
@@ -201,6 +453,7 @@ async function getProfile(userId) {
 }
 
 async function isAdmin() {
+
   if (!db) return false;
 
   const {
@@ -216,6 +469,7 @@ async function isAdmin() {
 }
 
 async function updateUserUI() {
+
   if (!db) return;
 
   try {
@@ -224,14 +478,21 @@ async function updateUserUI() {
       data: { user }
     } = await db.auth.getUser();
 
-    const loginBtn = $('loginBtn');
-    const admin = $('admin');
+    const loginBtn =
+      $('loginBtn');
+
+    const admin =
+      $('admin');
 
     if (!user) {
 
       if (loginBtn) {
-        loginBtn.textContent = 'LOG IN';
-        loginBtn.onclick = () => openAuth('login');
+
+        loginBtn.textContent =
+          'LOG IN';
+
+        loginBtn.onclick =
+          () => openAuth('login');
       }
 
       if (admin) {
@@ -245,8 +506,12 @@ async function updateUserUI() {
       await getProfile(user.id);
 
     if (loginBtn) {
-      loginBtn.textContent = 'LOG OUT';
-      loginBtn.onclick = logout;
+
+      loginBtn.textContent =
+        'LOG OUT';
+
+      loginBtn.onclick =
+        logout;
     }
 
     if (profile?.role === 'admin') {
@@ -262,10 +527,16 @@ async function updateUserUI() {
       if (admin) {
         admin.classList.add('hidden');
       }
+
     }
 
   } catch (error) {
-    console.error('User UI error:', error);
+
+    console.error(
+      'User UI error:',
+      error
+    );
+
   }
 }
 
@@ -293,7 +564,9 @@ function card(article) {
           ${esc(article.category || 'TRAINING')}
         </span>
 
-        <h3>${esc(article.title)}</h3>
+        <h3>
+          ${esc(article.title)}
+        </h3>
 
         <p class="card-excerpt">
           ${esc(article.excerpt || '')}
@@ -321,15 +594,22 @@ function card(article) {
 
 function renderArticles() {
 
-  const cards = $('cards');
-  const drawer = $('drawerArticles');
+  const cards =
+    $('cards');
+
+  const drawer =
+    $('drawerArticles');
 
   if (cards) {
 
     cards.innerHTML =
       articles.length
-        ? articles.slice(0, 4).map(card).join('')
+        ? articles
+            .slice(0, 4)
+            .map(card)
+            .join('')
         : '<p style="color:#888">No articles yet.</p>';
+
   }
 
   if (drawer) {
@@ -369,6 +649,7 @@ function renderArticles() {
         `).join('')
 
         : '<p style="color:#888">No articles yet.</p>';
+
   }
 }
 
@@ -376,13 +657,15 @@ async function loadArticles() {
 
   if (!db) return;
 
-  const { data, error } =
-    await db
-      .from('articles')
-      .select('*')
-      .order('created_at', {
-        ascending: false
-      });
+  const {
+    data,
+    error
+  } = await db
+    .from('articles')
+    .select('*')
+    .order('created_at', {
+      ascending: false
+    });
 
   if (error) {
 
@@ -392,27 +675,34 @@ async function loadArticles() {
     );
 
     if ($('cards')) {
+
       $('cards').innerHTML =
         '<p style="color:#f66">Could not load articles.</p>';
+
     }
 
     return;
   }
 
-  articles = data || [];
+  articles =
+    data || [];
 
   renderArticles();
+
   renderAdminList();
 
   if ($('adminArticles')) {
+
     $('adminArticles').textContent =
       articles.length;
   }
 
   if ($('publicArticles')) {
+
     $('publicArticles').textContent =
       articles.length;
   }
+
 }
 
 /* =========================
@@ -421,10 +711,15 @@ async function loadArticles() {
 
 function toggleDrawer() {
 
-  const drawer = $('drawer');
+  const drawer =
+    $('drawer');
 
   if (drawer) {
-    drawer.classList.toggle('open');
+
+    drawer.classList.toggle(
+      'open'
+    );
+
   }
 }
 
@@ -438,32 +733,37 @@ async function refreshAdminStats() {
 
   try {
 
-    const { count: subscribers } =
-      await db
-        .from('subscribers')
-        .select('*', {
-          count: 'exact',
-          head: true
-        });
+    const {
+      count: subscribers
+    } = await db
+      .from('subscribers')
+      .select('*', {
+        count: 'exact',
+        head: true
+      });
 
-    const { data: stats } =
-      await db
-        .from('site_stats')
-        .select('visits')
-        .eq('id', 1)
-        .maybeSingle();
+    const {
+      data: stats
+    } = await db
+      .from('site_stats')
+      .select('visits')
+      .eq('id', 1)
+      .maybeSingle();
 
     if ($('subs')) {
+
       $('subs').textContent =
         subscribers ?? 0;
     }
 
     if ($('adminArticles')) {
+
       $('adminArticles').textContent =
         articles.length;
     }
 
     if ($('visits')) {
+
       $('visits').textContent =
         stats?.visits ?? 0;
     }
@@ -474,6 +774,7 @@ async function refreshAdminStats() {
       'Admin stats error:',
       error
     );
+
   }
 }
 
@@ -492,12 +793,14 @@ async function uploadCoverImage(file) {
   ];
 
   if (!allowed.includes(file.type)) {
+
     throw new Error(
       'Please use JPG, PNG or WEBP.'
     );
   }
 
   if (file.size > 5 * 1024 * 1024) {
+
     throw new Error(
       'Image must be smaller than 5 MB.'
     );
@@ -508,6 +811,7 @@ async function uploadCoverImage(file) {
   } = await db.auth.getUser();
 
   if (!user) {
+
     throw new Error(
       'You must be logged in.'
     );
@@ -522,53 +826,65 @@ async function uploadCoverImage(file) {
   const filename =
     `${user.id}/${crypto.randomUUID()}.${extension}`;
 
-  const { error } =
-    await db.storage
-      .from('article-images')
-      .upload(
-        filename,
-        file,
-        {
-          cacheControl: '3600',
-          upsert: false,
-          contentType: file.type
-        }
-      );
+  const {
+    error
+  } = await db.storage
+    .from('article-images')
+    .upload(
+      filename,
+      file,
+      {
+        cacheControl: '3600',
+        upsert: false,
+        contentType: file.type
+      }
+    );
 
   if (error) {
     throw error;
   }
 
-  const { data } =
-    db.storage
-      .from('article-images')
-      .getPublicUrl(filename);
+  const {
+    data
+  } = db.storage
+    .from('article-images')
+    .getPublicUrl(filename);
 
   return data.publicUrl;
 }
 
 function showCoverPreview(url) {
 
-  const preview = $('coverPreview');
-  const image = $('coverPreviewImg');
+  const preview =
+    $('coverPreview');
+
+  const image =
+    $('coverPreviewImg');
 
   if (!preview || !image) return;
 
   if (!url) {
 
-    preview.classList.add('hidden');
+    preview.classList.add(
+      'hidden'
+    );
+
     image.src = '';
 
     return;
   }
 
   image.src = url;
-  preview.classList.remove('hidden');
+
+  preview.classList.remove(
+    'hidden'
+  );
 }
 
 async function removeCoverImage() {
 
-  const cover = $('cover');
+  const cover =
+    $('cover');
 
   const url =
     cover?.value || '';
@@ -600,7 +916,9 @@ async function removeCoverImage() {
           'Could not delete image:',
           error
         );
+
       }
+
     }
   }
 
@@ -635,17 +953,23 @@ async function saveArticle(event) {
     $('articleSubmit');
 
   if (button) {
+
     button.disabled = true;
-    button.textContent = 'SAVING...';
+
+    button.textContent =
+      'SAVING...';
+
   }
 
   try {
 
     let coverUrl =
-      $('cover')?.value.trim() || null;
+      $('cover')?.value.trim() ||
+      null;
 
     const file =
-      $('coverFile')?.files?.[0];
+      $('coverFile')
+        ?.files?.[0];
 
     if (file) {
 
@@ -657,11 +981,22 @@ async function saveArticle(event) {
     }
 
     const payload = {
-      title: $('title').value.trim(),
-      excerpt: $('excerpt').value.trim(),
-      content: $('content').value.trim(),
-      cover_url: coverUrl,
-      category: $('category').value
+
+      title:
+        $('title').value.trim(),
+
+      excerpt:
+        $('excerpt').value.trim(),
+
+      content:
+        $('content').value.trim(),
+
+      cover_url:
+        coverUrl,
+
+      category:
+        $('category').value
+
     };
 
     let result;
@@ -687,6 +1022,7 @@ async function saveArticle(event) {
             ...payload,
             author_id: user.id
           });
+
     }
 
     if (result.error) {
@@ -709,11 +1045,14 @@ async function saveArticle(event) {
     showCoverPreview(null);
 
     if (button) {
+
       button.textContent =
         'PUBLISH ARTICLE';
+
     }
 
     await loadArticles();
+
     await refreshAdminStats();
 
   } catch (error) {
@@ -730,13 +1069,18 @@ async function saveArticle(event) {
   } finally {
 
     if (button) {
+
       button.disabled = false;
 
       if (!editingId) {
+
         button.textContent =
           'PUBLISH ARTICLE';
+
       }
+
     }
+
   }
 }
 
@@ -754,7 +1098,8 @@ function editArticle(id) {
 
   if (!article) return;
 
-  editingId = article.id;
+  editingId =
+    article.id;
 
   $('title').value =
     article.title || '';
@@ -791,11 +1136,16 @@ async function deleteArticle(id) {
 
   if (!(await isAdmin())) {
 
-    alert('Admin access required.');
+    alert(
+      'Admin access required.'
+    );
+
     return;
   }
 
-  if (!confirm('Delete this article?')) {
+  if (!confirm(
+    'Delete this article?'
+  )) {
     return;
   }
 
@@ -805,15 +1155,19 @@ async function deleteArticle(id) {
         Number(item.id) === Number(id)
     );
 
-  const { error } =
-    await db
-      .from('articles')
-      .delete()
-      .eq('id', id);
+  const {
+    error
+  } = await db
+    .from('articles')
+    .delete()
+    .eq('id', id);
 
   if (error) {
 
-    alert(error.message);
+    alert(
+      error.message
+    );
+
     return;
   }
 
@@ -823,7 +1177,9 @@ async function deleteArticle(id) {
       '/storage/v1/object/public/article-images/';
 
     const index =
-      article.cover_url.indexOf(marker);
+      article.cover_url.indexOf(
+        marker
+      );
 
     if (index !== -1) {
 
@@ -844,11 +1200,15 @@ async function deleteArticle(id) {
           'Could not remove image:',
           error
         );
+
       }
+
     }
+
   }
 
   await loadArticles();
+
   await refreshAdminStats();
 }
 
@@ -932,12 +1292,13 @@ async function subscribe(event) {
       .trim()
       .toLowerCase();
 
-  const { error } =
-    await db
-      .from('subscribers')
-      .insert({
-        email
-      });
+  const {
+    error
+  } = await db
+    .from('subscribers')
+    .insert({
+      email
+    });
 
   if (
     error &&
@@ -989,9 +1350,9 @@ function openArticle(id) {
   $('articleViewContent').innerHTML =
     article.content || '';
 
-  $('articleView').classList.remove(
-    'hidden'
-  );
+  $('articleView')
+    .classList
+    .remove('hidden');
 }
 
 function closeArticle() {
@@ -1024,8 +1385,10 @@ function clearArticleForm() {
   showCoverPreview(null);
 
   if ($('articleSubmit')) {
+
     $('articleSubmit').textContent =
       'PUBLISH ARTICLE';
+
   }
 
   if ($('articleMsg')) {
@@ -1053,6 +1416,7 @@ async function trackVisit() {
       'Visit tracking failed:',
       error
     );
+
   }
 }
 
@@ -1062,7 +1426,23 @@ async function trackVisit() {
 
 function setupEvents() {
 
-  /* LOGIN BUTTON */
+  /* SEARCH */
+
+  const searchButton =
+    document.querySelector(
+      '.icon-btn'
+    );
+
+  if (searchButton) {
+
+    searchButton.addEventListener(
+      'click',
+      openSearch
+    );
+
+  }
+
+  /* LOGIN */
 
   const loginBtn =
     $('loginBtn');
@@ -1071,6 +1451,7 @@ function setupEvents() {
 
     loginBtn.onclick =
       () => openAuth('login');
+
   }
 
   /* AUTH FORM */
@@ -1082,6 +1463,7 @@ function setupEvents() {
         'submit',
         handleAuth
       );
+
   }
 
   if ($('authSwitch')) {
@@ -1091,6 +1473,7 @@ function setupEvents() {
         'click',
         toggleAuthMode
       );
+
   }
 
   /* NEWSLETTER */
@@ -1102,6 +1485,7 @@ function setupEvents() {
         'submit',
         subscribe
       );
+
   }
 
   /* ARTICLE FORM */
@@ -1113,6 +1497,7 @@ function setupEvents() {
         'submit',
         saveArticle
       );
+
   }
 
   /* IMAGE FILE */
@@ -1137,9 +1522,13 @@ function setupEvents() {
               reader.result
             );
 
-          reader.readAsDataURL(file);
+          reader.readAsDataURL(
+            file
+          );
+
         }
       );
+
   }
 
   /* AUTH BACKDROP */
@@ -1152,13 +1541,17 @@ function setupEvents() {
         event => {
 
           if (
-            event.target === $('auth')
+            event.target ===
+            $('auth')
           ) {
+
             closeAuth();
+
           }
 
         }
       );
+
   }
 
   /* ARTICLE BACKDROP */
@@ -1174,12 +1567,46 @@ function setupEvents() {
             event.target ===
             $('articleView')
           ) {
+
             closeArticle();
+
           }
 
         }
       );
+
   }
+
+  /* ESCAPE */
+
+  document.addEventListener(
+    'keydown',
+    event => {
+
+      if (event.key !== 'Escape') {
+        return;
+      }
+
+      if (searchOpen) {
+        closeSearch();
+      }
+
+      if (
+        $('auth') &&
+        !$('auth').classList.contains('hidden')
+      ) {
+        closeAuth();
+      }
+
+      if (
+        $('articleView') &&
+        !$('articleView').classList.contains('hidden')
+      ) {
+        closeArticle();
+      }
+
+    }
+  );
 }
 
 /* =========================
@@ -1188,7 +1615,9 @@ function setupEvents() {
 
 async function init() {
 
-  console.log('Fitness Fuel starting...');
+  console.log(
+    'Fitness Fuel starting...'
+  );
 
   if (!initSupabase()) {
 
@@ -1216,7 +1645,10 @@ async function init() {
    START
 ========================= */
 
-if (document.readyState === 'loading') {
+if (
+  document.readyState ===
+  'loading'
+) {
 
   document.addEventListener(
     'DOMContentLoaded',
@@ -1226,4 +1658,5 @@ if (document.readyState === 'loading') {
 } else {
 
   init();
+
 }
