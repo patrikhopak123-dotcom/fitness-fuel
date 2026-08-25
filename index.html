@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="cs">
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -14,14 +13,13 @@
 
   <meta
     name="theme-color"
-    content="#1f8f55">
+    content="#315c43">
 
   <title>VIRENO – Aktivní život po 40</title>
 
   <link
     rel="stylesheet"
     href="style.css">
-
 </head>
 
 <body>
@@ -32,46 +30,35 @@
 
 <header class="topbar">
 
-  <a
-    href="#home"
-    class="brand">
-
+  <a href="#home" class="brand">
     <span class="brand-mark">●</span>
     VIRENO
-
   </a>
-
 
   <nav class="desktop-nav">
 
     <a
       href="#home"
-      class="active">
+      class="active"
+      data-nav="home">
       DOMŮ
     </a>
 
-    <a href="#articles">
+    <a
+      href="#articles"
+      data-nav="articles">
       ČLÁNKY
     </a>
 
-    <a href="#categories">
-      TÉMATA
-    </a>
-
-    <a href="#nutrition">
-      VÝŽIVA
-    </a>
-
-    <a href="#health">
-      ZDRAVÍ
+    <a
+      href="#about"
+      data-nav="about">
+      O NÁS
     </a>
 
   </nav>
 
-
   <div class="actions">
-
-    <!-- LUPA -->
 
     <button
       type="button"
@@ -81,18 +68,12 @@
       🔍
     </button>
 
-
-    <!-- PŘIHLÁŠENÍ -->
-
     <button
       type="button"
       class="login"
       id="loginBtn">
       PŘIHLÁSIT SE
     </button>
-
-
-    <!-- MOBILNÍ MENU -->
 
     <button
       type="button"
@@ -178,9 +159,9 @@
       </a>
 
       <a
-        href="#categories"
+        href="#about"
         class="btn light">
-        OBJEVIT TÉMATA
+        O NÁS
       </a>
 
     </div>
@@ -200,19 +181,15 @@
 
   </div>
 
-
   <div class="hero-athlete">
 
     <div class="hero-circle"></div>
 
     <div class="hero-card">
-
       <strong>40+</strong>
-
       <span>
         Věk není konec.
       </span>
-
     </div>
 
   </div>
@@ -221,85 +198,10 @@
 
 
 <!-- =========================
-     TÉMATA
-========================= -->
-
-<section
-  id="categories"
-  class="categories">
-
-  <a href="#articles">
-
-    <strong>🏃</strong>
-
-    <div>
-      <span>POHYB</span>
-      <small>Kondice a cvičení</small>
-    </div>
-
-  </a>
-
-
-  <a href="#articles">
-
-    <strong>🥗</strong>
-
-    <div>
-      <span>VÝŽIVA</span>
-      <small>Jídlo a energie</small>
-    </div>
-
-  </a>
-
-
-  <a href="#articles">
-
-    <strong>⚖</strong>
-
-    <div>
-      <span>HUBNUTÍ</span>
-      <small>Zdravá váha</small>
-    </div>
-
-  </a>
-
-
-  <a href="#articles">
-
-    <strong>😴</strong>
-
-    <div>
-      <span>REGENERACE</span>
-      <small>Spánek a odpočinek</small>
-    </div>
-
-  </a>
-
-
-  <a href="#articles">
-
-    <strong>❤</strong>
-
-    <div>
-      <span>ZDRAVÍ</span>
-      <small>Vitalita a prevence</small>
-    </div>
-
-  </a>
-
-</section>
-
-
-<!-- =========================
      HLAVNÍ OBSAH
 ========================= -->
 
-<main
-  id="articles"
-  class="content">
-
-
-  <!-- ČLÁNKY -->
+<main id="articles" class="content">
 
   <section class="latest">
 
@@ -312,23 +214,21 @@
         </div>
 
         <h2>
-          NEJNOVĚJŠÍ ČLÁNKY
+          VŠECHNY ČLÁNKY
         </h2>
 
       </div>
 
-      <a href="#articles">
-        VŠECHNY ČLÁNKY
-      </a>
+      <span class="article-count-label">
+        AKTUÁLNÍ OBSAH
+      </span>
 
     </div>
-
 
     <div
       id="searchStatus"
       class="search-status hidden">
     </div>
-
 
     <div
       id="cards"
@@ -347,9 +247,7 @@
        NEWSLETTER
   ========================= -->
 
-  <aside
-    id="health"
-    class="subscribe">
+  <aside class="subscribe">
 
     <div class="kicker">
       VIRENO NEWSLETTER
@@ -366,7 +264,6 @@
       po čtyřicítce.
     </p>
 
-
     <form id="subscribe">
 
       <input
@@ -382,11 +279,9 @@
 
     </form>
 
-
     <small>
       Žádný spam. Jen užitečný obsah.
     </small>
-
 
     <div class="follow">
 
@@ -406,54 +301,105 @@
 
 
 <!-- =========================
+     O NÁS
+========================= -->
+
+<section
+  id="about"
+  class="about-section">
+
+  <div class="about-inner">
+
+    <div class="about-copy">
+
+      <div class="kicker">
+        VIRENO
+      </div>
+
+      <h2>
+        ŽIVOT PO 40<br>
+        <em>NEMUSÍ ZPOMALIT.</em>
+      </h2>
+
+      <p>
+        Vireno vzniklo pro všechny, kteří chtějí
+        zůstat aktivní, zdraví a plní energie
+        i v dalších dekádách života.
+      </p>
+
+      <p>
+        Přinášíme praktické informace o pohybu,
+        zdraví, výživě, regeneraci a každodenních
+        návycích. Bez zbytečných extrémů a
+        nereálných slibů.
+      </p>
+
+      <div class="about-points">
+
+        <div>
+          <strong>01</strong>
+          <span>Praktické informace</span>
+        </div>
+
+        <div>
+          <strong>02</strong>
+          <span>Žádné nesmyslné extrémy</span>
+        </div>
+
+        <div>
+          <strong>03</strong>
+          <span>Aktivní život v každém věku</span>
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="about-card">
+
+      <div class="about-big">
+        40<span>+</span>
+      </div>
+
+      <h3>
+        Věk není překážka.
+      </h3>
+
+      <p>
+        Je to začátek nové etapy.
+      </p>
+
+    </div>
+
+  </div>
+
+</section>
+
+
+<!-- =========================
      STATISTIKY
 ========================= -->
 
 <section class="bottom-strip">
 
   <div>
-
     <b>40+</b>
-
-    <span>
-      PRO KAŽDÝ VĚK
-    </span>
-
+    <span>PRO KAŽDÝ VĚK</span>
   </div>
 
-
   <div>
-
-    <b id="publicArticles">
-      0
-    </b>
-
-    <span>
-      ČLÁNKŮ
-    </span>
-
+    <b id="publicArticles">0</b>
+    <span>ČLÁNKŮ</span>
   </div>
 
-
   <div>
-
-    <b>5</b>
-
-    <span>
-      HLAVNÍCH TÉMAT
-    </span>
-
-  </div>
-
-
-  <div>
-
     <b>100%</b>
+    <span>PRAKTICKÝ OBSAH</span>
+  </div>
 
-    <span>
-      PRAKTICKÝ OBSAH
-    </span>
-
+  <div>
+    <b>∞</b>
+    <span>INSPIRACE</span>
   </div>
 
 </section>
@@ -476,7 +422,7 @@
       </div>
 
       <h2>
-        ČLÁNKY
+        MENU
       </h2>
 
     </div>
@@ -490,23 +436,41 @@
 
   </div>
 
+  <nav class="mobile-nav">
 
-  <div
-    id="drawerArticles">
+    <a
+      href="#home"
+      onclick="toggleDrawer()">
+      DOMŮ
+    </a>
+
+    <a
+      href="#articles"
+      onclick="toggleDrawer()">
+      ČLÁNKY
+    </a>
+
+    <a
+      href="#about"
+      onclick="toggleDrawer()">
+      O NÁS
+    </a>
+
+  </nav>
+
+  <div class="drawer-divider"></div>
+
+  <div class="drawer-label">
+    POSLEDNÍ ČLÁNKY
+  </div>
+
+  <div id="drawerArticles">
 
     <p class="muted">
       Načítám články...
     </p>
 
   </div>
-
-
-  <a
-    href="#articles"
-    class="drawer-all"
-    onclick="toggleDrawer()">
-    ZOBRAZIT VŠECHNY ČLÁNKY
-  </a>
 
 </aside>
 
@@ -529,16 +493,13 @@
       ×
     </button>
 
-
     <div class="kicker">
       VIRENO
     </div>
 
-
     <h2 id="authTitle">
       PŘIHLÁSIT SE
     </h2>
-
 
     <form id="authForm">
 
@@ -548,14 +509,12 @@
         placeholder="E-mail"
         required>
 
-
       <input
         id="authPassword"
         type="password"
         placeholder="Heslo"
         minlength="6"
         required>
-
 
       <button
         id="authSubmit"
@@ -566,9 +525,7 @@
 
     </form>
 
-
     <p id="authMsg"></p>
-
 
     <button
       id="authSwitch"
@@ -594,63 +551,35 @@
     VIRENO ADMIN
   </div>
 
-
   <h2>
     SPRÁVA WEBU
   </h2>
 
-
   <div class="admin-stats">
 
     <div>
-
-      <b id="adminArticles">
-        0
-      </b>
-
-      <span>
-        ČLÁNKŮ
-      </span>
-
+      <b id="adminArticles">0</b>
+      <span>ČLÁNKŮ</span>
     </div>
 
-
     <div>
-
-      <b id="subs">
-        0
-      </b>
-
-      <span>
-        ODBĚRATELŮ
-      </span>
-
+      <b id="subs">0</b>
+      <span>ODBĚRATELŮ</span>
     </div>
 
-
     <div>
-
-      <b id="visits">
-        0
-      </b>
-
-      <span>
-        NÁVŠTĚV
-      </span>
-
+      <b id="visits">0</b>
+      <span>NÁVŠTĚV</span>
     </div>
 
   </div>
 
-
-  <!-- EDITOR -->
 
   <div class="admin-editor">
 
     <h3>
       NOVÝ ČLÁNEK
     </h3>
-
 
     <form id="articleForm">
 
@@ -659,7 +588,6 @@
         type="text"
         placeholder="Název článku"
         required>
-
 
       <select id="category">
 
@@ -685,11 +613,9 @@
 
       </select>
 
-
       <input
         id="cover"
         type="hidden">
-
 
       <div class="cover-upload">
 
@@ -704,7 +630,6 @@
 
       </div>
 
-
       <div
         id="coverPreview"
         class="cover-preview hidden">
@@ -716,19 +641,16 @@
 
       </div>
 
-
       <input
         id="excerpt"
         type="text"
         placeholder="Krátký popis článku"
         required>
 
-
       <textarea
         id="content"
         placeholder="Obsah článku..."
         required></textarea>
-
 
       <button
         id="articleSubmit"
@@ -737,14 +659,12 @@
         PUBLIKOVAT ČLÁNEK
       </button>
 
-
       <button
         id="clearArticleBtn"
         type="button"
         class="btn light">
         VYČISTIT
       </button>
-
 
       <p id="articleMsg"></p>
 
@@ -753,14 +673,11 @@
   </div>
 
 
-  <!-- SEZNAM ČLÁNKŮ -->
-
   <div class="admin-list">
 
     <h3>
       ČLÁNKY
     </h3>
-
 
     <div id="adminList">
 
@@ -793,26 +710,21 @@
       ×
     </button>
 
-
     <img
       id="articleViewImage"
       src=""
       alt="Obrázek článku">
 
-
     <div class="kicker">
       VIRENO
     </div>
 
-
     <h2 id="articleViewTitle"></h2>
-
 
     <div
       id="articleViewMeta"
       class="muted">
     </div>
-
 
     <div
       id="articleViewContent">
@@ -827,14 +739,9 @@
      SUPABASE
 ========================= -->
 
-<script
-  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
-</script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-
-<script
-  src="app.js">
-</script>
+<script src="app.js"></script>
 
 </body>
 </html>
