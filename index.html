@@ -1,760 +1,705 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="cs">
 <head>
+
   <meta charset="UTF-8">
 
   <meta
     name="viewport"
     content="width=device-width, initial-scale=1.0">
 
-  <title>Fitness Fuel</title>
+  <meta
+    name="description"
+    content="Vireno – pohyb, zdraví, výživa a kondice pro život po čtyřicítce.">
 
-  <link rel="stylesheet" href="style.css">
+  <title>Vireno – Aktivní život po 40</title>
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-    defer>
-  </script>
+  <link
+    rel="stylesheet"
+    href="style.css">
 
-  <script src="app.js" defer></script>
 </head>
 
 <body>
 
-  <!-- =========================
-       TOP BAR
-  ========================== -->
+<!-- =========================
+     HEADER
+========================= -->
 
-  <header class="topbar">
+<header class="topbar">
 
-    <a href="#" class="brand">
-      <span>●</span>
-      FITNESS <b>FUEL</b>
-    </a>
+  <a
+    href="#"
+    class="brand">
 
-    <nav class="desktop-nav">
+    <span>●</span>
+    VIRENO
 
-      <a href="#" class="active">
-        HOME
-      </a>
+  </a>
 
-      <a href="#latest">
-        ARTICLES
-      </a>
-
-      <a href="#categories">
-        TRAINING
-      </a>
-
-      <a href="#subscribe">
-        NUTRITION
-      </a>
-
-    </nav>
-
-    <div class="actions">
-
-      <!-- SEARCH -->
-
-      <div class="search-wrap">
-
-        <button
-          type="button"
-          class="icon-btn"
-          id="searchBtn"
-          aria-label="Search articles">
-
-          🔍
-
-        </button>
-
-        <div
-          id="searchPanel"
-          class="search-panel hidden">
-
-          <input
-            type="search"
-            id="searchBox"
-            placeholder="Search articles..."
-            autocomplete="off"
-            aria-label="Search articles">
-
-          <button
-            type="button"
-            id="searchClose"
-            class="search-close"
-            aria-label="Close search">
-
-            ×
-
-          </button>
-
-        </div>
-
-      </div>
-
-      <!-- MENU -->
-
-      <button
-        type="button"
-        class="menu-btn"
-        onclick="toggleDrawer()"
-        aria-label="Open menu">
-
-        ☰
-
-      </button>
-
-      <!-- LOGIN -->
-
-      <button
-        type="button"
-        class="login"
-        id="loginBtn">
-
-        LOG IN
-
-      </button>
-
-    </div>
-
-  </header>
-
-
-  <!-- =========================
-       HERO
-  ========================== -->
-
-  <section class="hero">
-
-    <div class="hero-copy">
-
-      <div class="kicker">
-        TRAIN HARD · LIVE STRONG
-      </div>
-
-      <h1>
-        BUILD<br>
-        YOUR<br>
-        <em>BEST</em><br>
-        SELF.
-      </h1>
-
-      <p>
-        Training, nutrition and mindset for people
-        who refuse to settle for average.
-      </p>
-
-      <div class="hero-buttons">
-
-        <a
-          href="#latest"
-          class="btn red">
-          EXPLORE ARTICLES
-        </a>
-
-        <a
-          href="#categories"
-          class="btn dark">
-          START TRAINING
-        </a>
-
-      </div>
-
-      <div class="social-proof">
-
-        <div class="avatars">
-          ● ● ●
-        </div>
-
-        <span>
-          Joined by
-          <b>10,000+</b>
-          fitness enthusiasts
-        </span>
-
-      </div>
-
-    </div>
-
-    <div class="hero-athlete"></div>
-
-  </section>
-
-
-  <!-- =========================
-       CATEGORIES
-  ========================== -->
-
-  <section
-    class="categories"
-    id="categories">
-
-    <a href="#latest">
-
-      <strong>01</strong>
-
-      <div>
-        <span>STRENGTH</span>
-        <small>Build power</small>
-      </div>
-
-    </a>
-
-    <a href="#latest">
-
-      <strong>02</strong>
-
-      <div>
-        <span>TRAINING</span>
-        <small>Train smarter</small>
-      </div>
-
-    </a>
-
-    <a href="#latest">
-
-      <strong>03</strong>
-
-      <div>
-        <span>NUTRITION</span>
-        <small>Eat better</small>
-      </div>
-
-    </a>
-
-    <a href="#latest">
-
-      <strong>04</strong>
-
-      <div>
-        <span>RECOVERY</span>
-        <small>Recover faster</small>
-      </div>
-
-    </a>
-
-    <a href="#latest">
-
-      <strong>05</strong>
-
-      <div>
-        <span>MINDSET</span>
-        <small>Stay focused</small>
-      </div>
-
-    </a>
-
-  </section>
-
-
-  <!-- =========================
-       CONTENT
-  ========================== -->
-
-  <main class="content">
-
-    <section
-      class="latest"
-      id="latest">
-
-      <div class="section-title">
-
-        <div>
-
-          <div class="kicker">
-            THE LATEST
-          </div>
-
-          <h2>
-            FRESH FROM FITNESS FUEL
-          </h2>
-
-        </div>
-
-        <a href="#latest">
-          VIEW ALL
-        </a>
-
-      </div>
-
-      <div
-        class="cards"
-        id="cards">
-
-        <p style="color:#888">
-          Loading articles...
-        </p>
-
-      </div>
-
-    </section>
-
-
-    <!-- =========================
-         SUBSCRIBE
-    ========================== -->
-
-    <aside
-      class="subscribe"
-      id="subscribe">
-
-      <div class="kicker">
-        STAY IN THE LOOP
-      </div>
-
-      <h3>
-        GET STRONGER.
-        <br>
-        EVERY WEEK.
-      </h3>
-
-      <p>
-        Get the latest training,
-        nutrition and fitness articles
-        delivered straight to your inbox.
-      </p>
-
-      <form id="subscribe">
-
-        <input
-          type="email"
-          placeholder="Your email address"
-          required>
-
-        <button
-          type="submit"
-          class="btn red">
-
-          SUBSCRIBE
-
-        </button>
-
-      </form>
-
-      <small>
-        No spam. Just useful fitness content.
-      </small>
-
-      <div class="follow">
-
-        <b>
-          FOLLOW FITNESS FUEL
-        </b>
-
-        <span>IG</span>
-        <span>YT</span>
-        <span>TK</span>
-
-      </div>
-
-    </aside>
-
-  </main>
-
-
-  <!-- =========================
-       BOTTOM STATS
-  ========================== -->
-
-  <section class="bottom-strip">
-
-    <div>
-
-      <b id="publicArticles">
-        0
-      </b>
-
-      <span>
-        ARTICLES
-      </span>
-
-    </div>
-
-    <div>
-
-      <b>
-        10K+
-      </b>
-
-      <span>
-        READERS
-      </span>
-
-    </div>
-
-    <div>
-
-      <b>
-        24/7
-      </b>
-
-      <span>
-        MOTIVATION
-      </span>
-
-    </div>
-
-    <div>
-
-      <b>
-        100%
-      </b>
-
-      <span>
-        COMMITMENT
-      </span>
-
-    </div>
-
-  </section>
-
-
-  <!-- =========================
-       DRAWER
-  ========================== -->
-
-  <aside
-    class="drawer"
-    id="drawer">
-
-    <div class="drawer-head">
-
-      <h2>
-        ARTICLES
-      </h2>
-
-      <button
-        type="button"
-        class="close"
-        onclick="toggleDrawer()">
-
-        ×
-
-      </button>
-
-    </div>
-
-    <div id="drawerArticles">
-
-      <p style="color:#888">
-        Loading...
-      </p>
-
-    </div>
+  <nav class="desktop-nav">
 
     <a
-      href="#latest"
-      class="drawer-all"
-      onclick="toggleDrawer()">
-
-      VIEW ALL ARTICLES
-
+      href="#home"
+      class="active">
+      DOMŮ
     </a>
+
+    <a href="#articles">
+      ČLÁNKY
+    </a>
+
+    <a href="#movement">
+      POHYB
+    </a>
+
+    <a href="#nutrition">
+      VÝŽIVA
+    </a>
+
+    <a href="#health">
+      ZDRAVÍ
+    </a>
+
+  </nav>
+
+  <div class="actions">
+
+    <button
+      type="button"
+      class="icon-btn"
+      id="searchBtn"
+      aria-label="Vyhledávání">
+      🔍
+    </button>
+
+    <button
+      type="button"
+      class="login"
+      id="loginBtn">
+      PŘIHLÁSIT SE
+    </button>
+
+    <button
+      type="button"
+      class="menu-btn"
+      onclick="toggleDrawer()"
+      aria-label="Menu">
+      ☰
+    </button>
+
+  </div>
+
+</header>
+
+
+<!-- =========================
+     SEARCH
+========================= -->
+
+<div
+  id="searchOverlay"
+  class="search-overlay hidden">
+
+  <div
+    class="search-panel"
+    role="search">
+
+    <input
+      id="searchInput"
+      type="search"
+      placeholder="Hledat články..."
+      autocomplete="off">
+
+    <button
+      id="searchClose"
+      type="button"
+      class="search-close"
+      aria-label="Zavřít vyhledávání">
+      ×
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     HERO
+========================= -->
+
+<section
+  id="home"
+  class="hero">
+
+  <div class="hero-copy">
+
+    <div class="kicker">
+      VIRENO · AKTIVNÍ ŽIVOT 40+
+    </div>
+
+    <h1>
+      ŽIVOT<br>
+      V <em>KONDICI.</em>
+    </h1>
+
+    <p>
+      Praktické rady pro pohyb, zdraví, výživu
+      a energii. Bez extrémů a bez nesmyslných
+      diet. Prostě lepší kondice pro každý den.
+    </p>
+
+    <div class="hero-buttons">
+
+      <a
+        href="#articles"
+        class="btn green">
+        PROHLÉDNOUT ČLÁNKY
+      </a>
+
+      <a
+        href="#categories"
+        class="btn dark">
+        OBJEVIT VIRENO
+      </a>
+
+    </div>
+
+    <div class="social-proof">
+
+      <div class="avatars">
+        ●●●
+      </div>
+
+      <span>
+        Obsah pro aktivní život <b>po 40</b>
+      </span>
+
+    </div>
+
+  </div>
+
+  <div class="hero-athlete"></div>
+
+</section>
+
+
+<!-- =========================
+     KATEGORIE
+========================= -->
+
+<section
+  id="categories"
+  class="categories">
+
+  <a href="#articles">
+
+    <strong>🏃</strong>
+
+    <div>
+      <span>POHYB</span>
+      <small>Kondice a cvičení</small>
+    </div>
+
+  </a>
+
+  <a href="#articles">
+
+    <strong>🥗</strong>
+
+    <div>
+      <span>VÝŽIVA</span>
+      <small>Jídlo a energie</small>
+    </div>
+
+  </a>
+
+  <a href="#articles">
+
+    <strong>⚖</strong>
+
+    <div>
+      <span>HUBNUTÍ</span>
+      <small>Zdravá váha</small>
+    </div>
+
+  </a>
+
+  <a href="#articles">
+
+    <strong>😴</strong>
+
+    <div>
+      <span>REGENERACE</span>
+      <small>Spánek a odpočinek</small>
+    </div>
+
+  </a>
+
+  <a href="#articles">
+
+    <strong>❤</strong>
+
+    <div>
+      <span>ZDRAVÍ</span>
+      <small>Vitalita a prevence</small>
+    </div>
+
+  </a>
+
+</section>
+
+
+<!-- =========================
+     CONTENT
+========================= -->
+
+<main
+  id="articles"
+  class="content">
+
+  <section class="latest">
+
+    <div class="section-title">
+
+      <div>
+
+        <div class="kicker">
+          VIRENO
+        </div>
+
+        <h2>
+          NEJNOVĚJŠÍ ČLÁNKY
+        </h2>
+
+      </div>
+
+      <a href="#articles">
+        VŠECHNY ČLÁNKY
+      </a>
+
+    </div>
+
+    <div
+      id="cards"
+      class="cards">
+
+      <div class="no-results">
+        <strong>Načítám články...</strong>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <!-- =========================
+       NEWSLETTER
+  ========================= -->
+
+  <aside
+    id="health"
+    class="subscribe">
+
+    <div class="kicker">
+      VIRENO NEWSLETTER
+    </div>
+
+    <h3>
+      ZŮSTAŇTE<br>
+      V OBRAZE
+    </h3>
+
+    <p>
+      Jednou za čas vám pošleme praktické tipy
+      pro pohyb, výživu, zdraví a lepší kondici
+      po čtyřicítce.
+    </p>
+
+    <form id="subscribe">
+
+      <input
+        type="email"
+        placeholder="Váš e-mail"
+        required>
+
+      <button
+        type="submit"
+        class="btn green">
+        PŘIHLÁSIT SE
+      </button>
+
+    </form>
+
+    <small>
+      Žádný spam. Jen užitečný obsah.
+    </small>
+
+    <div class="follow">
+
+      <b>
+        SLEDUJTE VIRENO
+      </b>
+
+      <span>●</span>
+      <span>●</span>
+      <span>●</span>
+
+    </div>
 
   </aside>
 
+</main>
 
-  <!-- =========================
-       AUTH MODAL
-  ========================== -->
 
-  <div
-    class="modal hidden"
-    id="auth">
+<!-- =========================
+     BOTTOM STATS
+========================= -->
 
-    <div class="modal-box">
+<section class="bottom-strip">
 
-      <button
-        type="button"
-        class="close modal-close"
-        onclick="closeAuth()">
-
-        ×
-
-      </button>
-
-      <h2 id="authTitle">
-        LOG IN
-      </h2>
-
-      <form id="authForm">
-
-        <input
-          type="email"
-          id="authEmail"
-          placeholder="Email"
-          required>
-
-        <input
-          type="password"
-          id="authPassword"
-          placeholder="Password"
-          minlength="6"
-          required>
-
-        <button
-          type="submit"
-          class="btn red full"
-          id="authSubmit">
-
-          LOG IN
-
-        </button>
-
-      </form>
-
-      <p id="authMsg"></p>
-
-      <button
-        type="button"
-        class="auth-switch"
-        id="authSwitch">
-
-        Don't have an account? Sign up
-
-      </button>
-
-    </div>
-
+  <div>
+    <b>40+</b>
+    <span>VĚK NENÍ LIMIT</span>
   </div>
 
-
-  <!-- =========================
-       ARTICLE VIEW
-  ========================== -->
-
-  <div
-    class="modal hidden"
-    id="articleView">
-
-    <article class="article-view">
-
-      <button
-        type="button"
-        class="close"
-        onclick="closeArticle()">
-
-        ×
-
-      </button>
-
-      <img
-        id="articleViewImage"
-        src=""
-        alt="Article cover">
-
-      <div class="kicker">
-        FITNESS FUEL
-      </div>
-
-      <h2 id="articleViewTitle"></h2>
-
-      <div
-        class="article-view-meta"
-        id="articleViewMeta">
-      </div>
-
-      <div
-        id="articleViewContent">
-      </div>
-
-    </article>
-
+  <div>
+    <b id="publicArticles">0</b>
+    <span>ČLÁNKŮ</span>
   </div>
 
+  <div>
+    <b>5</b>
+    <span>HLAVNÍCH TÉMAT</span>
+  </div>
 
-  <!-- =========================
-       ADMIN
-  ========================== -->
+  <div>
+    <b>100%</b>
+    <span>PRAKTICKÝ OBSAH</span>
+  </div>
 
-  <section
-    class="admin-panel hidden"
-    id="admin">
+</section>
 
-    <div class="kicker">
-      ADMIN AREA
-    </div>
+
+<!-- =========================
+     DRAWER
+========================= -->
+
+<aside
+  id="drawer"
+  class="drawer">
+
+  <div class="drawer-head">
 
     <h2>
-      CONTENT MANAGEMENT
+      VIRENO
     </h2>
 
+    <button
+      type="button"
+      onclick="toggleDrawer()"
+      aria-label="Zavřít menu">
+      ×
+    </button>
 
-    <div class="admin-stats">
+  </div>
 
-      <div>
+  <div
+    id="drawerArticles">
 
-        <b id="adminArticles">
-          0
-        </b>
+    <p class="muted">
+      Načítám články...
+    </p>
 
-        <span>
-          ARTICLES
-        </span>
+  </div>
 
-      </div>
+  <a
+    href="#articles"
+    class="drawer-all"
+    onclick="toggleDrawer()">
+    ZOBRAZIT ČLÁNKY
+  </a>
 
-      <div>
+</aside>
 
-        <b id="subs">
-          0
-        </b>
 
-        <span>
-          SUBSCRIBERS
-        </span>
+<!-- =========================
+     AUTH MODAL
+========================= -->
 
-      </div>
+<div
+  id="auth"
+  class="modal hidden">
 
-      <div>
+  <div class="modal-box">
 
-        <b id="visits">
-          0
-        </b>
+    <button
+      type="button"
+      class="close"
+      onclick="closeAuth()"
+      aria-label="Zavřít">
+      ×
+    </button>
 
-        <span>
-          VISITS
-        </span>
-
-      </div>
-
+    <div class="kicker">
+      VIRENO
     </div>
 
+    <h2 id="authTitle">
+      PŘIHLÁSIT SE
+    </h2>
 
-    <!-- EDITOR -->
+    <form id="authForm">
 
-    <div class="admin-editor">
+      <input
+        id="authEmail"
+        type="email"
+        placeholder="E-mail"
+        required>
 
-      <h3>
-        PUBLISH ARTICLE
-      </h3>
+      <input
+        id="authPassword"
+        type="password"
+        placeholder="Heslo"
+        minlength="6"
+        required>
 
-      <form id="articleForm">
+      <button
+        id="authSubmit"
+        type="submit"
+        class="btn green full">
+        PŘIHLÁSIT SE
+      </button>
+
+    </form>
+
+    <p
+      id="authMsg">
+    </p>
+
+    <button
+      id="authSwitch"
+      type="button"
+      class="auth-switch">
+      Nemáte účet? Vytvořte si ho
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =========================
+     ADMIN
+========================= -->
+
+<section
+  id="admin"
+  class="admin-panel hidden">
+
+  <div class="kicker">
+    VIRENO ADMIN
+  </div>
+
+  <h2>
+    SPRÁVA WEBU
+  </h2>
+
+  <div class="admin-stats">
+
+    <div>
+      <b id="adminArticles">0</b>
+      <span>ČLÁNKŮ</span>
+    </div>
+
+    <div>
+      <b id="subs">0</b>
+      <span>ODBĚRATELŮ</span>
+    </div>
+
+    <div>
+      <b id="visits">0</b>
+      <span>NÁVŠTĚV</span>
+    </div>
+
+  </div>
+
+
+  <!-- EDITOR -->
+
+  <div class="admin-editor">
+
+    <h3>
+      NOVÝ ČLÁNEK
+    </h3>
+
+    <form id="articleForm">
+
+      <input
+        id="title"
+        type="text"
+        placeholder="Název článku"
+        required>
+
+      <select id="category">
+
+        <option value="POHYB">
+          POHYB
+        </option>
+
+        <option value="VÝŽIVA">
+          VÝŽIVA
+        </option>
+
+        <option value="HUBNUTÍ">
+          HUBNUTÍ
+        </option>
+
+        <option value="REGENERACE">
+          REGENERACE
+        </option>
+
+        <option value="ZDRAVÍ">
+          ZDRAVÍ
+        </option>
+
+      </select>
+
+      <input
+        id="cover"
+        type="hidden">
+
+      <div class="cover-upload">
+
+        <label>
+          TITULNÍ OBRÁZEK
+        </label>
 
         <input
-          type="text"
-          id="title"
-          placeholder="Article title"
-          required>
+          id="coverFile"
+          type="file"
+          accept="image/jpeg,image/png,image/webp">
 
-        <select id="category">
+      </div>
 
-          <option value="TRAINING">
-            TRAINING
-          </option>
+      <div
+        id="coverPreview"
+        class="cover-preview hidden">
 
-          <option value="NUTRITION">
-            NUTRITION
-          </option>
+        <img
+          id="coverPreviewImg"
+          src=""
+          alt="Náhled obrázku">
 
-          <option value="STRENGTH">
-            STRENGTH
-          </option>
+      </div>
 
-          <option value="RECOVERY">
-            RECOVERY
-          </option>
+      <input
+        id="excerpt"
+        type="text"
+        placeholder="Krátký popis článku"
+        required>
 
-          <option value="MINDSET">
-            MINDSET
-          </option>
+      <textarea
+        id="content"
+        placeholder="Obsah článku..."
+        required></textarea>
 
-        </select>
+      <button
+        id="articleSubmit"
+        type="submit"
+        class="btn green">
+        PUBLIKOVAT ČLÁNEK
+      </button>
 
-        <input
-          type="url"
-          id="cover"
-          placeholder="Cover image URL">
-
-        <div class="cover-upload">
-
-          <label for="coverFile">
-            OR UPLOAD COVER IMAGE
-          </label>
-
-          <input
-            type="file"
-            id="coverFile"
-            accept="image/jpeg,image/png,image/webp">
-
-        </div>
-
-        <div
-          id="coverPreview"
-          class="cover-preview hidden">
-
-          <img
-            id="coverPreviewImg"
-            src=""
-            alt="Cover preview">
-
-          <button
-            type="button"
-            class="btn dark"
-            onclick="removeCoverImage()">
-
-            REMOVE IMAGE
-
-          </button>
-
-        </div>
-
-        <input
-          type="text"
-          id="excerpt"
-          placeholder="Short excerpt">
-
-        <textarea
-          id="content"
-          rows="12"
-          placeholder="Article content..."
-          required></textarea>
-
-        <button
-          type="submit"
-          class="btn red"
-          id="articleSubmit">
-
-          PUBLISH ARTICLE
-
-        </button>
-
-        <button
-          type="button"
-          class="btn dark"
-          id="clearArticleBtn">
-
-          CLEAR
-
-        </button>
-
-      </form>
+      <button
+        id="clearArticleBtn"
+        type="button"
+        class="btn dark">
+        VYČISTIT
+      </button>
 
       <p id="articleMsg"></p>
 
+    </form>
+
+  </div>
+
+
+  <!-- ARTICLE LIST -->
+
+  <div class="admin-list">
+
+    <h3>
+      ČLÁNKY
+    </h3>
+
+    <div id="adminList">
+
+      <p class="muted">
+        Načítám...
+      </p>
+
     </div>
 
+  </div>
 
-    <!-- ADMIN LIST -->
+</section>
 
-    <div class="admin-list">
 
-      <h3>
-        ARTICLES
-      </h3>
+<!-- =========================
+     ARTICLE VIEW
+========================= -->
 
-      <div id="adminList">
+<div
+  id="articleView"
+  class="modal hidden">
 
-        <p style="color:#888">
-          Loading...
-        </p>
+  <article class="article-view">
 
-      </div>
+    <button
+      type="button"
+      class="close"
+      onclick="closeArticle()"
+      aria-label="Zavřít článek">
+      ×
+    </button>
 
+    <img
+      id="articleViewImage"
+      src=""
+      alt="Obrázek článku">
+
+    <div class="kicker">
+      VIRENO
     </div>
 
-  </section>
+    <h2 id="articleViewTitle"></h2>
+
+    <div
+      id="articleViewMeta"
+      class="muted">
+    </div>
+
+    <div
+      id="articleViewContent">
+    </div>
+
+  </article>
+
+</div>
+
+
+<!-- =========================
+     SUPABASE
+========================= -->
+
+<script
+  src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2">
+</script>
+
+<script
+  src="app.js">
+</script>
 
 </body>
 </html>
