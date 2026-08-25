@@ -5,17 +5,20 @@ let db = null;
 let articles = [];
 let editingId = null;
 let authMode = 'login';
-let searchOpen = false;
+
+/* =========================
+   HELPERS
+========================= */
 
 const $ = id => document.getElementById(id);
 
 function esc(value = '') {
   return String(value).replace(/[&<>'"]/g, c => ({
-    '&': '&amp;',
-    '<': '&lt;',
-    '>': '&gt;',
-    "'": '&#39;',
-    '"': '&quot;'
+    '&':'&amp;',
+    '<':'&lt;',
+    '>':'&gt;',
+    "'":'&#39;',
+    '"':'&quot;'
   }[c]));
 }
 
@@ -23,143 +26,109 @@ function formatDate(value) {
   if (!value) return '';
 
   return new Date(value).toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric'
+    year:'numeric',
+    month:'short',
+    day:'numeric'
   });
-}
-
-/* =========================
-   SUPABASE
-========================= */
-
-function initSupabase() {
-  if (!window.supabase) {
-    console.error('Supabase library was not loaded.');
-    return false;
-  }
-
-  db = window.supabase.createClient(
-    SUPABASE_URL,
-    SUPABASE_PUBLISHABLE_KEY
-  );
-
-  return true;
 }
 
 /* =========================
    SEARCH
 ========================= */
 
-function createSearchBox() {
-
-  if (document.getElementById('searchBox')) {
-    return;
-  }
-
-  const topbar = document.querySelector('.topbar');
-
-  if (!topbar) return;
-
-  const searchBox = document.createElement('div');
-
-  searchBox.id = 'searchBox';
-
-  searchBox.innerHTML = `
-    <input
-      id="searchInput"
-      type="search"
-      placeholder="Search articles..."
-      autocomplete="off"
-    >
-
-    <button
-      type="button"
-      id="searchClose"
-      aria-label="Close search">
-      ×
-    </button>
-
-    <div id="searchResults"></div>
-  `;
-
-  topbar.appendChild(searchBox);
-
-  const input = $('searchInput');
-  const close = $('searchClose');
-
-  input.addEventListener('input', () => {
-    performSearch(input.value);
-  });
-
-  close.addEventListener('click', closeSearch);
-
-  input.addEventListener('keydown', event => {
-
-    if (event.key === 'Escape') {
-      closeSearch();
-    }
-
-  });
-}
-
 function openSearch() {
 
-  createSearchBox();
+  let box = $('searchBox');
 
-  const searchBox = $('searchBox');
-  const input = $('searchInput');
+  if (!box) {
 
-  if (!searchBox) return;
+    box = document.createElement('div');
 
-  searchOpen = true;
+    box.id = 'searchBox';
 
-  searchBox.classList.add('open');
+    box.innerHTML = `
+      <div class="search-inner">
+
+        <input
+          id="searchInput"
+          type="search"
+          placeholder="Search articles..."
+          autocomplete="off"
+        >
+
+        <button
+          type="button"
+          id="searchClose"
+          onclick="closeSearch()">
+          ×
+        </button>
+
+      </div>
+
+      <div id="searchResults"></div>
+    `;
+
+    document.body.appendChild(box);
+
+    const input = $('searchInput');
+
+    if (input) {
+      input.addEventListener('input', function() {
+        searchArticles(this.value);
+      });
+    }
+  }
+
+  box.classList.add('open');
 
   setTimeout(() => {
+
+    const input = $('searchInput');
 
     if (input) {
       input.focus();
     }
 
-  }, 50);
+  }, 100);
 }
 
 function closeSearch() {
 
-  const searchBox = $('searchBox');
-  const input = $('searchInput');
-  const results = $('searchResults');
+  const box = $('searchBox');
 
-  searchOpen = false;
+  if (box) {
+    box.classList.remove('open');
+  }
+
+  const input = $('searchInput');
 
   if (input) {
     input.value = '';
   }
 
+  const results = $('searchResults');
+
   if (results) {
     results.innerHTML = '';
   }
-
-  if (searchBox) {
-    searchBox.classList.remove('open');
-  }
 }
 
-function performSearch(query) {
+function searchArticles(query) {
 
   const results = $('searchResults');
 
   if (!results) return;
 
-  const text = String(query || '').trim().toLowerCase();
+  const search = String(query || '')
+    .trim()
+    .toLowerCase();
 
-  if (!text) {
+  if (!search) {
     results.innerHTML = '';
     return;
   }
 
-  const matches = articles.filter(article => {
+  const found = articles.filter(article => {
 
     const title =
       String(article.title || '').toLowerCase();
@@ -174,27 +143,27 @@ function performSearch(query) {
       String(article.content || '').toLowerCase();
 
     return (
-      title.includes(text) ||
-      excerpt.includes(text) ||
-      category.includes(text) ||
-      content.includes(text)
+      title.includes(search) ||
+      excerpt.includes(search) ||
+      category.includes(search) ||
+      content.includes(search)
     );
 
   });
 
-  if (!matches.length) {
+  if (!found.length) {
 
     results.innerHTML = `
       <div class="search-empty">
-        No articles found.
+        NO ARTICLES FOUND
       </div>
     `;
 
     return;
   }
 
-  results.innerHTML = matches
-    .slice(0, 8)
+  results.innerHTML = found
+    .slice(0, 10)
     .map(article => {
 
       const image =
@@ -237,13 +206,34 @@ function openSearchArticle(id) {
 
   closeSearch();
 
-  setTimeout(() => {
-    openArticle(id);
-  }, 100);
+  openArticle(id);
 }
 
 /* =========================
-   AUTH MODAL
+   SUPABASE
+========================= */
+
+function initSupabase() {
+
+  if (!window.supabase) {
+
+    console.error(
+      'Supabase library was not loaded.'
+    );
+
+    return false;
+  }
+
+  db = window.supabase.createClient(
+    SUPABASE_URL,
+    SUPABASE_PUBLISHABLE_KEY
+  );
+
+  return true;
+}
+
+/* =========================
+   AUTH
 ========================= */
 
 function openAuth(mode = 'login') {
@@ -252,59 +242,48 @@ function openAuth(mode = 'login') {
 
   const auth = $('auth');
 
-  if (!auth) {
-    console.error('Element #auth was not found in index.html');
-    return;
-  }
+  if (!auth) return;
 
   auth.classList.remove('hidden');
 
   if ($('authTitle')) {
-
     $('authTitle').textContent =
       mode === 'signup'
         ? 'CREATE ACCOUNT'
         : 'LOG IN';
-
   }
 
   if ($('authSubmit')) {
-
     $('authSubmit').textContent =
       mode === 'signup'
         ? 'SIGN UP'
         : 'LOG IN';
-
   }
 
   if ($('authSwitch')) {
-
     $('authSwitch').textContent =
       mode === 'signup'
         ? 'Already have an account? Log in'
         : "Don't have an account? Sign up";
-
   }
 
   if ($('authMsg')) {
     $('authMsg').textContent = '';
   }
 
-  if ($('authEmail')) {
+  setTimeout(() => {
 
-    setTimeout(() => {
+    if ($('authEmail')) {
       $('authEmail').focus();
-    }, 50);
+    }
 
-  }
+  }, 100);
 }
 
 function closeAuth() {
 
-  const auth = $('auth');
-
-  if (auth) {
-    auth.classList.add('hidden');
+  if ($('auth')) {
+    $('auth').classList.add('hidden');
   }
 }
 
@@ -321,13 +300,7 @@ async function handleAuth(event) {
 
   event.preventDefault();
 
-  if (!db) {
-
-    $('authMsg').textContent =
-      'Supabase is not connected.';
-
-    return;
-  }
+  if (!db) return;
 
   const email =
     $('authEmail').value.trim();
@@ -373,18 +346,19 @@ async function handleAuth(event) {
       } else {
 
         $('authMsg').textContent =
-          'Account created. Check your email to confirm your account.';
+          'Account created. Check your email.';
 
       }
 
       return;
     }
 
-    const { error } =
-      await db.auth.signInWithPassword({
-        email,
-        password
-      });
+    const {
+      error
+    } = await db.auth.signInWithPassword({
+      email,
+      password
+    });
 
     if (error) {
 
@@ -400,14 +374,12 @@ async function handleAuth(event) {
 
   } catch (error) {
 
-    console.error(
-      'Login error:',
-      error
-    );
+    console.error(error);
 
     $('authMsg').textContent =
       error.message ||
       'Login failed.';
+
   }
 }
 
@@ -421,14 +393,12 @@ async function logout() {
 }
 
 /* =========================
-   USER / ADMIN
+   PROFILE / ADMIN
 ========================= */
 
 async function getProfile(userId) {
 
-  if (!db || !userId) {
-    return null;
-  }
+  if (!db || !userId) return null;
 
   const {
     data,
@@ -441,10 +411,7 @@ async function getProfile(userId) {
 
   if (error) {
 
-    console.error(
-      'Profile error:',
-      error
-    );
+    console.error(error);
 
     return null;
   }
@@ -457,7 +424,7 @@ async function isAdmin() {
   if (!db) return false;
 
   const {
-    data: { user }
+    data:{user}
   } = await db.auth.getUser();
 
   if (!user) return false;
@@ -472,70 +439,56 @@ async function updateUserUI() {
 
   if (!db) return;
 
-  try {
+  const {
+    data:{user}
+  } = await db.auth.getUser();
 
-    const {
-      data: { user }
-    } = await db.auth.getUser();
+  const loginBtn = $('loginBtn');
+  const admin = $('admin');
 
-    const loginBtn =
-      $('loginBtn');
-
-    const admin =
-      $('admin');
-
-    if (!user) {
-
-      if (loginBtn) {
-
-        loginBtn.textContent =
-          'LOG IN';
-
-        loginBtn.onclick =
-          () => openAuth('login');
-      }
-
-      if (admin) {
-        admin.classList.add('hidden');
-      }
-
-      return;
-    }
-
-    const profile =
-      await getProfile(user.id);
+  if (!user) {
 
     if (loginBtn) {
 
       loginBtn.textContent =
-        'LOG OUT';
+        'LOG IN';
 
       loginBtn.onclick =
-        logout;
+        () => openAuth('login');
     }
 
-    if (profile?.role === 'admin') {
-
-      if (admin) {
-        admin.classList.remove('hidden');
-      }
-
-      await refreshAdminStats();
-
-    } else {
-
-      if (admin) {
-        admin.classList.add('hidden');
-      }
-
+    if (admin) {
+      admin.classList.add('hidden');
     }
 
-  } catch (error) {
+    return;
+  }
 
-    console.error(
-      'User UI error:',
-      error
-    );
+  const profile =
+    await getProfile(user.id);
+
+  if (loginBtn) {
+
+    loginBtn.textContent =
+      'LOG OUT';
+
+    loginBtn.onclick =
+      logout;
+  }
+
+  if (profile?.role === 'admin') {
+
+    if (admin) {
+      admin.classList.remove('hidden');
+    }
+
+    await refreshAdminStats();
+
+  } else {
+
+    if (admin) {
+      admin.classList.add('hidden');
+    }
 
   }
 }
@@ -580,7 +533,7 @@ function card(article) {
 
           <a
             href="#"
-            onclick="openArticle(${article.id}); return false;">
+            onclick="openArticle(${article.id});return false;">
             READ MORE →
           </a>
 
@@ -594,35 +547,26 @@ function card(article) {
 
 function renderArticles() {
 
-  const cards =
-    $('cards');
-
-  const drawer =
-    $('drawerArticles');
+  const cards = $('cards');
+  const drawer = $('drawerArticles');
 
   if (cards) {
 
     cards.innerHTML =
       articles.length
-        ? articles
-            .slice(0, 4)
-            .map(card)
-            .join('')
+        ? articles.slice(0,4).map(card).join('')
         : '<p style="color:#888">No articles yet.</p>';
-
   }
 
   if (drawer) {
 
     drawer.innerHTML =
       articles.length
-
         ? articles.map(article => `
 
           <div
             class="drawer-item"
-            onclick="openArticle(${article.id}); toggleDrawer();"
-            style="cursor:pointer">
+            onclick="openArticle(${article.id});toggleDrawer()">
 
             ${
               article.cover_url
@@ -647,9 +591,7 @@ function renderArticles() {
           </div>
 
         `).join('')
-
         : '<p style="color:#888">No articles yet.</p>';
-
   }
 }
 
@@ -663,8 +605,8 @@ async function loadArticles() {
   } = await db
     .from('articles')
     .select('*')
-    .order('created_at', {
-      ascending: false
+    .order('created_at',{
+      ascending:false
     });
 
   if (error) {
@@ -675,10 +617,8 @@ async function loadArticles() {
     );
 
     if ($('cards')) {
-
       $('cards').innerHTML =
         '<p style="color:#f66">Could not load articles.</p>';
-
     }
 
     return;
@@ -688,21 +628,17 @@ async function loadArticles() {
     data || [];
 
   renderArticles();
-
   renderAdminList();
 
   if ($('adminArticles')) {
-
     $('adminArticles').textContent =
       articles.length;
   }
 
   if ($('publicArticles')) {
-
     $('publicArticles').textContent =
       articles.length;
   }
-
 }
 
 /* =========================
@@ -711,15 +647,10 @@ async function loadArticles() {
 
 function toggleDrawer() {
 
-  const drawer =
-    $('drawer');
+  const drawer = $('drawer');
 
   if (drawer) {
-
-    drawer.classList.toggle(
-      'open'
-    );
-
+    drawer.classList.toggle('open');
   }
 }
 
@@ -734,46 +665,40 @@ async function refreshAdminStats() {
   try {
 
     const {
-      count: subscribers
+      count:subscribers
     } = await db
       .from('subscribers')
-      .select('*', {
-        count: 'exact',
-        head: true
+      .select('*',{
+        count:'exact',
+        head:true
       });
 
     const {
-      data: stats
+      data:stats
     } = await db
       .from('site_stats')
       .select('visits')
-      .eq('id', 1)
+      .eq('id',1)
       .maybeSingle();
 
     if ($('subs')) {
-
       $('subs').textContent =
         subscribers ?? 0;
     }
 
     if ($('adminArticles')) {
-
       $('adminArticles').textContent =
         articles.length;
     }
 
     if ($('visits')) {
-
       $('visits').textContent =
         stats?.visits ?? 0;
     }
 
-  } catch (error) {
+  } catch(error) {
 
-    console.error(
-      'Admin stats error:',
-      error
-    );
+    console.error(error);
 
   }
 }
@@ -793,25 +718,22 @@ async function uploadCoverImage(file) {
   ];
 
   if (!allowed.includes(file.type)) {
-
     throw new Error(
       'Please use JPG, PNG or WEBP.'
     );
   }
 
   if (file.size > 5 * 1024 * 1024) {
-
     throw new Error(
       'Image must be smaller than 5 MB.'
     );
   }
 
   const {
-    data: { user }
+    data:{user}
   } = await db.auth.getUser();
 
   if (!user) {
-
     throw new Error(
       'You must be logged in.'
     );
@@ -834,15 +756,13 @@ async function uploadCoverImage(file) {
       filename,
       file,
       {
-        cacheControl: '3600',
-        upsert: false,
-        contentType: file.type
+        cacheControl:'3600',
+        upsert:false,
+        contentType:file.type
       }
     );
 
-  if (error) {
-    throw error;
-  }
+  if (error) throw error;
 
   const {
     data
@@ -865,10 +785,7 @@ function showCoverPreview(url) {
 
   if (!url) {
 
-    preview.classList.add(
-      'hidden'
-    );
-
+    preview.classList.add('hidden');
     image.src = '';
 
     return;
@@ -876,9 +793,7 @@ function showCoverPreview(url) {
 
   image.src = url;
 
-  preview.classList.remove(
-    'hidden'
-  );
+  preview.classList.remove('hidden');
 }
 
 async function removeCoverImage() {
@@ -910,15 +825,11 @@ async function removeCoverImage() {
           .from('article-images')
           .remove([path]);
 
-      } catch (error) {
+      } catch(error) {
 
-        console.warn(
-          'Could not delete image:',
-          error
-        );
+        console.warn(error);
 
       }
-
     }
   }
 
@@ -955,21 +866,17 @@ async function saveArticle(event) {
   if (button) {
 
     button.disabled = true;
-
-    button.textContent =
-      'SAVING...';
+    button.textContent = 'SAVING...';
 
   }
 
   try {
 
     let coverUrl =
-      $('cover')?.value.trim() ||
-      null;
+      $('cover')?.value.trim() || null;
 
     const file =
-      $('coverFile')
-        ?.files?.[0];
+      $('coverFile')?.files?.[0];
 
     if (file) {
 
@@ -982,20 +889,15 @@ async function saveArticle(event) {
 
     const payload = {
 
-      title:
-        $('title').value.trim(),
+      title:$('title').value.trim(),
 
-      excerpt:
-        $('excerpt').value.trim(),
+      excerpt:$('excerpt').value.trim(),
 
-      content:
-        $('content').value.trim(),
+      content:$('content').value.trim(),
 
-      cover_url:
-        coverUrl,
+      cover_url:coverUrl,
 
-      category:
-        $('category').value
+      category:$('category').value
 
     };
 
@@ -1007,12 +909,12 @@ async function saveArticle(event) {
         await db
           .from('articles')
           .update(payload)
-          .eq('id', editingId);
+          .eq('id',editingId);
 
     } else {
 
       const {
-        data: { user }
+        data:{user}
       } = await db.auth.getUser();
 
       result =
@@ -1020,9 +922,8 @@ async function saveArticle(event) {
           .from('articles')
           .insert({
             ...payload,
-            author_id: user.id
+            author_id:user.id
           });
-
     }
 
     if (result.error) {
@@ -1045,22 +946,16 @@ async function saveArticle(event) {
     showCoverPreview(null);
 
     if (button) {
-
       button.textContent =
         'PUBLISH ARTICLE';
-
     }
 
     await loadArticles();
-
     await refreshAdminStats();
 
-  } catch (error) {
+  } catch(error) {
 
-    console.error(
-      'Save article error:',
-      error
-    );
+    console.error(error);
 
     $('articleMsg').textContent =
       error.message ||
@@ -1073,19 +968,16 @@ async function saveArticle(event) {
       button.disabled = false;
 
       if (!editingId) {
-
         button.textContent =
           'PUBLISH ARTICLE';
-
       }
 
     }
-
   }
 }
 
 /* =========================
-   EDIT ARTICLE
+   EDIT
 ========================= */
 
 function editArticle(id) {
@@ -1124,28 +1016,24 @@ function editArticle(id) {
     'SAVE CHANGES';
 
   $('admin').scrollIntoView({
-    behavior: 'smooth'
+    behavior:'smooth'
   });
 }
 
 /* =========================
-   DELETE ARTICLE
+   DELETE
 ========================= */
 
 async function deleteArticle(id) {
 
   if (!(await isAdmin())) {
 
-    alert(
-      'Admin access required.'
-    );
+    alert('Admin access required.');
 
     return;
   }
 
-  if (!confirm(
-    'Delete this article?'
-  )) {
+  if (!confirm('Delete this article?')) {
     return;
   }
 
@@ -1160,13 +1048,11 @@ async function deleteArticle(id) {
   } = await db
     .from('articles')
     .delete()
-    .eq('id', id);
+    .eq('id',id);
 
   if (error) {
 
-    alert(
-      error.message
-    );
+    alert(error.message);
 
     return;
   }
@@ -1177,9 +1063,7 @@ async function deleteArticle(id) {
       '/storage/v1/object/public/article-images/';
 
     const index =
-      article.cover_url.indexOf(
-        marker
-      );
+      article.cover_url.indexOf(marker);
 
     if (index !== -1) {
 
@@ -1194,26 +1078,20 @@ async function deleteArticle(id) {
           .from('article-images')
           .remove([path]);
 
-      } catch (error) {
+      } catch(error) {
 
-        console.warn(
-          'Could not remove image:',
-          error
-        );
+        console.warn(error);
 
       }
-
     }
-
   }
 
   await loadArticles();
-
   await refreshAdminStats();
 }
 
 /* =========================
-   ADMIN ARTICLE LIST
+   ADMIN LIST
 ========================= */
 
 function renderAdminList() {
@@ -1296,9 +1174,7 @@ async function subscribe(event) {
     error
   } = await db
     .from('subscribers')
-    .insert({
-      email
-    });
+    .insert({email});
 
   if (
     error &&
@@ -1363,7 +1239,7 @@ function closeArticle() {
 }
 
 /* =========================
-   CLEAR ARTICLE FORM
+   CLEAR
 ========================= */
 
 function clearArticleForm() {
@@ -1385,10 +1261,8 @@ function clearArticleForm() {
   showCoverPreview(null);
 
   if ($('articleSubmit')) {
-
     $('articleSubmit').textContent =
       'PUBLISH ARTICLE';
-
   }
 
   if ($('articleMsg')) {
@@ -1410,7 +1284,7 @@ async function trackVisit() {
       'track_page_view'
     );
 
-  } catch (error) {
+  } catch(error) {
 
     console.warn(
       'Visit tracking failed:',
@@ -1421,40 +1295,35 @@ async function trackVisit() {
 }
 
 /* =========================
-   EVENTS
+   INIT
 ========================= */
 
-function setupEvents() {
+async function init() {
 
-  /* SEARCH */
+  console.log(
+    'Fitness Fuel starting...'
+  );
+
+  /*
+     SEARCH BUTTON
+     PŘÍMO NASTAVÍME ONCLICK
+  */
 
   const searchButton =
-    document.querySelector(
-      '.icon-btn'
-    );
+    document.querySelector('.icon-btn');
 
   if (searchButton) {
 
-    searchButton.addEventListener(
-      'click',
-      openSearch
-    );
+    searchButton.onclick =
+      openSearch;
 
   }
 
-  /* LOGIN */
-
-  const loginBtn =
-    $('loginBtn');
-
-  if (loginBtn) {
-
-    loginBtn.onclick =
-      () => openAuth('login');
-
+  if (!initSupabase()) {
+    return;
   }
 
-  /* AUTH FORM */
+  /* AUTH */
 
   if ($('authForm')) {
 
@@ -1488,7 +1357,7 @@ function setupEvents() {
 
   }
 
-  /* ARTICLE FORM */
+  /* ARTICLE */
 
   if ($('articleForm')) {
 
@@ -1500,7 +1369,7 @@ function setupEvents() {
 
   }
 
-  /* IMAGE FILE */
+  /* COVER */
 
   if ($('coverFile')) {
 
@@ -1522,9 +1391,7 @@ function setupEvents() {
               reader.result
             );
 
-          reader.readAsDataURL(
-            file
-          );
+          reader.readAsDataURL(file);
 
         }
       );
@@ -1541,12 +1408,9 @@ function setupEvents() {
         event => {
 
           if (
-            event.target ===
-            $('auth')
+            event.target === $('auth')
           ) {
-
             closeAuth();
-
           }
 
         }
@@ -1567,9 +1431,7 @@ function setupEvents() {
             event.target ===
             $('articleView')
           ) {
-
             closeArticle();
-
           }
 
         }
@@ -1577,58 +1439,34 @@ function setupEvents() {
 
   }
 
-  /* ESCAPE */
+  /* ESC */
 
   document.addEventListener(
     'keydown',
     event => {
 
-      if (event.key !== 'Escape') {
-        return;
-      }
+      if (event.key === 'Escape') {
 
-      if (searchOpen) {
         closeSearch();
-      }
 
-      if (
-        $('auth') &&
-        !$('auth').classList.contains('hidden')
-      ) {
-        closeAuth();
-      }
+        if (
+          $('auth') &&
+          !$('auth').classList.contains('hidden')
+        ) {
+          closeAuth();
+        }
 
-      if (
-        $('articleView') &&
-        !$('articleView').classList.contains('hidden')
-      ) {
-        closeArticle();
+        if (
+          $('articleView') &&
+          !$('articleView').classList.contains('hidden')
+        ) {
+          closeArticle();
+        }
+
       }
 
     }
   );
-}
-
-/* =========================
-   INIT
-========================= */
-
-async function init() {
-
-  console.log(
-    'Fitness Fuel starting...'
-  );
-
-  if (!initSupabase()) {
-
-    console.error(
-      'Supabase could not be initialized.'
-    );
-
-    return;
-  }
-
-  setupEvents();
 
   await loadArticles();
 
