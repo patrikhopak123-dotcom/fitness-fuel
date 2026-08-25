@@ -1,73 +1,217 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
 
-<meta name="description" content="Fitness Fuel — training, nutrition, motivation and health.">
-<meta property="og:title" content="Fitness Fuel">
-<meta property="og:description" content="Push your limits with practical fitness advice.">
+<head>
+
+<meta charset="utf-8">
+
+<meta
+  name="viewport"
+  content="width=device-width,initial-scale=1"
+>
+
+<meta
+  name="description"
+  content="Fitness Fuel — training, nutrition, motivation and health."
+>
+
+<meta
+  property="og:title"
+  content="Fitness Fuel"
+>
+
+<meta
+  property="og:description"
+  content="Push your limits with practical fitness advice."
+>
 
 <title>Fitness Fuel — Push Your Limits</title>
 
 <link rel="stylesheet" href="style.css">
+
 </head>
+
 
 <body>
 
+
+<!-- =========================
+     TOP BAR
+========================= -->
+
 <header class="topbar">
 
-  <a class="brand" href="#home">
-    <span>⚡</span> FITNESS <b>FUEL</b>
+  <a
+    class="brand"
+    href="#home"
+  >
+    <span>⚡</span>
+    FITNESS <b>FUEL</b>
   </a>
 
+
   <nav class="desktop-nav">
-    <a class="active" href="#home">HOME</a>
-    <a href="#articles">ARTICLES</a>
-    <a href="#training">TRAINING</a>
-    <a href="#nutrition">NUTRITION</a>
-    <a href="#motivation">MOTIVATION</a>
-    <a href="#about">ABOUT US</a>
+
+    <a
+      class="active"
+      href="#home"
+    >
+      HOME
+    </a>
+
+    <a href="#articles">
+      ARTICLES
+    </a>
+
+    <a href="#training">
+      TRAINING
+    </a>
+
+    <a href="#nutrition">
+      NUTRITION
+    </a>
+
+    <a href="#motivation">
+      MOTIVATION
+    </a>
+
+    <a href="#about">
+      ABOUT US
+    </a>
+
   </nav>
 
-  <div class="actions">
-    <button class="icon-btn" aria-label="Search">⌕</button>
 
-    <button id="loginBtn" class="login" onclick="openAuth('login')">
+  <div class="actions">
+
+
+    <!-- SEARCH -->
+
+    <button
+      class="icon-btn"
+      id="searchButton"
+      type="button"
+      aria-label="Search"
+    >
+      ⌕
+    </button>
+
+
+    <!-- LOGIN -->
+
+    <button
+      id="loginBtn"
+      class="login"
+      type="button"
+    >
       LOG IN
     </button>
 
-    <button class="menu-btn" onclick="toggleDrawer()" aria-label="Open articles">
+
+    <!-- MOBILE MENU -->
+
+    <button
+      class="menu-btn"
+      type="button"
+      onclick="toggleDrawer()"
+      aria-label="Open articles"
+    >
       ☰
     </button>
+
   </div>
 
 </header>
 
 
-<!-- ARTICLE DRAWER -->
 
-<aside id="drawer" class="drawer">
+<!-- =========================
+     SEARCH
+========================= -->
+
+<div
+  id="searchArea"
+  class="search-area"
+>
+
+  <div class="search-inner">
+
+    <span class="search-symbol">
+      ⌕
+    </span>
+
+    <input
+      id="searchBox"
+      type="search"
+      placeholder="Search articles by title or category..."
+      autocomplete="off"
+    >
+
+    <button
+      id="clearSearch"
+      type="button"
+      aria-label="Clear search"
+    >
+      ×
+    </button>
+
+  </div>
+
+</div>
+
+
+
+<!-- =========================
+     ARTICLE DRAWER
+========================= -->
+
+<aside
+  id="drawer"
+  class="drawer"
+>
 
   <div class="drawer-head">
-    <h2>ALL ARTICLES</h2>
-    <button onclick="toggleDrawer()">×</button>
+
+    <h2>
+      ALL ARTICLES
+    </h2>
+
+    <button
+      type="button"
+      onclick="toggleDrawer()"
+    >
+      ×
+    </button>
+
   </div>
+
 
   <div id="drawerArticles"></div>
 
-  <a class="drawer-all" href="#articles" onclick="toggleDrawer()">
+
+  <a
+    class="drawer-all"
+    href="#articles"
+    onclick="toggleDrawer()"
+  >
     VIEW ALL ARTICLES
   </a>
 
 </aside>
 
 
+
 <main>
 
-<!-- HERO -->
 
-<section id="home" class="hero">
+<!-- =========================
+     HERO
+========================= -->
+
+<section
+  id="home"
+  class="hero"
+>
 
   <div class="hero-copy">
 
@@ -75,128 +219,253 @@
       TRAINING • NUTRITION • MINDSET
     </div>
 
+
     <h1>
+
       PUSH YOUR<br>
+
       <em>LIMITS</em>
+
     </h1>
 
+
     <p>
-      Practical tips, training plans and motivation to help you become
-      the strongest version of yourself.
+      Practical tips, training plans and motivation
+      to help you become the strongest version of yourself.
     </p>
+
 
     <div class="hero-buttons">
 
-      <a class="btn red" href="#articles">
+      <a
+        class="btn red"
+        href="#articles"
+      >
         LATEST ARTICLES
       </a>
 
-      <a class="btn dark" href="#training">
+
+      <a
+        class="btn dark"
+        href="#training"
+      >
         TRAINING PLANS
       </a>
 
     </div>
 
+
     <div class="social-proof">
-      <div class="avatars">● ● ● ●</div>
+
+      <div class="avatars">
+        ● ● ● ●
+      </div>
 
       <span>
         Join <b>3,247+</b> people<br>
         getting better every day.
       </span>
+
     </div>
 
   </div>
 
-  <div class="hero-athlete" aria-hidden="true"></div>
+
+  <div
+    class="hero-athlete"
+    aria-hidden="true"
+  ></div>
 
 </section>
 
 
-<!-- CATEGORIES -->
+
+<!-- =========================
+     CATEGORIES
+========================= -->
 
 <section class="categories">
 
+
   <a href="#training">
-    <strong>⚡</strong>
+
+    <strong>
+      ⚡
+    </strong>
+
     <span>
+
       TRAINING
-      <small>Tips & workout plans</small>
+
+      <small>
+        Tips & workout plans
+      </small>
+
     </span>
+
   </a>
+
+
 
   <a href="#nutrition">
-    <strong>♧</strong>
+
+    <strong>
+      ♧
+    </strong>
+
     <span>
+
       NUTRITION
-      <small>Food & supplementation</small>
+
+      <small>
+        Food & supplementation
+      </small>
+
     </span>
+
   </a>
+
+
 
   <a href="#articles">
-    <strong>◉</strong>
+
+    <strong>
+      ◉
+    </strong>
+
     <span>
+
       FAT LOSS
-      <small>Guides for getting lean</small>
+
+      <small>
+        Guides for getting lean
+      </small>
+
     </span>
+
   </a>
+
+
 
   <a href="#motivation">
-    <strong>♢</strong>
+
+    <strong>
+      ♢
+    </strong>
+
     <span>
+
       MOTIVATION
-      <small>Mindset & discipline</small>
+
+      <small>
+        Mindset & discipline
+      </small>
+
     </span>
+
   </a>
 
+
+
   <a href="#about">
-    <strong>♡</strong>
+
+    <strong>
+      ♡
+    </strong>
+
     <span>
+
       HEALTH
-      <small>Recovery & wellbeing</small>
+
+      <small>
+        Recovery & wellbeing
+      </small>
+
     </span>
+
   </a>
 
 </section>
 
 
-<!-- ARTICLES -->
 
-<section id="articles" class="content">
+<!-- =========================
+     ARTICLES
+========================= -->
+
+<section
+  id="articles"
+  class="content"
+>
+
 
   <div class="latest">
+
 
     <div class="section-title">
 
       <div>
-        <div class="kicker">THE LATEST</div>
-        <h2>LATEST ARTICLES</h2>
+
+        <div class="kicker">
+          THE LATEST
+        </div>
+
+        <h2>
+          LATEST ARTICLES
+        </h2>
+
       </div>
 
-      <a href="#articles">VIEW ALL</a>
+
+      <a href="#articles">
+        VIEW ALL
+      </a>
 
     </div>
 
-    <div id="cards" class="cards"></div>
+
+    <!-- SEARCH RESULT MESSAGE -->
+
+    <div
+      id="searchResults"
+      class="search-results"
+    ></div>
+
+
+    <!-- ARTICLE CARDS -->
+
+    <div
+      id="cards"
+      class="cards"
+    ></div>
+
 
   </div>
 
 
-  <!-- NEWSLETTER -->
+
+  <!-- =========================
+       NEWSLETTER
+  ========================= -->
 
   <aside class="subscribe">
 
-    <div class="kicker">NEWSLETTER</div>
+    <div class="kicker">
+      NEWSLETTER
+    </div>
+
 
     <h3>
       GET NEW ARTICLES<br>
       IN YOUR INBOX.
     </h3>
 
+
     <p>
       Subscribe and get the latest training,
       nutrition and motivation articles by email.
     </p>
+
 
     <form id="subscribe">
 
@@ -206,21 +475,40 @@
         required
       >
 
-      <button class="btn red">
+
+      <button
+        class="btn red"
+        type="submit"
+      >
         SUBSCRIBE
       </button>
 
     </form>
 
+
     <small>
       No spam. Unsubscribe anytime.
     </small>
 
+
     <div class="follow">
-      <b>FOLLOW US</b>
-      <span>◎</span>
-      <span>▶</span>
-      <span>f</span>
+
+      <b>
+        FOLLOW US
+      </b>
+
+      <span>
+        ◎
+      </span>
+
+      <span>
+        ▶
+      </span>
+
+      <span>
+        f
+      </span>
+
     </div>
 
   </aside>
@@ -228,28 +516,62 @@
 </section>
 
 
-<!-- STATS -->
+
+<!-- =========================
+     STATS
+========================= -->
 
 <section class="bottom-strip">
 
   <div>
-    <b id="publicArticles">—</b>
-    <span>ARTICLES</span>
+
+    <b id="publicArticles">
+      —
+    </b>
+
+    <span>
+      ARTICLES
+    </span>
+
   </div>
 
-  <div>
-    <b>REGULAR</b>
-    <span>NEW ARTICLES</span>
-  </div>
 
   <div>
-    <b>2</b>
-    <span>ADMINISTRATORS</span>
+
+    <b>
+      REGULAR
+    </b>
+
+    <span>
+      NEW ARTICLES
+    </span>
+
   </div>
 
+
   <div>
-    <b>FITNESS</b>
-    <span>COMMUNITY</span>
+
+    <b>
+      2
+    </b>
+
+    <span>
+      ADMINISTRATORS
+    </span>
+
+  </div>
+
+
+  <div>
+
+    <b>
+      FITNESS
+    </b>
+
+    <span>
+      COMMUNITY
+    </span>
+
   </div>
 
 </section>
@@ -257,18 +579,33 @@
 </main>
 
 
-<!-- ADMIN DASHBOARD -->
 
-<section id="admin" class="admin-panel hidden">
+<!-- =========================
+     ADMIN DASHBOARD
+========================= -->
+
+<section
+  id="admin"
+  class="admin-panel hidden"
+>
+
 
   <div class="section-title">
 
     <div>
-      <div class="kicker">ADMIN</div>
-      <h2>ADMIN DASHBOARD</h2>
+
+      <div class="kicker">
+        ADMIN
+      </div>
+
+      <h2>
+        ADMIN DASHBOARD
+      </h2>
+
     </div>
 
   </div>
+
 
 
   <!-- ADMIN STATS -->
@@ -276,21 +613,45 @@
   <div class="admin-stats">
 
     <div>
-      <b id="visits">—</b>
-      <span>TOTAL VISITS</span>
+
+      <b id="visits">
+        —
+      </b>
+
+      <span>
+        TOTAL VISITS
+      </span>
+
     </div>
 
-    <div>
-      <b id="subs">—</b>
-      <span>SUBSCRIBERS</span>
-    </div>
 
     <div>
-      <b id="adminArticles">—</b>
-      <span>ARTICLES</span>
+
+      <b id="subs">
+        —
+      </b>
+
+      <span>
+        SUBSCRIBERS
+      </span>
+
+    </div>
+
+
+    <div>
+
+      <b id="adminArticles">
+        —
+      </b>
+
+      <span>
+        ARTICLES
+      </span>
+
     </div>
 
   </div>
+
 
 
   <!-- ARTICLE EDITOR -->
@@ -301,12 +662,14 @@
       ARTICLE EDITOR
     </div>
 
+
     <h3>
       ADD / EDIT ARTICLE
     </h3>
 
 
     <form id="articleForm">
+
 
       <input
         id="title"
@@ -317,16 +680,31 @@
 
       <select id="category">
 
-        <option>TRAINING</option>
-        <option>NUTRITION</option>
-        <option>MOTIVATION</option>
-        <option>FAT LOSS</option>
-        <option>HEALTH</option>
+        <option>
+          TRAINING
+        </option>
+
+        <option>
+          NUTRITION
+        </option>
+
+        <option>
+          MOTIVATION
+        </option>
+
+        <option>
+          FAT LOSS
+        </option>
+
+        <option>
+          HEALTH
+        </option>
 
       </select>
 
 
-      <!-- IMAGE UPLOAD -->
+
+      <!-- COVER IMAGE -->
 
       <div class="cover-upload">
 
@@ -335,13 +713,17 @@
         </label>
 
 
-        <div id="coverPreview" class="cover-preview hidden">
+        <div
+          id="coverPreview"
+          class="cover-preview hidden"
+        >
 
           <img
             id="coverPreviewImg"
             src=""
             alt="Cover preview"
           >
+
 
           <button
             type="button"
@@ -368,6 +750,7 @@
         >
 
       </div>
+
 
 
       <textarea
@@ -410,6 +793,7 @@
   </div>
 
 
+
   <!-- ARTICLE MANAGEMENT -->
 
   <div class="admin-list">
@@ -418,6 +802,7 @@
       MANAGE ARTICLES
     </div>
 
+
     <div id="adminList"></div>
 
   </div>
@@ -425,22 +810,32 @@
 </section>
 
 
-<!-- LOGIN -->
 
-<div id="auth" class="modal hidden">
+<!-- =========================
+     LOGIN
+========================= -->
+
+<div
+  id="auth"
+  class="modal hidden"
+>
 
   <div class="modal-box">
 
+
     <button
       class="close"
+      type="button"
       onclick="closeAuth()"
     >
       ×
     </button>
 
+
     <div class="kicker">
       YOUR ACCOUNT
     </div>
+
 
     <h2 id="authTitle">
       LOG IN
@@ -449,12 +844,14 @@
 
     <form id="authForm">
 
+
       <input
         id="authEmail"
         type="email"
         placeholder="Email"
         required
       >
+
 
       <input
         id="authPassword"
@@ -464,6 +861,7 @@
         required
       >
 
+
       <button
         id="authSubmit"
         class="btn red full"
@@ -471,6 +869,7 @@
       >
         LOG IN
       </button>
+
 
       <p id="authMsg"></p>
 
@@ -490,18 +889,27 @@
 </div>
 
 
-<!-- ARTICLE VIEW -->
 
-<div id="articleView" class="modal hidden">
+<!-- =========================
+     ARTICLE VIEW
+========================= -->
+
+<div
+  id="articleView"
+  class="modal hidden"
+>
 
   <div class="article-view">
 
+
     <button
       class="close"
+      type="button"
       onclick="closeArticle()"
     >
       ×
     </button>
+
 
     <img
       id="articleViewImage"
@@ -509,27 +917,41 @@
       alt=""
     >
 
+
     <div
       class="kicker"
       id="articleViewMeta"
     ></div>
 
-    <h2 id="articleViewTitle"></h2>
 
-    <div id="articleViewContent"></div>
+    <h2
+      id="articleViewTitle"
+    ></h2>
+
+
+    <div
+      id="articleViewContent"
+    ></div>
 
   </div>
 
 </div>
 
 
-<!-- SUPABASE -->
+
+<!-- =========================
+     SUPABASE
+========================= -->
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-<!-- YOUR JAVASCRIPT -->
+
+<!-- =========================
+     APP JS
+========================= -->
 
 <script src="app.js"></script>
+
 
 </body>
 </html>
