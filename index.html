@@ -1,8 +1,6 @@
 <!DOCTYPE html>
 <html lang="cs">
-
 <head>
-
   <meta charset="UTF-8">
 
   <meta
@@ -12,389 +10,283 @@
 
   <meta
     name="description"
-    content="VIRENO – praktický průvodce pohybem, výživou, hubnutím, regenerací a zdravím pro každý věk."
-  >
-
-  <meta
-    name="theme-color"
-    content="#f4f5f0"
+    content="Vireno – praktické informace o pohybu, výživě, hubnutí, regeneraci a zdraví."
   >
 
   <title>VIRENO — zdravější tělo. silnější život.</title>
 
-
-  <!-- =====================================================
-       FONTS
-  ====================================================== -->
-
+  <!-- FONTY -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
   <link
-    href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap"
+    href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700;800;900&family=Inter:wght@400;500;600;700;800&display=swap"
     rel="stylesheet"
   >
 
-
-  <!-- =====================================================
-       ICONS
-  ====================================================== -->
-
+  <!-- IKONY -->
   <link
     rel="stylesheet"
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
   >
 
-
-  <!-- =====================================================
-       CSS
-  ====================================================== -->
-
-  <link
-    rel="stylesheet"
-    href="style.css"
-  >
-
+  <link rel="stylesheet" href="style.css">
 </head>
-
 
 <body>
 
+<!-- =====================================================
+     HEADER
+====================================================== -->
 
-  <!-- =====================================================
-       HEADER
-  ====================================================== -->
+<header class="topbar">
 
-  <header class="topbar">
+  <a
+    href="#top"
+    class="brand"
+    onclick="showHome(); return false;"
+  >
+    <span class="brand-mark">V</span><span>IRENO</span>
+  </a>
+
+  <nav class="desktop-nav">
 
     <a
-      href="#top"
-      class="brand"
-      onclick="showHome()"
-      aria-label="VIRENO"
+      href="#articles"
+      data-category="POHYB"
+      onclick="showCategory('POHYB'); return false;"
     >
-
-      <span class="brand-mark">
-        V
-      </span>
-
-      <span class="brand-name">
-        VIRENO
-      </span>
-
+      POHYB
     </a>
 
+    <a
+      href="#articles"
+      data-category="VÝŽIVA"
+      onclick="showCategory('VÝŽIVA'); return false;"
+    >
+      VÝŽIVA
+    </a>
 
-    <nav class="desktop-nav">
+    <a
+      href="#articles"
+      data-category="HUBNUTÍ"
+      onclick="showCategory('HUBNUTÍ'); return false;"
+    >
+      HUBNUTÍ
+    </a>
 
-      <a
-        href="#top"
-        class="active"
-        data-section="home"
-        onclick="showHome()"
-      >
-        DOMŮ
-      </a>
+    <a
+      href="#articles"
+      data-category="REGENERACE"
+      onclick="showCategory('REGENERACE'); return false;"
+    >
+      REGENERACE
+    </a>
 
-      <a
-        href="#articles"
-        data-category="POHYB"
-        onclick="showCategory('POHYB'); return false;"
-      >
-        POHYB
-      </a>
+    <a
+      href="#articles"
+      data-category="ZDRAVÍ"
+      onclick="showCategory('ZDRAVÍ'); return false;"
+    >
+      ZDRAVÍ
+    </a>
 
-      <a
-        href="#articles"
-        data-category="VÝŽIVA"
-        onclick="showCategory('VÝŽIVA'); return false;"
-      >
-        VÝŽIVA
-      </a>
+  </nav>
 
-      <a
-        href="#articles"
-        data-category="HUBNUTÍ"
-        onclick="showCategory('HUBNUTÍ'); return false;"
-      >
-        HUBNUTÍ
-      </a>
+  <div class="actions">
 
-      <a
-        href="#articles"
-        data-category="REGENERACE"
-        onclick="showCategory('REGENERACE'); return false;"
-      >
-        REGENERACE
-      </a>
+    <button
+      type="button"
+      class="icon-btn"
+      id="searchBtn"
+      aria-label="Vyhledávání"
+    >
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </button>
 
-      <a
-        href="#articles"
-        data-category="ZDRAVÍ"
-        onclick="showCategory('ZDRAVÍ'); return false;"
-      >
-        ZDRAVÍ
-      </a>
+    <button
+      type="button"
+      class="login"
+      id="loginBtn"
+    >
+      PŘIHLÁSIT SE
+    </button>
 
-    </nav>
-
-
-    <div class="actions">
-
-      <button
-        type="button"
-        class="icon-btn"
-        id="searchBtn"
-        aria-label="Vyhledávání"
-      >
-        <i class="fa-solid fa-magnifying-glass"></i>
-      </button>
-
-
-      <button
-        type="button"
-        class="login"
-        id="loginBtn"
-      >
-        PŘIHLÁSIT SE
-      </button>
-
-
-      <button
-        type="button"
-        class="menu-btn"
-        onclick="toggleDrawer()"
-        aria-label="Otevřít menu"
-      >
-        <i class="fa-solid fa-bars"></i>
-      </button>
-
-    </div>
-
-  </header>
-
-
-
-  <!-- =====================================================
-       SEARCH
-  ====================================================== -->
-
-  <div
-    id="searchOverlay"
-    class="search-overlay hidden"
-  >
-
-    <div class="search-panel">
-
-      <span class="search-symbol">
-        <i class="fa-solid fa-magnifying-glass"></i>
-      </span>
-
-      <input
-        type="search"
-        id="searchInput"
-        placeholder="Hledat články, pohyb, výživu..."
-        autocomplete="off"
-      >
-
-      <button
-        type="button"
-        class="search-close"
-        id="searchClose"
-        aria-label="Zavřít vyhledávání"
-      >
-        ×
-      </button>
-
-    </div>
+    <button
+      type="button"
+      class="menu-btn"
+      onclick="toggleDrawer()"
+      aria-label="Menu"
+    >
+      <i class="fa-solid fa-bars"></i>
+    </button>
 
   </div>
 
+</header>
 
 
-  <!-- =====================================================
-       MOBILE DRAWER
-  ====================================================== -->
+<!-- =====================================================
+     SEARCH
+====================================================== -->
 
-  <aside
-    id="drawer"
-    class="drawer"
-  >
+<div
+  id="searchOverlay"
+  class="search-overlay hidden"
+>
 
-    <div class="drawer-head">
+  <div class="search-panel">
 
-      <div>
+    <span class="search-symbol">
+      <i class="fa-solid fa-magnifying-glass"></i>
+    </span>
 
-        <span class="drawer-label">
-          VIRENO
-        </span>
+    <input
+      type="search"
+      id="searchInput"
+      placeholder="Hledat články nebo témata..."
+      autocomplete="off"
+    >
 
-        <h2>
-          MENU
-        </h2>
+    <button
+      type="button"
+      class="search-close"
+      id="searchClose"
+    >
+      ×
+    </button>
 
-      </div>
+  </div>
 
-      <button
-        type="button"
-        onclick="toggleDrawer()"
-        aria-label="Zavřít menu"
-      >
-        ×
-      </button>
-
-    </div>
-
-
-    <nav class="mobile-nav">
-
-      <a
-        href="#top"
-        onclick="showHome(); toggleDrawer();"
-      >
-        DOMŮ
-      </a>
-
-      <a
-        href="#articles"
-        onclick="showCategory('POHYB'); toggleDrawer(); return false;"
-      >
-        <span>🏃</span>
-        POHYB
-      </a>
-
-      <a
-        href="#articles"
-        onclick="showCategory('VÝŽIVA'); toggleDrawer(); return false;"
-      >
-        <span>🥗</span>
-        VÝŽIVA
-      </a>
-
-      <a
-        href="#articles"
-        onclick="showCategory('HUBNUTÍ'); toggleDrawer(); return false;"
-      >
-        <span>⚖️</span>
-        HUBNUTÍ
-      </a>
-
-      <a
-        href="#articles"
-        onclick="showCategory('REGENERACE'); toggleDrawer(); return false;"
-      >
-        <span>🌙</span>
-        REGENERACE
-      </a>
-
-      <a
-        href="#articles"
-        onclick="showCategory('ZDRAVÍ'); toggleDrawer(); return false;"
-      >
-        <span>♥</span>
-        ZDRAVÍ
-      </a>
-
-      <a
-        href="#calculators"
-        onclick="
-          showHome();
-          setTimeout(() => document.getElementById('calculators')?.scrollIntoView({behavior:'smooth'}), 100);
-          toggleDrawer();
-        "
-      >
-        <span>🧮</span>
-        KALKULAČKY
-      </a>
-
-    </nav>
+</div>
 
 
-    <div class="drawer-divider"></div>
+<!-- =====================================================
+     MOBILE MENU
+====================================================== -->
 
+<aside id="drawer" class="drawer">
+
+  <div class="drawer-head">
 
     <div>
-
-      <span class="drawer-label">
-        NEJNOVĚJŠÍ ČLÁNKY
-      </span>
-
-      <div id="drawerArticles"></div>
-
+      <span class="drawer-label">VIRENO</span>
+      <h2>MENU</h2>
     </div>
 
-  </aside>
+    <button
+      type="button"
+      onclick="toggleDrawer()"
+    >
+      ×
+    </button>
+
+  </div>
+
+  <nav class="mobile-nav">
+
+    <a href="#top" onclick="showHome(); toggleDrawer(); return false;">
+      DOMŮ
+    </a>
+
+    <a href="#articles" onclick="showCategory('POHYB'); toggleDrawer(); return false;">
+      POHYB
+    </a>
+
+    <a href="#articles" onclick="showCategory('VÝŽIVA'); toggleDrawer(); return false;">
+      VÝŽIVA
+    </a>
+
+    <a href="#articles" onclick="showCategory('HUBNUTÍ'); toggleDrawer(); return false;">
+      HUBNUTÍ
+    </a>
+
+    <a href="#articles" onclick="showCategory('REGENERACE'); toggleDrawer(); return false;">
+      REGENERACE
+    </a>
+
+    <a href="#articles" onclick="showCategory('ZDRAVÍ'); toggleDrawer(); return false;">
+      ZDRAVÍ
+    </a>
+
+    <a href="#calculators" onclick="showCalculators(); toggleDrawer(); return false;">
+      KALKULAČKY
+    </a>
+
+  </nav>
+
+  <div class="drawer-divider"></div>
+
+  <span class="drawer-label">
+    NEJNOVĚJŠÍ ČLÁNKY
+  </span>
+
+  <div id="drawerArticles"></div>
+
+</aside>
 
 
+<!-- =====================================================
+     MAIN
+====================================================== -->
 
-  <!-- =====================================================
-       MAIN
-  ====================================================== -->
+<main id="top">
 
-  <main id="top">
+  <!-- HOME -->
 
-
-    <!-- ===================================================
-         HERO
-    ==================================================== -->
+  <div id="homeView">
 
     <section class="hero">
 
       <div class="hero-copy">
 
         <span class="kicker">
-          POHYB • VÝŽIVA • ZDRAVÍ
+          VIRENO • ZDRAVÍ PRO KAŽDÝ VĚK
         </span>
 
-
         <h1>
-          ZDRAVĚJŠÍ
+          SILNĚJŠÍ
           <span>KAŽDÝ DEN.</span>
         </h1>
 
-
-        <p class="hero-text">
+        <p>
           Praktické informace o pohybu, výživě, hubnutí,
-          regeneraci a zdraví. Srozumitelně, bez zbytečných
-          komplikací a pro běžný život.
+          regeneraci a zdraví. Srozumitelně, bez extrémů
+          a bez zbytečných komplikací.
         </p>
-
 
         <div class="hero-buttons">
 
-          <a
-            href="#articles"
+          <button
             class="btn green"
-            onclick="showAllArticles(); return false;"
+            type="button"
+            onclick="showAllArticles()"
           >
             PROHLÉDNOUT ČLÁNKY
-          </a>
+          </button>
 
-
-          <a
-            href="#calculators"
+          <button
             class="btn light"
+            type="button"
+            onclick="showCalculators()"
           >
             KALKULAČKY
-          </a>
+          </button>
 
         </div>
 
-
         <div class="hero-proof">
 
-          <span class="proof-badge">
+          <span class="proof-number">
             40+
           </span>
 
           <span>
             <strong>
-              PRO KAŽDÝ VĚK
+              PRAKTICKY PRO AKTIVNÍ ŽIVOT
             </strong>
-
-            <small>
-              Prakticky a srozumitelně
-            </small>
+            <br>
+            informace pro každou životní etapu
           </span>
 
         </div>
@@ -402,47 +294,18 @@
       </div>
 
 
-
-      <!-- HERO VISUAL -->
-
       <div class="hero-visual">
 
-        <div class="hero-orbit orbit-one"></div>
-        <div class="hero-orbit orbit-two"></div>
+        <div class="hero-circle"></div>
 
-        <div class="hero-circle">
-
-          <div class="hero-circle-inner">
-
-            <span class="hero-circle-small">
-              VIRENO
-            </span>
-
-            <strong>
-              40+
-            </strong>
-
-            <span class="hero-circle-text">
-              ZDRAVÍ<br>
-              POHYB<br>
-              ŽIVOT
-            </span>
-
-          </div>
-
+        <div class="hero-age">
+          40<span>+</span>
         </div>
 
-
-        <div class="hero-floating-card">
-
-          <span>
-            KAŽDÝ DEN
-          </span>
-
-          <strong>
-            O KROK LEPŠÍ
-          </strong>
-
+        <div class="hero-label">
+          POHYB<br>
+          VÝŽIVA<br>
+          ZDRAVÍ
         </div>
 
       </div>
@@ -450,184 +313,70 @@
     </section>
 
 
+    <!-- QUICK TOPICS -->
 
-    <!-- ===================================================
-         CATEGORIES
-    ==================================================== -->
+    <section class="quick-topics">
 
-    <section class="categories-wrap">
-
-      <div class="categories-head">
+      <div class="section-title compact">
 
         <div>
-
-          <span class="kicker">
-            VYBERTE TÉMA
-          </span>
+          <span class="kicker">VYBERTE TÉMA</span>
 
           <h2>
             CO VÁS ZAJÍMÁ?
           </h2>
-
         </div>
-
-        <span class="category-hint">
-          POSUŇTE →
-        </span>
 
       </div>
 
+      <div class="topic-row">
 
-      <div class="categories">
-
-
-        <a
-          href="#articles"
-          class="category-card movement"
-          onclick="showCategory('POHYB'); return false;"
+        <button
+          class="topic-pill"
+          onclick="showCategory('POHYB')"
         >
+          <span>01</span>
+          POHYB
+        </button>
 
-          <div class="category-icon">
-            🏃
-          </div>
-
-          <div>
-
-            <span>
-              POHYB
-            </span>
-
-            <small>
-              Cvičení, síla a kondice
-            </small>
-
-          </div>
-
-          <i class="fa-solid fa-arrow-right"></i>
-
-        </a>
-
-
-
-        <a
-          href="#articles"
-          class="category-card nutrition"
-          onclick="showCategory('VÝŽIVA'); return false;"
+        <button
+          class="topic-pill"
+          onclick="showCategory('VÝŽIVA')"
         >
+          <span>02</span>
+          VÝŽIVA
+        </button>
 
-          <div class="category-icon">
-            🥗
-          </div>
-
-          <div>
-
-            <span>
-              VÝŽIVA
-            </span>
-
-            <small>
-              Jídlo a každodenní strava
-            </small>
-
-          </div>
-
-          <i class="fa-solid fa-arrow-right"></i>
-
-        </a>
-
-
-
-        <a
-          href="#articles"
-          class="category-card weight"
-          onclick="showCategory('HUBNUTÍ'); return false;"
+        <button
+          class="topic-pill"
+          onclick="showCategory('HUBNUTÍ')"
         >
+          <span>03</span>
+          HUBNUTÍ
+        </button>
 
-          <div class="category-icon">
-            ⚖️
-          </div>
-
-          <div>
-
-            <span>
-              HUBNUTÍ
-            </span>
-
-            <small>
-              Váha, tuk a kalorický příjem
-            </small>
-
-          </div>
-
-          <i class="fa-solid fa-arrow-right"></i>
-
-        </a>
-
-
-
-        <a
-          href="#articles"
-          class="category-card recovery"
-          onclick="showCategory('REGENERACE'); return false;"
+        <button
+          class="topic-pill"
+          onclick="showCategory('REGENERACE')"
         >
+          <span>04</span>
+          REGENERACE
+        </button>
 
-          <div class="category-icon">
-            🌙
-          </div>
-
-          <div>
-
-            <span>
-              REGENERACE
-            </span>
-
-            <small>
-              Spánek, odpočinek a energie
-            </small>
-
-          </div>
-
-          <i class="fa-solid fa-arrow-right"></i>
-
-        </a>
-
-
-
-        <a
-          href="#articles"
-          class="category-card health"
-          onclick="showCategory('ZDRAVÍ'); return false;"
+        <button
+          class="topic-pill"
+          onclick="showCategory('ZDRAVÍ')"
         >
-
-          <div class="category-icon">
-            ♥
-          </div>
-
-          <div>
-
-            <span>
-              ZDRAVÍ
-            </span>
-
-            <small>
-              Prevence a zdravější život
-            </small>
-
-          </div>
-
-          <i class="fa-solid fa-arrow-right"></i>
-
-        </a>
+          <span>05</span>
+          ZDRAVÍ
+        </button>
 
       </div>
 
     </section>
 
 
-
-    <!-- ===================================================
-         ARTICLES
-    ==================================================== -->
+    <!-- ARTICLES -->
 
     <section
       id="articles"
@@ -639,28 +388,23 @@
         <div class="section-title">
 
           <div>
-
-            <span class="kicker">
-              VIRENO MAGAZÍN
-            </span>
+            <span class="kicker">VIRENO MAGAZÍN</span>
 
             <h2 id="articlesHeading">
               NEJNOVĚJŠÍ ČLÁNKY
             </h2>
-
           </div>
-
 
           <button
             type="button"
             id="showAllArticles"
             class="outline-btn"
+            onclick="showAllArticles()"
           >
             VŠECHNY ČLÁNKY
           </button>
 
         </div>
-
 
         <div
           id="cards"
@@ -670,68 +414,11 @@
       </div>
 
 
-
       <!-- SIDEBAR -->
 
       <aside class="sidebar">
 
-
-        <div class="about-card">
-
-          <span class="kicker">
-            O VIRENO
-          </span>
-
-          <h3>
-            ZDRAVÍ.
-            <span>JEDNODUŠE.</span>
-          </h3>
-
-          <p>
-            VIRENO pomáhá lépe rozumět vlastnímu tělu.
-            Najdete zde praktické informace o pohybu,
-            jídle, hubnutí, odpočinku a zdraví.
-          </p>
-
-          <a
-            href="#calculators"
-            class="text-link"
-          >
-            VYPOČÍTAT SI SVÉ HODNOTY
-            <span>→</span>
-          </a>
-
-        </div>
-
-
-
-        <div class="age-card">
-
-          <div class="age-card-icon">
-            40+
-          </div>
-
-          <div>
-
-            <span class="kicker">
-              DŮLEŽITÉ
-            </span>
-
-            <h3>
-              NIKDY NENÍ POZDĚ.
-            </h3>
-
-            <p>
-              S věkem se mění potřeby těla.
-              Proto chceme informace vysvětlovat
-              jednoduše a prakticky.
-            </p>
-
-          </div>
-
-        </div>
-
-
+        <!-- NEWSLETTER JE SCHVÁLNĚ PRVNÍ -->
 
         <div class="subscribe">
 
@@ -740,13 +427,13 @@
           </span>
 
           <h3>
-            NOVÉ ČLÁNKY
-            <span>DO E-MAILU.</span>
+            NOVÉ ČLÁNKY<br>
+            DO E-MAILU.
           </h3>
 
           <p>
-            Přihlaste se k odběru a nové články
-            vám můžeme posílat přímo do e-mailu.
+            Dostávejte nové články a praktické tipy
+            přímo do své e-mailové schránky.
           </p>
 
           <form id="subscribe">
@@ -773,1111 +460,876 @@
 
         </div>
 
+
+        <div class="about-card">
+
+          <span class="kicker">
+            O VIRENO
+          </span>
+
+          <h3>
+            ZDRAVÍ.<br>
+            <span>JEDNODUŠE.</span>
+          </h3>
+
+          <p>
+            Místo pro lidi, kteří chtějí lépe rozumět
+            svému tělu a dělat rozumná rozhodnutí.
+            Bez extrémů a zbytečných zákazů.
+          </p>
+
+          <button
+            type="button"
+            class="text-link"
+            onclick="showCalculators()"
+          >
+            VYPOČÍTAT SI SVÉ HODNOTY →
+          </button>
+
+        </div>
+
       </aside>
 
     </section>
 
 
+    <!-- SHORT CALCULATOR TEASER -->
 
-    <!-- ===================================================
-         CALCULATORS
-    ==================================================== -->
+    <section class="tools-teaser">
 
-    <section
-      id="calculators"
-      class="calculators-section"
-    >
-
-      <div class="calculators-header">
+      <div>
 
         <span class="kicker">
-          VIRENO NÁSTROJE
+          VIRENO TOOLS
         </span>
 
         <h2>
-          KALKULAČKY PRO KAŽDODENNÍ ŽIVOT
+          CHCETE VĚDĚT,<br>
+          KDE ZAČÍT?
         </h2>
 
         <p>
-          Jednoduché orientační výpočty, které vám pomohou
-          lépe pochopit vlastní tělo, příjem energie
-          a vaše cíle.
-        </p>
-
-        <div class="calculator-note">
-
-          <i class="fa-solid fa-circle-info"></i>
-
-          <span>
-            Výsledky jsou pouze orientační. Každý člověk
-            je jiný a skutečné potřeby se mohou lišit.
-          </span>
-
-        </div>
-
-      </div>
-
-
-
-      <div class="calculator-grid">
-
-
-        <!-- =================================================
-             BMI
-        ================================================== -->
-
-        <div class="calculator-card">
-
-          <div class="calculator-top">
-
-            <div class="calculator-icon">
-              <i class="fa-solid fa-scale-balanced"></i>
-            </div>
-
-            <span class="calculator-number">
-              01
-            </span>
-
-          </div>
-
-
-          <h3>
-            BMI KALKULAČKA
-          </h3>
-
-          <p class="calculator-description">
-            BMI je jednoduchý orientační ukazatel,
-            který porovnává vaši hmotnost s výškou.
-          </p>
-
-
-          <div class="calculator-help">
-
-            <strong>
-              Jak na to?
-            </strong>
-
-            <span>
-              Zadejte svoji váhu a výšku.
-              Výsledek se zobrazí automaticky.
-            </span>
-
-          </div>
-
-
-          <div class="calculator-form">
-
-            <label>
-
-              <span>
-                Váha
-              </span>
-
-              <div class="input-unit">
-
-                <input
-                  type="number"
-                  id="bmiWeight"
-                  min="1"
-                  step="0.1"
-                  placeholder="např. 80"
-                >
-
-                <b>kg</b>
-
-              </div>
-
-            </label>
-
-
-            <label>
-
-              <span>
-                Výška
-              </span>
-
-              <div class="input-unit">
-
-                <input
-                  type="number"
-                  id="bmiHeight"
-                  min="50"
-                  step="1"
-                  placeholder="např. 180"
-                >
-
-                <b>cm</b>
-
-              </div>
-
-            </label>
-
-
-            <button
-              type="button"
-              class="btn green full"
-              onclick="calculateBMI()"
-            >
-              VYPOČÍTAT BMI
-            </button>
-
-
-            <div
-              id="bmiResult"
-              class="calculator-result"
-            >
-              <strong>
-                Výsledek
-              </strong>
-
-              <span>
-                Zadejte své údaje.
-              </span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-
-        <!-- =================================================
-             MAINTENANCE
-        ================================================== -->
-
-        <div class="calculator-card featured-calculator">
-
-          <div class="calculator-top">
-
-            <div class="calculator-icon">
-              <i class="fa-solid fa-fire"></i>
-            </div>
-
-            <span class="calculator-number">
-              02
-            </span>
-
-          </div>
-
-
-          <h3>
-            UDRŽOVACÍ PŘÍJEM
-          </h3>
-
-          <p class="calculator-description">
-            Orientační množství energie, které můžete
-            potřebovat pro udržení současné hmotnosti.
-          </p>
-
-
-          <div class="calculator-help">
-
-            <strong>
-              Co znamená udržovací příjem?
-            </strong>
-
-            <span>
-              Je to přibližný počet kalorií, při kterém
-              by se vaše hmotnost měla dlouhodobě držet
-              přibližně na stejné úrovni.
-            </span>
-
-          </div>
-
-
-          <div class="calculator-form">
-
-            <label>
-
-              <span>
-                Pohlaví
-              </span>
-
-              <select id="maintenanceSex">
-
-                <option value="male">
-                  Muž
-                </option>
-
-                <option value="female">
-                  Žena
-                </option>
-
-              </select>
-
-            </label>
-
-
-            <label>
-
-              <span>
-                Věk
-              </span>
-
-              <div class="input-unit">
-
-                <input
-                  type="number"
-                  id="maintenanceAge"
-                  min="15"
-                  max="100"
-                  placeholder="např. 55"
-                >
-
-                <b>let</b>
-
-              </div>
-
-            </label>
-
-
-            <label>
-
-              <span>
-                Váha
-              </span>
-
-              <div class="input-unit">
-
-                <input
-                  type="number"
-                  id="maintenanceWeight"
-                  min="1"
-                  step="0.1"
-                  placeholder="např. 80"
-                >
-
-                <b>kg</b>
-
-              </div>
-
-            </label>
-
-
-            <label>
-
-              <span>
-                Výška
-              </span>
-
-              <div class="input-unit">
-
-                <input
-                  type="number"
-                  id="maintenanceHeight"
-                  min="50"
-                  placeholder="např. 180"
-                >
-
-                <b>cm</b>
-
-              </div>
-
-            </label>
-
-
-            <label>
-
-              <span>
-                Úroveň pohybu
-              </span>
-
-              <select id="maintenanceActivity">
-
-                <option value="1.2">
-                  Málo pohybu – většinu dne sedím
-                </option>
-
-                <option value="1.375">
-                  Lehký pohyb – 1 až 3× týdně
-                </option>
-
-                <option value="1.55">
-                  Střední pohyb – 3 až 5× týdně
-                </option>
-
-                <option value="1.725">
-                  Hodně pohybu – 6 až 7× týdně
-                </option>
-
-                <option value="1.9">
-                  Velmi vysoká aktivita
-                </option>
-
-              </select>
-
-            </label>
-
-
-            <button
-              type="button"
-              class="btn green full"
-              onclick="calculateMaintenance()"
-            >
-              VYPOČÍTAT PŘÍJEM
-            </button>
-
-
-            <div
-              id="maintenanceResult"
-              class="calculator-result"
-            >
-
-              <strong>
-                Výsledek
-              </strong>
-
-              <span>
-                Vyplňte své údaje.
-              </span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-
-        <!-- =================================================
-             CUT
-        ================================================== -->
-
-        <div class="calculator-card">
-
-          <div class="calculator-top">
-
-            <div class="calculator-icon">
-              <i class="fa-solid fa-arrow-trend-down"></i>
-            </div>
-
-            <span class="calculator-number">
-              03
-            </span>
-
-          </div>
-
-
-          <h3>
-            PŘÍJEM PRO HUBNUTÍ
-          </h3>
-
-          <p class="calculator-description">
-            Orientační výpočet příjmu energie při snaze
-            postupně snižovat tělesnou hmotnost.
-          </p>
-
-
-          <div class="calculator-help">
-
-            <strong>
-              Jak výpočet funguje?
-            </strong>
-
-            <span>
-              Od vašeho udržovacího příjmu odečteme
-              zvolený podíl kalorií.
-            </span>
-
-          </div>
-
-
-          <div class="calculator-form">
-
-            <label>
-
-              <span>
-                Udržovací příjem
-              </span>
-
-              <div class="input-unit">
-
-                <input
-                  type="number"
-                  id="cutMaintenance"
-                  min="500"
-                  placeholder="např. 2500"
-                >
-
-                <b>kcal</b>
-
-              </div>
-
-            </label>
-
-
-            <label>
-
-              <span>
-                Zvolený deficit
-              </span>
-
-              <select id="cutDeficit">
-
-                <option value="0.10">
-                  Mírný – 10 %
-                </option>
-
-                <option value="0.15">
-                  Střední – 15 %
-                </option>
-
-                <option value="0.20">
-                  Vyšší – 20 %
-                </option>
-
-                <option value="0.25">
-                  Velký – 25 %
-                </option>
-
-              </select>
-
-            </label>
-
-
-            <button
-              type="button"
-              class="btn green full"
-              onclick="calculateCut()"
-            >
-              VYPOČÍTAT PŘÍJEM
-            </button>
-
-
-            <div
-              id="cutResult"
-              class="calculator-result"
-            >
-
-              <strong>
-                Výsledek
-              </strong>
-
-              <span>
-                Zadejte udržovací příjem.
-              </span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-
-
-        <!-- =================================================
-             BULK
-        ================================================== -->
-
-        <div class="calculator-card">
-
-          <div class="calculator-top">
-
-            <div class="calculator-icon">
-              <i class="fa-solid fa-arrow-trend-up"></i>
-            </div>
-
-            <span class="calculator-number">
-              04
-            </span>
-
-          </div>
-
-
-          <h3>
-            PŘÍJEM PRO NABÍRÁNÍ
-          </h3>
-
-          <p class="calculator-description">
-            Orientační příjem energie s mírným
-            kalorickým nadbytkem pro nabírání hmotnosti.
-          </p>
-
-
-          <div class="calculator-help">
-
-            <strong>
-              Co znamená kalorický nadbytek?
-            </strong>
-
-            <span>
-              Přijímáte o něco více energie, než vaše tělo
-              přibližně spotřebuje.
-            </span>
-
-          </div>
-
-
-          <div class="calculator-form">
-
-            <label>
-
-              <span>
-                Udržovací příjem
-              </span>
-
-              <div class="input-unit">
-
-                <input
-                  type="number"
-                  id="bulkMaintenance"
-                  min="500"
-                  placeholder="např. 2500"
-                >
-
-                <b>kcal</b>
-
-              </div>
-
-            </label>
-
-
-            <label>
-
-              <span>
-                Zvolený nadbytek
-              </span>
-
-              <select id="bulkSurplus">
-
-                <option value="0.05">
-                  Mírný – 5 %
-                </option>
-
-                <option value="0.10">
-                  Střední – 10 %
-                </option>
-
-                <option value="0.15">
-                  Vyšší – 15 %
-                </option>
-
-                <option value="0.20">
-                  Velký – 20 %
-                </option>
-
-              </select>
-
-            </label>
-
-
-            <button
-              type="button"
-              class="btn green full"
-              onclick="calculateBulk()"
-            >
-              VYPOČÍTAT PŘÍJEM
-            </button>
-
-
-            <div
-              id="bulkResult"
-              class="calculator-result"
-            >
-
-              <strong>
-                Výsledek
-              </strong>
-
-              <span>
-                Zadejte udržovací příjem.
-              </span>
-
-            </div>
-
-          </div>
-
-        </div>
-
-      </div>
-
-
-      <div class="calculator-disclaimer">
-
-        <i class="fa-solid fa-circle-info"></i>
-
-        <p>
-          Kalkulačky slouží pouze jako orientační pomůcka.
-          Nejde o lékařské doporučení. Pokud máte zdravotní
-          potíže, užíváte léky nebo výrazně měníte jídelníček
-          či pohyb, je vhodné postup konzultovat s lékařem
-          nebo kvalifikovaným odborníkem.
+          Vyzkoušejte naše jednoduché kalkulačky.
+          Výsledky jsou orientační a slouží hlavně
+          pro lepší přehled.
         </p>
 
       </div>
 
-    </section>
-
-
-
-    <!-- ===================================================
-         BOTTOM STATS
-    ==================================================== -->
-
-    <section class="bottom-strip">
-
-      <div>
-
-        <b id="publicArticles">
-          0
-        </b>
-
-        <span>
-          ČLÁNKŮ
-        </span>
-
-      </div>
-
-
-      <div>
-
-        <b>
-          5
-        </b>
-
-        <span>
-          HLAVNÍCH TÉMAT
-        </span>
-
-      </div>
-
-
-      <div>
-
-        <b>
-          4
-        </b>
-
-        <span>
-          PRAKTICKÉ NÁSTROJE
-        </span>
-
-      </div>
-
-
-      <div>
-
-        <b>
-          40+
-        </b>
-
-        <span>
-          PRO KAŽDÝ VĚK
-        </span>
-
-      </div>
+      <button
+        type="button"
+        class="btn green"
+        onclick="showCalculators()"
+      >
+        OTEVŘÍT KALKULAČKY
+      </button>
 
     </section>
 
-  </main>
-
+  </div>
 
 
   <!-- =====================================================
-       ADMIN
+       ARTICLE PAGE
   ====================================================== -->
 
   <section
-    id="admin"
-    class="admin-panel hidden"
+    id="articlePage"
+    class="page-view hidden"
   >
 
-    <span class="kicker">
-      ADMINISTRACE
-    </span>
-
-    <h2>
-      SPRÁVA VIRENO
-    </h2>
-
-
-    <div class="admin-stats">
-
-      <div>
-
-        <b id="adminArticles">
-          0
-        </b>
-
-        <span>
-          ČLÁNKŮ
-        </span>
-
-      </div>
-
-
-      <div>
-
-        <b id="subs">
-          0
-        </b>
-
-        <span>
-          ODBĚRATELŮ
-        </span>
-
-      </div>
-
-
-      <div>
-
-        <b id="visits">
-          0
-        </b>
-
-        <span>
-          NÁVŠTĚV
-        </span>
-
-      </div>
-
-    </div>
-
-
-
-    <!-- ARTICLE EDITOR -->
-
-    <div class="admin-editor">
+    <div class="page-heading">
 
       <span class="kicker">
-        EDITOR
+        VIRENO MAGAZÍN
       </span>
 
-      <h3>
-        PŘIDAT / UPRAVIT ČLÁNEK
-      </h3>
+      <h1 id="pageArticlesTitle">
+        VŠECHNY ČLÁNKY
+      </h1>
 
-
-      <form id="articleForm">
-
-        <input
-          type="text"
-          id="title"
-          placeholder="Název článku"
-          required
-        >
-
-
-        <select
-          id="category"
-          required
-        >
-
-          <option value="POHYB">
-            POHYB
-          </option>
-
-          <option value="VÝŽIVA">
-            VÝŽIVA
-          </option>
-
-          <option value="HUBNUTÍ">
-            HUBNUTÍ
-          </option>
-
-          <option value="REGENERACE">
-            REGENERACE
-          </option>
-
-          <option value="ZDRAVÍ">
-            ZDRAVÍ
-          </option>
-
-        </select>
-
-
-        <input
-          type="text"
-          id="excerpt"
-          placeholder="Krátký popis článku"
-          required
-        >
-
-
-        <input
-          type="url"
-          id="cover"
-          placeholder="URL obrázku"
-        >
-
-
-        <div class="cover-upload">
-
-          <label for="coverFile">
-            NEBO NAHRÁT OBRÁZEK
-          </label>
-
-          <input
-            type="file"
-            id="coverFile"
-            accept="image/jpeg,image/png,image/webp"
-          >
-
-        </div>
-
-
-        <div
-          id="coverPreview"
-          class="cover-preview hidden"
-        >
-
-          <img
-            id="coverPreviewImg"
-            src=""
-            alt="Náhled obrázku"
-          >
-
-        </div>
-
-
-        <textarea
-          id="content"
-          placeholder="Obsah článku..."
-          required
-        ></textarea>
-
-
-        <div class="admin-form-actions">
-
-          <button
-            type="submit"
-            id="articleSubmit"
-            class="btn green"
-          >
-            PUBLIKOVAT ČLÁNEK
-          </button>
-
-
-          <button
-            type="button"
-            id="clearArticleBtn"
-            class="btn light"
-          >
-            VYČISTIT
-          </button>
-
-        </div>
-
-
-        <p id="articleMsg"></p>
-
-      </form>
+      <p id="pageArticlesDescription">
+        Praktické informace pro zdravější a aktivnější život.
+      </p>
 
     </div>
 
-
-
-    <!-- ADMIN ARTICLE LIST -->
-
-    <div class="admin-list">
-
-      <span class="kicker">
-        PUBLIKOVANÉ ČLÁNKY
-      </span>
-
-      <h3>
-        SPRÁVA ČLÁNKŮ
-      </h3>
-
-      <div id="adminList"></div>
-
-    </div>
+    <div
+      id="pageCards"
+      class="cards page-cards"
+    ></div>
 
   </section>
 
 
-
   <!-- =====================================================
-       AUTH MODAL
+       CALCULATOR PAGE
   ====================================================== -->
 
-  <div
-    id="auth"
-    class="modal hidden"
+  <section
+    id="calculatorPage"
+    class="page-view hidden"
   >
 
-    <div class="modal-box">
-
-      <button
-        type="button"
-        class="close"
-        onclick="closeAuth()"
-        aria-label="Zavřít"
-      >
-        ×
-      </button>
-
+    <div class="page-heading calculator-heading">
 
       <span class="kicker">
-        VIRENO ÚČET
+        VIRENO TOOLS
       </span>
 
-
-      <h2 id="authTitle">
-        PŘIHLÁSIT SE
-      </h2>
-
-
-      <form id="authForm">
-
-        <input
-          type="email"
-          id="authEmail"
-          placeholder="E-mail"
-          autocomplete="email"
-          required
-        >
-
-
-        <input
-          type="password"
-          id="authPassword"
-          placeholder="Heslo"
-          autocomplete="current-password"
-          required
-        >
-
-
-        <button
-          type="submit"
-          id="authSubmit"
-          class="btn green full"
-        >
-          PŘIHLÁSIT SE
-        </button>
-
-      </form>
-
-
-      <p id="authMsg"></p>
-
-
-      <button
-        type="button"
-        id="authSwitch"
-        class="auth-switch"
-      >
-        Nemáte účet? Vytvořte si ho
-      </button>
-
-    </div>
-
-  </div>
-
-
-
-  <!-- =====================================================
-       ARTICLE MODAL
-  ====================================================== -->
-
-  <div
-    id="articleView"
-    class="modal hidden"
-  >
-
-    <article class="article-view">
-
-      <button
-        type="button"
-        class="close"
-        onclick="closeArticle()"
-        aria-label="Zavřít článek"
-      >
-        ×
-      </button>
-
-
-      <img
-        id="articleViewImage"
-        src=""
-        alt=""
-      >
-
-
-      <span
-        id="articleViewMeta"
-        class="kicker"
-      ></span>
-
-
-      <h2 id="articleViewTitle"></h2>
-
-
-      <div id="articleViewContent"></div>
-
-    </article>
-
-  </div>
-
-
-
-  <!-- =====================================================
-       FOOTER
-  ====================================================== -->
-
-  <footer class="footer">
-
-    <div>
-
-      <a
-        href="#top"
-        class="brand"
-      >
-
-        <span class="brand-mark">
-          V
-        </span>
-
-        <span class="brand-name">
-          VIRENO
-        </span>
-
-      </a>
-
+      <h1>
+        KALKULAČKY
+      </h1>
 
       <p>
-        Zdravější tělo. Silnější život.
+        Jednoduché orientační výpočty. Výsledek není lékařská
+        diagnóza ani přesný návod pro každého člověka.
       </p>
 
     </div>
 
 
-    <div class="footer-links">
+    <div class="calculator-grid">
 
-      <a href="#articles">
-        Články
-      </a>
 
-      <a href="#calculators">
-        Kalkulačky
-      </a>
+      <!-- BMI -->
 
-      <a href="#top">
-        Nahoru ↑
-      </a>
+      <div class="calculator-card">
+
+        <div class="calculator-top">
+
+          <div class="calculator-icon">
+            <i class="fa-solid fa-scale-balanced"></i>
+          </div>
+
+          <span class="tool-number">
+            01
+          </span>
+
+        </div>
+
+        <h3>
+          BMI
+        </h3>
+
+        <p>
+          Orientační poměr tělesné hmotnosti a výšky.
+        </p>
+
+        <div class="help-box">
+          <strong>Co to znamená?</strong>
+          BMI je pouze orientační ukazatel. U starších
+          lidí, svalnatých lidí nebo při některých
+          zdravotních stavech nemusí přesně popisovat
+          množství tělesného tuku.
+        </div>
+
+        <div class="calculator-form">
+
+          <label>
+            Tělesná hmotnost
+            <span>Kolik vážíte v kilogramech?</span>
+
+            <input
+              type="number"
+              id="bmiWeight"
+              min="1"
+              step="0.1"
+              placeholder="např. 80"
+            >
+          </label>
+
+          <label>
+            Výška
+            <span>Vaše výška v centimetrech.</span>
+
+            <input
+              type="number"
+              id="bmiHeight"
+              min="50"
+              step="1"
+              placeholder="např. 180"
+            >
+          </label>
+
+          <button
+            type="button"
+            class="btn green full"
+            onclick="calculateBMI()"
+          >
+            VYPOČÍTAT BMI
+          </button>
+
+          <div
+            id="bmiResult"
+            class="calculator-result"
+          >
+            Zadejte svou váhu a výšku.
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- MAINTENANCE -->
+
+      <div class="calculator-card featured-tool">
+
+        <div class="calculator-top">
+
+          <div class="calculator-icon">
+            <i class="fa-solid fa-fire-flame-curved"></i>
+          </div>
+
+          <span class="tool-number">
+            02
+          </span>
+
+        </div>
+
+        <h3>
+          UDRŽOVACÍ PŘÍJEM
+        </h3>
+
+        <p>
+          Přibližný denní příjem energie pro udržení
+          současné tělesné hmotnosti.
+        </p>
+
+        <div class="help-box">
+          <strong>Jednoduše řečeno</strong>
+          Je to přibližné množství energie, které vaše tělo
+          za den potřebuje. Skutečná hodnota se může měnit
+          podle pohybu, práce, spánku, věku a dalších faktorů.
+        </div>
+
+        <div class="calculator-form">
+
+          <label>
+            Pohlaví
+            <span>Vyberte svou biologickou kategorii.</span>
+
+            <select id="maintenanceSex">
+
+              <option value="male">
+                Muž
+              </option>
+
+              <option value="female">
+                Žena
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <label>
+            Věk
+            <span>Věk v celých letech.</span>
+
+            <input
+              type="number"
+              id="maintenanceAge"
+              min="18"
+              max="100"
+              placeholder="např. 45"
+            >
+
+          </label>
+
+
+          <label>
+            Hmotnost
+            <span>Vaše aktuální váha v kg.</span>
+
+            <input
+              type="number"
+              id="maintenanceWeight"
+              min="1"
+              step="0.1"
+              placeholder="např. 80"
+            >
+
+          </label>
+
+
+          <label>
+            Výška
+            <span>Výška v centimetrech.</span>
+
+            <input
+              type="number"
+              id="maintenanceHeight"
+              min="100"
+              max="250"
+              placeholder="např. 180"
+            >
+
+          </label>
+
+
+          <label>
+            Úroveň pohybu
+            <span>Vyberte nejbližší běžnému týdnu.</span>
+
+            <select id="maintenanceActivity">
+
+              <option value="1.2">
+                Převážně sedavý život
+              </option>
+
+              <option value="1.375">
+                Lehce aktivní
+              </option>
+
+              <option value="1.55">
+                Středně aktivní
+              </option>
+
+              <option value="1.725">
+                Hodně aktivní
+              </option>
+
+              <option value="1.9">
+                Velmi aktivní
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <button
+            type="button"
+            class="btn green full"
+            onclick="calculateMaintenance()"
+          >
+            VYPOČÍTAT UDRŽOVACÍ PŘÍJEM
+          </button>
+
+
+          <div
+            id="maintenanceResult"
+            class="calculator-result"
+          >
+            Vyplňte všechny údaje.
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- CUT -->
+
+      <div class="calculator-card">
+
+        <div class="calculator-top">
+
+          <div class="calculator-icon">
+            <i class="fa-solid fa-arrow-trend-down"></i>
+          </div>
+
+          <span class="tool-number">
+            03
+          </span>
+
+        </div>
+
+        <h3>
+          HUBNUTÍ
+        </h3>
+
+        <p>
+          Orientační příjem při snaze postupně snižovat
+          tělesnou hmotnost.
+        </p>
+
+        <div class="help-box">
+          <strong>Pro začátek</strong>
+          Rozumnější bývá mírný deficit než velmi nízký
+          příjem. U starších lidí je zvlášť důležité
+          myslet také na dostatek bílkovin a svalovou hmotu.
+        </div>
+
+        <div class="calculator-form">
+
+          <label>
+            Udržovací příjem
+            <span>Např. výsledek z předchozí kalkulačky.</span>
+
+            <input
+              type="number"
+              id="cutMaintenance"
+              min="500"
+              placeholder="např. 2400"
+            >
+          </label>
+
+
+          <label>
+            Snížení příjmu
+            <span>Menší procento = mírnější deficit.</span>
+
+            <select id="cutDeficit">
+
+              <option value="0.10">
+                10 %
+              </option>
+
+              <option value="0.15">
+                15 %
+              </option>
+
+              <option value="0.20">
+                20 %
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <button
+            type="button"
+            class="btn green full"
+            onclick="calculateCut()"
+          >
+            VYPOČÍTAT
+          </button>
+
+
+          <div
+            id="cutResult"
+            class="calculator-result"
+          >
+            Zadejte svůj udržovací příjem.
+          </div>
+
+        </div>
+
+      </div>
+
+
+      <!-- BULK -->
+
+      <div class="calculator-card">
+
+        <div class="calculator-top">
+
+          <div class="calculator-icon">
+            <i class="fa-solid fa-dumbbell"></i>
+          </div>
+
+          <span class="tool-number">
+            04
+          </span>
+
+        </div>
+
+        <h3>
+          NABÍRÁNÍ
+        </h3>
+
+        <p>
+          Orientační příjem s mírným energetickým nadbytkem
+          pro podporu nabírání hmotnosti.
+        </p>
+
+        <div class="help-box">
+          <strong>Pomalu je často lépe</strong>
+          Větší příjem neznamená automaticky více svalů.
+          Mírný nadbytek a pravidelný silový trénink bývají
+          rozumnější než velké přejídání.
+        </div>
+
+        <div class="calculator-form">
+
+          <label>
+            Udržovací příjem
+            <span>Váš přibližný denní příjem.</span>
+
+            <input
+              type="number"
+              id="bulkMaintenance"
+              min="500"
+              placeholder="např. 2400"
+            >
+          </label>
+
+
+          <label>
+            Zvýšení příjmu
+            <span>Menší nadbytek je obvykle dostačující.</span>
+
+            <select id="bulkSurplus">
+
+              <option value="0.05">
+                5 %
+              </option>
+
+              <option value="0.10">
+                10 %
+              </option>
+
+              <option value="0.15">
+                15 %
+              </option>
+
+            </select>
+
+          </label>
+
+
+          <button
+            type="button"
+            class="btn green full"
+            onclick="calculateBulk()"
+          >
+            VYPOČÍTAT
+          </button>
+
+
+          <div
+            id="bulkResult"
+            class="calculator-result"
+          >
+            Zadejte svůj udržovací příjem.
+          </div>
+
+        </div>
+
+      </div>
 
     </div>
 
-  </footer>
+
+    <div class="calculator-note">
+
+      <strong>TIP:</strong>
+
+      Výpočty berte jako výchozí bod. Pokud se vaše hmotnost
+      několik týdnů vyvíjí jinak, než očekáváte, je normální
+      výslednou hodnotu postupně upravit.
+
+    </div>
+
+  </section>
+
+</main>
 
 
+<!-- =====================================================
+     ADMIN
+====================================================== -->
 
-  <!-- =====================================================
-       SUPABASE
-  ====================================================== -->
+<section
+  id="admin"
+  class="admin-panel hidden"
+>
 
-  <script
-    src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"
-  ></script>
+  <span class="kicker">
+    ADMINISTRACE
+  </span>
+
+  <h2>
+    SPRÁVA VIRENO
+  </h2>
+
+  <div class="admin-stats">
+
+    <div>
+      <b id="adminArticles">0</b>
+      <span>ČLÁNKŮ</span>
+    </div>
+
+    <div>
+      <b id="subs">0</b>
+      <span>ODBĚRATELŮ</span>
+    </div>
+
+    <div>
+      <b id="visits">0</b>
+      <span>NÁVŠTĚV</span>
+    </div>
+
+  </div>
 
 
-  <!-- =====================================================
-       APP
-  ====================================================== -->
+  <div class="admin-editor">
 
-  <script src="app.js"></script>
+    <span class="kicker">
+      EDITOR
+    </span>
+
+    <h3>
+      PŘIDAT / UPRAVIT ČLÁNEK
+    </h3>
+
+    <form id="articleForm">
+
+      <input
+        type="text"
+        id="title"
+        placeholder="Název článku"
+        required
+      >
+
+      <select id="category" required>
+
+        <option value="POHYB">POHYB</option>
+        <option value="VÝŽIVA">VÝŽIVA</option>
+        <option value="HUBNUTÍ">HUBNUTÍ</option>
+        <option value="REGENERACE">REGENERACE</option>
+        <option value="ZDRAVÍ">ZDRAVÍ</option>
+
+      </select>
+
+      <input
+        type="text"
+        id="excerpt"
+        placeholder="Krátký popis článku"
+        required
+      >
+
+      <input
+        type="url"
+        id="cover"
+        placeholder="URL obrázku"
+      >
+
+      <div class="cover-upload">
+
+        <label for="coverFile">
+          NAHRÁT OBRÁZEK
+        </label>
+
+        <input
+          type="file"
+          id="coverFile"
+          accept="image/jpeg,image/png,image/webp"
+        >
+
+      </div>
+
+      <div
+        id="coverPreview"
+        class="cover-preview hidden"
+      >
+
+        <img
+          id="coverPreviewImg"
+          src=""
+          alt="Náhled"
+        >
+
+      </div>
+
+      <textarea
+        id="content"
+        placeholder="Obsah článku..."
+        required
+      ></textarea>
+
+      <div class="admin-form-actions">
+
+        <button
+          type="submit"
+          id="articleSubmit"
+          class="btn green"
+        >
+          PUBLIKOVAT ČLÁNEK
+        </button>
+
+        <button
+          type="button"
+          id="clearArticleBtn"
+          class="btn light"
+        >
+          VYČISTIT
+        </button>
+
+      </div>
+
+      <p id="articleMsg"></p>
+
+    </form>
+
+  </div>
+
+
+  <div class="admin-list">
+
+    <span class="kicker">
+      PUBLIKOVANÉ ČLÁNKY
+    </span>
+
+    <h3>
+      SPRÁVA ČLÁNKŮ
+    </h3>
+
+    <div id="adminList"></div>
+
+  </div>
+
+</section>
+
+
+<!-- =====================================================
+     AUTH
+====================================================== -->
+
+<div
+  id="auth"
+  class="modal hidden"
+>
+
+  <div class="modal-box">
+
+    <button
+      type="button"
+      class="close"
+      onclick="closeAuth()"
+    >
+      ×
+    </button>
+
+    <span class="kicker">
+      VIRENO ÚČET
+    </span>
+
+    <h2 id="authTitle">
+      PŘIHLÁSIT SE
+    </h2>
+
+    <form id="authForm">
+
+      <input
+        type="email"
+        id="authEmail"
+        placeholder="E-mail"
+        autocomplete="email"
+        required
+      >
+
+      <input
+        type="password"
+        id="authPassword"
+        placeholder="Heslo"
+        autocomplete="current-password"
+        required
+      >
+
+      <button
+        type="submit"
+        id="authSubmit"
+        class="btn green full"
+      >
+        PŘIHLÁSIT SE
+      </button>
+
+    </form>
+
+    <p id="authMsg"></p>
+
+    <button
+      type="button"
+      id="authSwitch"
+      class="auth-switch"
+    >
+      Nemáte účet? Vytvořte si ho
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =====================================================
+     ARTICLE MODAL
+====================================================== -->
+
+<div
+  id="articleView"
+  class="modal hidden"
+>
+
+  <article class="article-view">
+
+    <button
+      type="button"
+      class="close"
+      onclick="closeArticle()"
+    >
+      ×
+    </button>
+
+    <img
+      id="articleViewImage"
+      src=""
+      alt=""
+    >
+
+    <span
+      id="articleViewMeta"
+      class="kicker"
+    ></span>
+
+    <h2 id="articleViewTitle"></h2>
+
+    <div id="articleViewContent"></div>
+
+  </article>
+
+</div>
+
+
+<!-- =====================================================
+     FOOTER
+====================================================== -->
+
+<footer class="footer">
+
+  <div>
+
+    <a
+      href="#top"
+      class="brand"
+      onclick="showHome(); return false;"
+    >
+      <span class="brand-mark">V</span><span>IRENO</span>
+    </a>
+
+    <p>
+      Zdravější tělo. Silnější život.
+    </p>
+
+  </div>
+
+  <div class="footer-links">
+
+    <button onclick="showAllArticles()">
+      Články
+    </button>
+
+    <button onclick="showCalculators()">
+      Kalkulačky
+    </button>
+
+    <button onclick="showHome()">
+      Nahoru ↑
+    </button>
+
+  </div>
+
+</footer>
+
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
+<script src="app.js"></script>
 
 </body>
-
 </html>
