@@ -30,7 +30,7 @@
     href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css"
   >
 
-  <!-- YOUR CSS -->
+  <!-- CSS -->
   <link rel="stylesheet" href="style.css">
 </head>
 
@@ -45,7 +45,7 @@
     <a
       href="#top"
       class="brand"
-      onclick="showHome()"
+      onclick="showHome(); return false;"
     >
       <span class="brand-mark">V</span>IRENO
     </a>
@@ -56,7 +56,7 @@
         href="#top"
         class="active"
         data-section="home"
-        onclick="showHome()"
+        onclick="showHome(); return false;"
       >
         DOMŮ
       </a>
@@ -176,10 +176,7 @@
        MOBILE DRAWER
   ====================================================== -->
 
-  <aside
-    id="drawer"
-    class="drawer"
-  >
+  <aside id="drawer" class="drawer">
 
     <div class="drawer-head">
 
@@ -210,7 +207,7 @@
 
       <a
         href="#top"
-        onclick="showHome(); toggleDrawer();"
+        onclick="showHome(); toggleDrawer(); return false;"
       >
         DOMŮ
       </a>
@@ -238,9 +235,10 @@
 
       <a
         href="#articles"
+        class="regeneration-nav"
         onclick="showCategory('REGENERACE'); toggleDrawer(); return false;"
       >
-        😴 REGENERACE
+        🌙 REGENERACE
       </a>
 
       <a
@@ -252,7 +250,18 @@
 
       <a
         href="#calculators"
-        onclick="showHome(); setTimeout(() => document.getElementById('calculators')?.scrollIntoView({behavior:'smooth'}), 100); toggleDrawer();"
+        onclick="
+          showHome();
+          setTimeout(() => {
+            document
+              .getElementById('calculators')
+              ?.scrollIntoView({
+                behavior:'smooth'
+              });
+          },100);
+          toggleDrawer();
+          return false;
+        "
       >
         🧮 KALKULAČKY
       </a>
@@ -261,6 +270,7 @@
 
 
     <div class="drawer-divider"></div>
+
 
     <div>
 
@@ -276,10 +286,15 @@
 
 
   <!-- =====================================================
-       HERO
+       MAIN
   ====================================================== -->
 
   <main id="top">
+
+
+    <!-- ===================================================
+         HERO
+    ==================================================== -->
 
     <section class="hero">
 
@@ -305,7 +320,10 @@
           <a
             href="#articles"
             class="btn green"
-            onclick="showAllArticles(); return false;"
+            onclick="
+              showAllArticles();
+              return false;
+            "
           >
             PROHLÉDNOUT ČLÁNKY
           </a>
@@ -318,6 +336,7 @@
           </a>
 
         </div>
+
 
         <div class="hero-proof">
 
@@ -356,9 +375,9 @@
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          CATEGORIES
-    ====================================================== -->
+    ==================================================== -->
 
     <section class="categories-wrap">
 
@@ -384,6 +403,7 @@
 
 
       <div class="categories">
+
 
         <a
           href="#articles"
@@ -439,20 +459,23 @@
         </a>
 
 
+        <!-- REGENERACE -->
         <a
           href="#articles"
-          class="category-card"
+          class="category-card regeneration-card"
           onclick="showCategory('REGENERACE'); return false;"
         >
 
-          <strong>
-            😴
+          <strong class="regeneration-icon">
+            🌙
           </strong>
 
           <div>
             <span>REGENERACE</span>
-            <small>Spánek a odpočinek</small>
+            <small>Spánek, odpočinek a obnova</small>
           </div>
+
+          <i class="fa-solid fa-moon regeneration-decoration"></i>
 
         </a>
 
@@ -479,9 +502,9 @@
     </section>
 
 
-    <!-- =====================================================
-         CONTENT
-    ====================================================== -->
+    <!-- ===================================================
+         ARTICLES
+    ==================================================== -->
 
     <section
       id="articles"
@@ -523,9 +546,7 @@
       </div>
 
 
-      <!-- ===================================================
-           SIDEBAR
-      ==================================================== -->
+      <!-- SIDEBAR -->
 
       <aside class="sidebar">
 
@@ -601,9 +622,9 @@
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          CALCULATORS
-    ====================================================== -->
+    ==================================================== -->
 
     <section
       id="calculators"
@@ -621,40 +642,72 @@
         </h2>
 
         <p>
-          Rychlé orientační výpočty pro lepší přehled
-          o vašem těle a energetickém příjmu.
+          Orientační výpočty pro lepší přehled
+          o těle, energetickém příjmu a cílech.
         </p>
+
+        <div class="calculator-note">
+
+          <i class="fa-solid fa-circle-info"></i>
+
+          <span>
+            Výsledky jsou orientační. U lidí
+            <strong>40+ let</strong> může být vhodné
+            zohlednit změny metabolismu, pohybové aktivity
+            a svalové hmoty.
+          </span>
+
+        </div>
 
       </div>
 
 
       <div class="calculator-grid">
 
-        <!-- BMI -->
+
+        <!-- =================================================
+             BMI
+        ================================================== -->
 
         <div class="calculator-card">
 
-          <div class="calculator-icon">
-            🧮
+          <div class="calculator-top">
+
+            <div class="calculator-icon">
+              <i class="fa-solid fa-weight-scale"></i>
+            </div>
+
+            <span class="calculator-number">
+              01
+            </span>
+
           </div>
 
-          <span class="kicker">
-            01
-          </span>
+          <div class="calculator-copy">
 
-          <h3>
-            BMI KALKULAČKA
-          </h3>
+            <span class="kicker">
+              TĚLESNÉ HODNOTY
+            </span>
 
-          <p>
-            Orientační výpočet indexu tělesné hmotnosti.
-          </p>
+            <h3>
+              BMI KALKULAČKA
+            </h3>
+
+            <p>
+              Orientační výpočet indexu tělesné hmotnosti
+              podle výšky a váhy.
+            </p>
+
+          </div>
 
 
           <div class="calculator-form">
 
             <label>
-              Váha (kg)
+              <span>
+                Váha
+                <small>kg</small>
+              </span>
 
               <input
                 type="number"
@@ -663,12 +716,14 @@
                 step="0.1"
                 placeholder="80"
               >
-
             </label>
 
 
             <label>
-              Výška (cm)
+              <span>
+                Výška
+                <small>cm</small>
+              </span>
 
               <input
                 type="number"
@@ -677,7 +732,6 @@
                 step="1"
                 placeholder="180"
               >
-
             </label>
 
 
@@ -694,7 +748,7 @@
               id="bmiResult"
               class="calculator-result"
             >
-              Zadejte údaje.
+              <span>Výsledek se zobrazí zde.</span>
             </div>
 
           </div>
@@ -702,31 +756,50 @@
         </div>
 
 
-        <!-- MAINTENANCE -->
+        <!-- =================================================
+             MAINTENANCE
+        ================================================== -->
 
-        <div class="calculator-card">
+        <div class="calculator-card calculator-card-featured">
 
-          <div class="calculator-icon">
-            ⚖️
+          <div class="calculator-top">
+
+            <div class="calculator-icon">
+              <i class="fa-solid fa-scale-balanced"></i>
+            </div>
+
+            <span class="calculator-number">
+              02
+            </span>
+
           </div>
 
-          <span class="kicker">
-            02
-          </span>
 
-          <h3>
-            MAINTENANCE
-          </h3>
+          <div class="calculator-copy">
 
-          <p>
-            Orientační odhad denního příjmu pro udržení váhy.
-          </p>
+            <span class="kicker">
+              ENERGIE
+            </span>
+
+            <h3>
+              MAINTENANCE
+            </h3>
+
+            <p>
+              Odhad denního energetického příjmu,
+              při kterém by měla váha dlouhodobě zhruba
+              stagnovat.
+            </p>
+
+          </div>
 
 
           <div class="calculator-form">
 
             <label>
-              Pohlaví
+              <span>
+                Pohlaví
+              </span>
 
               <select id="maintenanceSex">
 
@@ -744,21 +817,31 @@
 
 
             <label>
-              Věk
+              <span>
+                Věk
+                <small>let</small>
+              </span>
 
               <input
                 type="number"
                 id="maintenanceAge"
                 min="15"
                 max="100"
-                placeholder="30"
+                placeholder="40"
               >
+
+              <em class="field-hint">
+                Pro 40+ zadejte skutečný věk.
+              </em>
 
             </label>
 
 
             <label>
-              Váha (kg)
+              <span>
+                Váha
+                <small>kg</small>
+              </span>
 
               <input
                 type="number"
@@ -767,12 +850,14 @@
                 step="0.1"
                 placeholder="80"
               >
-
             </label>
 
 
             <label>
-              Výška (cm)
+              <span>
+                Výška
+                <small>cm</small>
+              </span>
 
               <input
                 type="number"
@@ -780,12 +865,13 @@
                 min="50"
                 placeholder="180"
               >
-
             </label>
 
 
             <label>
-              Aktivita
+              <span>
+                Aktivita
+              </span>
 
               <select id="maintenanceActivity">
 
@@ -819,7 +905,7 @@
               class="btn green full"
               onclick="calculateMaintenance()"
             >
-              VYPOČÍTAT
+              VYPOČÍTAT MAINTENANCE
             </button>
 
 
@@ -827,7 +913,7 @@
               id="maintenanceResult"
               class="calculator-result"
             >
-              Zadejte údaje.
+              <span>Výsledek se zobrazí zde.</span>
             </div>
 
           </div>
@@ -835,31 +921,50 @@
         </div>
 
 
-        <!-- CUT -->
+        <!-- =================================================
+             CUT
+        ================================================== -->
 
         <div class="calculator-card">
 
-          <div class="calculator-icon">
-            🔥
+          <div class="calculator-top">
+
+            <div class="calculator-icon">
+              <i class="fa-solid fa-fire"></i>
+            </div>
+
+            <span class="calculator-number">
+              03
+            </span>
+
           </div>
 
-          <span class="kicker">
-            03
-          </span>
 
-          <h3>
-            CUT
-          </h3>
+          <div class="calculator-copy">
 
-          <p>
-            Orientační kalorický deficit pro redukci tuku.
-          </p>
+            <span class="kicker">
+              REDUKCE
+            </span>
+
+            <h3>
+              CUT
+            </h3>
+
+            <p>
+              Orientační kalorický deficit pro postupnou
+              redukci tělesného tuku.
+            </p>
+
+          </div>
 
 
           <div class="calculator-form">
 
             <label>
-              Maintenance kcal
+              <span>
+                Maintenance
+                <small>kcal</small>
+              </span>
 
               <input
                 type="number"
@@ -867,12 +972,13 @@
                 min="500"
                 placeholder="2500"
               >
-
             </label>
 
 
             <label>
-              Deficit
+              <span>
+                Deficit
+              </span>
 
               <select id="cutDeficit">
 
@@ -910,7 +1016,7 @@
               id="cutResult"
               class="calculator-result"
             >
-              Zadejte maintenance.
+              <span>Výsledek se zobrazí zde.</span>
             </div>
 
           </div>
@@ -918,31 +1024,50 @@
         </div>
 
 
-        <!-- BULK -->
+        <!-- =================================================
+             BULK
+        ================================================== -->
 
         <div class="calculator-card">
 
-          <div class="calculator-icon">
-            💪
+          <div class="calculator-top">
+
+            <div class="calculator-icon">
+              <i class="fa-solid fa-dumbbell"></i>
+            </div>
+
+            <span class="calculator-number">
+              04
+            </span>
+
           </div>
 
-          <span class="kicker">
-            04
-          </span>
 
-          <h3>
-            BULK
-          </h3>
+          <div class="calculator-copy">
 
-          <p>
-            Orientační kalorický nadbytek pro nabírání.
-          </p>
+            <span class="kicker">
+              NABÍRÁNÍ
+            </span>
+
+            <h3>
+              BULK
+            </h3>
+
+            <p>
+              Orientační kalorický nadbytek pro postupné
+              nabírání tělesné hmoty.
+            </p>
+
+          </div>
 
 
           <div class="calculator-form">
 
             <label>
-              Maintenance kcal
+              <span>
+                Maintenance
+                <small>kcal</small>
+              </span>
 
               <input
                 type="number"
@@ -950,12 +1075,13 @@
                 min="500"
                 placeholder="2500"
               >
-
             </label>
 
 
             <label>
-              Nadbytek
+              <span>
+                Nadbytek
+              </span>
 
               <select id="bulkSurplus">
 
@@ -993,7 +1119,7 @@
               id="bulkResult"
               class="calculator-result"
             >
-              Zadejte maintenance.
+              <span>Výsledek se zobrazí zde.</span>
             </div>
 
           </div>
@@ -1002,12 +1128,43 @@
 
       </div>
 
+
+      <!-- AGE 40+ -->
+
+      <div class="age40-note">
+
+        <div class="age40-icon">
+          40+
+        </div>
+
+        <div>
+
+          <span class="kicker">
+            VIRENO 40+
+          </span>
+
+          <h3>
+            TĚLO SE MĚNÍ. PRINCIPY ZŮSTÁVAJÍ.
+          </h3>
+
+          <p>
+            Po 40. roce je ještě důležitější sledovat
+            dostatek pohybu, svalovou hmotu, regeneraci
+            a celkový energetický příjem. Kalkulačky
+            používejte jako orientační výchozí bod,
+            ne jako absolutní číslo.
+          </p>
+
+        </div>
+
+      </div>
+
     </section>
 
 
-    <!-- =====================================================
+    <!-- ===================================================
          STATS
-    ====================================================== -->
+    ==================================================== -->
 
     <section class="bottom-strip">
 
@@ -1279,7 +1436,7 @@
 
 
   <!-- =====================================================
-       AUTH MODAL
+       AUTH
   ====================================================== -->
 
   <div
@@ -1356,7 +1513,7 @@
 
 
   <!-- =====================================================
-       ARTICLE MODAL
+       ARTICLE VIEW
   ====================================================== -->
 
   <div
@@ -1449,8 +1606,7 @@
   ></script>
 
 
-  <!-- YOUR JAVASCRIPT -->
-
+  <!-- APP -->
   <script src="app.js"></script>
 
 </body>
