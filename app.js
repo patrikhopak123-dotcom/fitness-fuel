@@ -5,12 +5,23 @@ const SUPABASE_PUBLISHABLE_KEY =
   'sb_publishable_L2uEZD5AX-AkKEuZ_YKQDw_6uH1FS6O';
 
 
+/* =====================================================
+   GLOBAL STATE
+===================================================== */
+
 let db = null;
+
 let articles = [];
+
 let editingId = null;
+
 let authMode = 'login';
+
 let searchOpen = false;
+
 let showingAll = false;
+
+let activeCategory = null;
 
 
 /* =====================================================
@@ -21,7 +32,7 @@ const $ = id =>
   document.getElementById(id);
 
 
-function esc(value = '') {
+function esc(value = ''){
 
   return String(value).replace(
     /[&<>'"]/g,
@@ -37,9 +48,9 @@ function esc(value = '') {
 }
 
 
-function formatDate(value) {
+function formatDate(value){
 
-  if (!value) return '';
+  if(!value) return '';
 
   return new Date(value).toLocaleDateString(
     'cs-CZ',
@@ -49,6 +60,60 @@ function formatDate(value) {
       day:'numeric'
     }
   );
+
+}
+
+
+function normalize(value = ''){
+
+  return String(value)
+    .normalize('NFD')
+    .replace(/[\u0300-\u036f]/g,'')
+    .toLowerCase()
+    .trim();
+
+}
+
+
+function showToast(message, type='success'){
+
+  let container =
+    document.querySelector('.toast-container');
+
+  if(!container){
+
+    container =
+      document.createElement('div');
+
+    container.className =
+      'toast-container';
+
+    document.body.appendChild(container);
+
+  }
+
+
+  const toast =
+    document.createElement('div');
+
+  toast.className =
+    `toast ${type === 'error' ? 'error' : ''}`;
+
+  toast.innerHTML = `
+    <strong>
+      ${type === 'error' ? 'CHYBA' : 'VIRENO'}
+    </strong>
+    ${esc(message)}
+  `;
+
+  container.appendChild(toast);
+
+
+  setTimeout(() => {
+
+    toast.remove();
+
+  },4000);
 
 }
 
@@ -66,7 +131,9 @@ function initSupabase(){
     );
 
     return false;
+
   }
+
 
   db =
     window.supabase.createClient(
@@ -74,7 +141,9 @@ function initSupabase(){
       SUPABASE_PUBLISHABLE_KEY
     );
 
+
   return true;
+
 }
 
 
@@ -84,17 +153,29 @@ function initSupabase(){
 
 function setupSearch(){
 
-  const button = $('searchBtn');
-  const input = $('searchInput');
-  const close = $('searchClose');
-  const overlay = $('searchOverlay');
+  const button =
+    $('searchBtn');
+
+  const input =
+    $('searchInput');
+
+  const close =
+    $('searchClose');
+
+  const overlay =
+    $('searchOverlay');
+
 
   if(
     !button ||
     !input ||
     !close ||
     !overlay
-  ) return;
+  ){
+
+    return;
+
+  }
 
 
   button.addEventListener(
@@ -111,7 +192,13 @@ function setupSearch(){
 
   input.addEventListener(
     'input',
-    () => filterArticles(input.value)
+    () => {
+
+      filterArticles(
+        input.value
+      );
+
+    }
   );
 
 
@@ -120,7 +207,9 @@ function setupSearch(){
     event => {
 
       if(event.key === 'Escape'){
+
         closeSearch();
+
       }
 
     }
@@ -132,7 +221,9 @@ function setupSearch(){
     event => {
 
       if(event.target === overlay){
+
         closeSearch();
+
       }
 
     }
@@ -143,107 +234,301 @@ function setupSearch(){
 
 function openSearch(){
 
-  const overlay = $('searchOverlay');
-  const input = $('searchInput');
+  const overlay =
+    $('searchOverlay');
+
+  const input =
+    $('searchInput');
+
 
   if(!overlay || !input) return;
 
+
   searchOpen = true;
 
-  overlay.classList.remove('hidden');
+
+  overlay.classList.remove(
+    'hidden'
+  );
+
 
   document.body.classList.add(
-    'search-active'
+    'modal-active'
   );
+
 
   setTimeout(
     () => input.focus(),
     50
   );
 
+
+  renderSearchResults('');
+
 }
 
 
 function closeSearch(){
 
-  const overlay = $('searchOverlay');
-  const input = $('searchInput');
+  const overlay =
+    $('searchOverlay');
+
+  const input =
+    $('searchInput');
+
 
   if(!overlay || !input) return;
+
 
   searchOpen = false;
 
   input.value = '';
 
-  overlay.classList.add('hidden');
-
-  document.body.classList.remove(
-    'search-active'
+  overlay.classList.add(
+    'hidden'
   );
 
-  showingAll = false;
+  document.body.classList.remove(
+    'modal-active'
+  );
 
-  renderArticles();
+
+  renderSearchResults('');
 
 }
 
 
-function filterArticles(value = ''){
+function getSearchResults(value=''){
 
   const query =
-    value
-      .trim()
-      .toLowerCase();
-
-  const cards = $('cards');
-
-  if(!cards) return;
+    normalize(value);
 
 
   if(!query){
 
-    renderArticles();
+    return articles.slice(0,8);
 
-    return;
   }
 
 
-  const filtered =
-    articles.filter(article => {
+  const words =
+    query
+      .split(/\s+/)
+      .filter(Boolean);
 
-      const title =
-        String(
-          article.title || ''
-        ).toLowerCase();
 
-      const category =
-        String(
-          article.category || ''
-        ).toLowerCase();
+  return articles
+    .map(article => {
 
-      const excerpt =
-        String(
-          article.excerpt || ''
-        ).toLowerCase();
+      const searchable =
+        normalize(`
+          ${article.title || ''}
+          ${article.category || ''}
+          ${article.excerpt || ''}
+          ${article.content || ''}
+        `);
 
-      const content =
-        String(
-          article.content || ''
-        ).toLowerCase();
 
-      return (
-        title.includes(query) ||
-        category.includes(query) ||
-        excerpt.includes(query) ||
-        content.includes(query)
+      let score = 0;
+
+
+      words.forEach(word => {
+
+        if(normalize(article.title).includes(word)){
+          score += 10;
+        }
+
+        if(normalize(article.category).includes(word)){
+          score += 7;
+        }
+
+        if(normalize(article.excerpt).includes(word)){
+          score += 4;
+        }
+
+        if(normalize(article.content).includes(word)){
+          score += 2;
+        }
+
+      });
+
+
+      return {
+        article,
+        score,
+        searchable
+      };
+
+    })
+    .filter(item => {
+
+      return words.every(
+        word =>
+          item.searchable.includes(word)
+      );
+
+    })
+    .sort(
+      (a,b) =>
+        b.score - a.score
+    )
+    .map(
+      item => item.article
+    )
+    .slice(0,12);
+
+}
+
+
+function renderSearchResults(value=''){
+
+  const overlay =
+    $('searchOverlay');
+
+
+  if(!overlay) return;
+
+
+  let results =
+    overlay.querySelector(
+      '.search-results'
+    );
+
+
+  if(!results){
+
+    results =
+      document.createElement('div');
+
+    results.className =
+      'search-results';
+
+    overlay.appendChild(results);
+
+  }
+
+
+  const found =
+    getSearchResults(value);
+
+
+  if(!found.length){
+
+    results.innerHTML = `
+      <div class="search-result-empty">
+
+        <strong>
+          NIC JSME NENAŠLI
+        </strong>
+
+        <span>
+          Zkus jiné slovo, téma nebo název článku.
+        </span>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  results.innerHTML =
+    found
+      .map(article => {
+
+        const image =
+          article.cover_url ||
+          defaultImage();
+
+
+        return `
+          <div
+            class="search-result"
+            data-search-article="${article.id}">
+
+            <img
+              src="${esc(image)}"
+              alt="">
+
+            <div>
+
+              <b>
+                ${esc(article.title)}
+              </b>
+
+              <small>
+                ${esc(article.category || 'POHYB')}
+                ·
+                ${formatDate(article.created_at)}
+              </small>
+
+            </div>
+
+          </div>
+        `;
+
+      })
+      .join('');
+
+
+  results
+    .querySelectorAll(
+      '[data-search-article]'
+    )
+    .forEach(item => {
+
+      item.addEventListener(
+        'click',
+        () => {
+
+          openArticle(
+            Number(
+              item.dataset.searchArticle
+            )
+          );
+
+          closeSearch();
+
+        }
       );
 
     });
 
+}
+
+
+function filterArticles(value=''){
+
+  const cards =
+    $('cards');
+
+
+  if(!cards) return;
+
+
+  const filtered =
+    getSearchResults(value);
+
 
   if($('articlesHeading')){
+
     $('articlesHeading').textContent =
-      'VÝSLEDKY VYHLEDÁVÁNÍ';
+      value.trim()
+        ? 'VÝSLEDKY VYHLEDÁVÁNÍ'
+        : 'NEJNOVĚJŠÍ ČLÁNKY';
+
+  }
+
+
+  if(!value.trim()){
+
+    renderArticles();
+
+    renderSearchResults('');
+
+    return;
+
   }
 
 
@@ -251,12 +536,22 @@ function filterArticles(value = ''){
 
     cards.innerHTML = `
       <div class="no-results">
-        <strong>Nic jsme nenašli</strong>
-        <span>Zkuste jiný název nebo téma.</span>
+
+        <strong>
+          NIC JSME NENAŠLI
+        </strong>
+
+        <span>
+          Zkuste jiný název nebo téma.
+        </span>
+
       </div>
     `;
 
+    renderSearchResults(value);
+
     return;
+
   }
 
 
@@ -264,6 +559,9 @@ function filterArticles(value = ''){
     filtered
       .map(card)
       .join('');
+
+
+  renderSearchResults(value);
 
 }
 
@@ -276,11 +574,21 @@ function openAuth(mode='login'){
 
   authMode = mode;
 
-  const auth = $('auth');
+  const auth =
+    $('auth');
+
 
   if(!auth) return;
 
-  auth.classList.remove('hidden');
+
+  auth.classList.remove(
+    'hidden'
+  );
+
+
+  document.body.classList.add(
+    'modal-active'
+  );
 
 
   if($('authTitle')){
@@ -314,7 +622,9 @@ function openAuth(mode='login'){
 
 
   if($('authMsg')){
+
     $('authMsg').textContent = '';
+
   }
 
 
@@ -330,6 +640,10 @@ function closeAuth(){
 
   $('auth')?.classList.add(
     'hidden'
+  );
+
+  document.body.classList.remove(
+    'modal-active'
   );
 
 }
@@ -350,19 +664,23 @@ async function handleAuth(event){
 
   event.preventDefault();
 
+
   if(!db){
 
     $('authMsg').textContent =
       'Spojení se serverem není dostupné.';
 
     return;
+
   }
 
 
   const email =
     $('authEmail')
       .value
-      .trim();
+      .trim()
+      .toLowerCase();
+
 
   const password =
     $('authPassword')
@@ -375,6 +693,7 @@ async function handleAuth(event){
       'Vyplňte e-mail a heslo.';
 
     return;
+
   }
 
 
@@ -402,6 +721,7 @@ async function handleAuth(event){
           error.message;
 
         return;
+
       }
 
 
@@ -429,6 +749,7 @@ async function handleAuth(event){
       }
 
       return;
+
     }
 
 
@@ -447,6 +768,7 @@ async function handleAuth(event){
         error.message;
 
       return;
+
     }
 
 
@@ -454,12 +776,18 @@ async function handleAuth(event){
 
     await updateUserUI();
 
+    showToast(
+      'Úspěšně jste se přihlásili.'
+    );
+
+
   }catch(error){
 
     console.error(
       'Chyba přihlášení:',
       error
     );
+
 
     $('authMsg').textContent =
       error.message ||
@@ -474,9 +802,14 @@ async function logout(){
 
   if(!db) return;
 
+
   await db.auth.signOut();
 
   await updateUserUI();
+
+  showToast(
+    'Byli jste odhlášeni.'
+  );
 
 }
 
@@ -497,7 +830,7 @@ async function getProfile(userId){
     await db
       .from('profiles')
       .select('role')
-      .eq('id', userId)
+      .eq('id',userId)
       .maybeSingle();
 
 
@@ -509,6 +842,7 @@ async function getProfile(userId){
     );
 
     return null;
+
   }
 
 
@@ -560,6 +894,7 @@ async function updateUserUI(){
     const loginBtn =
       $('loginBtn');
 
+
     const admin =
       $('admin');
 
@@ -576,9 +911,14 @@ async function updateUserUI(){
 
       }
 
-      admin?.classList.add('hidden');
+
+      admin?.classList.add(
+        'hidden'
+      );
+
 
       return;
+
     }
 
 
@@ -626,14 +966,21 @@ async function updateUserUI(){
 
 
 /* =====================================================
-   ARTICLE CARD
+   ARTICLE
 ===================================================== */
+
+function defaultImage(){
+
+  return 'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80';
+
+}
+
 
 function card(article){
 
   const image =
     article.cover_url ||
-    'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=80';
+    defaultImage();
 
 
   return `
@@ -668,7 +1015,11 @@ function card(article){
 
           <a
             href="#"
-            onclick="event.stopPropagation(); openArticle(${article.id}); return false;">
+            onclick="
+              event.stopPropagation();
+              openArticle(${article.id});
+              return false;
+            ">
 
             ČÍST →
 
@@ -685,6 +1036,409 @@ function card(article){
 
 
 /* =====================================================
+   CATEGORY FILTER
+===================================================== */
+
+const CATEGORY_INFO = {
+
+  'POHYB':{
+    icon:'🏃',
+    description:
+      'Trénink, cvičení, výkon, síla, kondice a aktivní životní styl.'
+  },
+
+  'VÝŽIVA':{
+    icon:'🥗',
+    description:
+      'Jídlo, makroživiny, kalorie, recepty a praktické tipy pro lepší stravování.'
+  },
+
+  'HUBNUTÍ':{
+    icon:'🔥',
+    description:
+      'Hubnutí, kalorický deficit, práce s příjmem a dlouhodobě udržitelná forma.'
+  },
+
+  'REGENERACE':{
+    icon:'😴',
+    description:
+      'Spánek, odpočinek, regenerace, mobilita a návrat po náročném tréninku.'
+  },
+
+  'ZDRAVÍ':{
+    icon:'❤️',
+    description:
+      'Zdraví, prevence, každodenní návyky a dlouhodobá péče o tělo.'
+  }
+
+};
+
+
+function getCategoryFromText(value=''){
+
+  const normalized =
+    normalize(value);
+
+
+  const categories =
+    Object.keys(CATEGORY_INFO);
+
+
+  return categories.find(
+    category =>
+      normalize(category) === normalized
+  ) || null;
+
+}
+
+
+function setupCategories(){
+
+  document
+    .querySelectorAll(
+      '.category-card'
+    )
+    .forEach(cardElement => {
+
+      const text =
+        cardElement.innerText
+          .trim();
+
+
+      const category =
+        getCategoryFromText(text);
+
+
+      if(!category) return;
+
+
+      cardElement.dataset.category =
+        category;
+
+
+      cardElement.addEventListener(
+        'click',
+        event => {
+
+          event.preventDefault();
+
+          filterCategory(
+            category
+          );
+
+        }
+      );
+
+    });
+
+
+  document
+    .querySelectorAll(
+      '.desktop-nav a'
+    )
+    .forEach(link => {
+
+      const category =
+        getCategoryFromText(
+          link.textContent
+        );
+
+
+      if(!category) return;
+
+
+      link.dataset.category =
+        category;
+
+
+      link.addEventListener(
+        'click',
+        event => {
+
+          event.preventDefault();
+
+          filterCategory(
+            category
+          );
+
+        }
+      );
+
+    });
+
+}
+
+
+function filterCategory(category){
+
+  activeCategory =
+    category;
+
+
+  showingAll = true;
+
+
+  const normalized =
+    normalize(category);
+
+
+  const filtered =
+    articles.filter(
+      article =>
+        normalize(
+          article.category || ''
+        ) === normalized
+    );
+
+
+  document
+    .querySelectorAll(
+      '.category-card'
+    )
+    .forEach(element => {
+
+      element.classList.toggle(
+        'active',
+        normalize(
+          element.dataset.category || ''
+        ) === normalized
+      );
+
+    });
+
+
+  document
+    .querySelectorAll(
+      '.desktop-nav a'
+    )
+    .forEach(element => {
+
+      element.classList.toggle(
+        'active',
+        normalize(
+          element.dataset.category || ''
+        ) === normalized
+      );
+
+    });
+
+
+  renderCategoryHeader(
+    category,
+    filtered.length
+  );
+
+
+  renderFilteredArticles(
+    filtered,
+    `${category} – ČLÁNKY`
+  );
+
+
+  document
+    .getElementById('articles')
+    ?.scrollIntoView({
+      behavior:'smooth',
+      block:'start'
+    });
+
+}
+
+
+function renderCategoryHeader(
+  category,
+  count
+){
+
+  let view =
+    $('categoryView');
+
+
+  if(!view){
+
+    view =
+      document.createElement('section');
+
+    view.id =
+      'categoryView';
+
+    view.className =
+      'category-view';
+
+
+    const content =
+      document.querySelector('.content');
+
+
+    if(content){
+
+      content.parentNode.insertBefore(
+        view,
+        content
+      );
+
+    }else{
+
+      document.body.prepend(
+        view
+      );
+
+    }
+
+  }
+
+
+  const info =
+    CATEGORY_INFO[category] ||
+    {
+      icon:'•',
+      description:''
+    };
+
+
+  view.innerHTML = `
+    <div class="category-view-inner">
+
+      <div>
+
+        <div class="kicker">
+          ${info.icon} KATEGORIE
+        </div>
+
+        <h2>
+          ${esc(category)}
+        </h2>
+
+        <p>
+          ${esc(info.description)}
+          <br>
+          <strong>
+            ${count} ${count === 1 ? 'článek' : 'článků'}
+          </strong>
+        </p>
+
+      </div>
+
+      <button
+        type="button"
+        class="category-back"
+        id="categoryBack">
+
+        VŠECHNY ČLÁNKY
+
+      </button>
+
+    </div>
+  `;
+
+
+  $('categoryBack')
+    ?.addEventListener(
+      'click',
+      clearCategory
+    );
+
+}
+
+
+function clearCategory(){
+
+  activeCategory =
+    null;
+
+  showingAll =
+    false;
+
+
+  document
+    .querySelectorAll(
+      '.category-card'
+    )
+    .forEach(element =>
+      element.classList.remove(
+        'active'
+      )
+    );
+
+
+  document
+    .querySelectorAll(
+      '.desktop-nav a'
+    )
+    .forEach(element =>
+      element.classList.remove(
+        'active'
+      )
+    );
+
+
+  $('categoryView')
+    ?.remove();
+
+
+  renderArticles();
+
+
+  document
+    .getElementById('articles')
+    ?.scrollIntoView({
+      behavior:'smooth',
+      block:'start'
+    });
+
+}
+
+
+function renderFilteredArticles(
+  list,
+  heading='ČLÁNKY'
+){
+
+  const cards =
+    $('cards');
+
+
+  if(!cards) return;
+
+
+  if($('articlesHeading')){
+
+    $('articlesHeading').textContent =
+      heading;
+
+  }
+
+
+  if(!list.length){
+
+    cards.innerHTML = `
+      <div class="no-results">
+
+        <strong>
+          ZATÍM NIC
+        </strong>
+
+        <span>
+          V této kategorii zatím nejsou žádné články.
+        </span>
+
+      </div>
+    `;
+
+    return;
+
+  }
+
+
+  cards.innerHTML =
+    list
+      .map(card)
+      .join('');
+
+}
+
+
+/* =====================================================
    RENDER
 ===================================================== */
 
@@ -693,11 +1447,36 @@ function renderArticles(){
   const cards =
     $('cards');
 
+
   const drawer =
     $('drawerArticles');
 
 
-  let visible =
+  if(activeCategory){
+
+    const filtered =
+      articles.filter(
+        article =>
+          normalize(
+            article.category || ''
+          ) === normalize(
+            activeCategory
+          )
+      );
+
+
+    renderFilteredArticles(
+      filtered,
+      `${activeCategory} – ČLÁNKY`
+    );
+
+
+    return;
+
+  }
+
+
+  const visible =
     showingAll
       ? articles
       : articles.slice(0,4);
@@ -718,7 +1497,7 @@ function renderArticles(){
         <div class="no-results">
 
           <strong>
-            Zatím zde nejsou žádné články.
+            ZATÍM ZDE NEJSOU ŽÁDNÉ ČLÁNKY
           </strong>
 
         </div>
@@ -760,12 +1539,15 @@ function renderArticles(){
 
       drawer.innerHTML =
         articles
-          .slice(0,8)
+          .slice(0,10)
           .map(article => `
 
             <div
               class="drawer-item"
-              onclick="openArticle(${article.id}); toggleDrawer();">
+              onclick="
+                openArticle(${article.id});
+                toggleDrawer();
+              ">
 
               ${
                 article.cover_url
@@ -844,7 +1626,7 @@ async function loadArticles(){
         <div class="no-results">
 
           <strong>
-            Články se nepodařilo načíst.
+            ČLÁNKY SE NEPODAŘILO NAČÍST
           </strong>
 
           <span>
@@ -857,6 +1639,7 @@ async function loadArticles(){
     }
 
     return;
+
   }
 
 
@@ -868,14 +1651,18 @@ async function loadArticles(){
 
 
   if($('adminArticles')){
+
     $('adminArticles').textContent =
       articles.length;
+
   }
 
 
   if($('publicArticles')){
+
     $('publicArticles').textContent =
       articles.length;
+
   }
 
 }
@@ -890,6 +1677,7 @@ function setupAllArticles(){
   const button =
     $('showAllArticles');
 
+
   if(!button) return;
 
 
@@ -897,10 +1685,21 @@ function setupAllArticles(){
     'click',
     () => {
 
+      if(activeCategory){
+
+        clearCategory();
+
+        return;
+
+      }
+
+
       showingAll =
         !showingAll;
 
+
       renderArticles();
+
 
       document
         .getElementById('articles')
@@ -1083,7 +1882,9 @@ async function uploadCoverImage(file){
   } =
     db.storage
       .from('article-images')
-      .getPublicUrl(filename);
+      .getPublicUrl(
+        filename
+      );
 
 
   return data.publicUrl;
@@ -1099,6 +1900,7 @@ function showCoverPreview(url){
 
   const preview =
     $('coverPreview');
+
 
   const image =
     $('coverPreviewImg');
@@ -1116,6 +1918,7 @@ function showCoverPreview(url){
     image.src = '';
 
     return;
+
   }
 
 
@@ -1139,10 +1942,15 @@ async function saveArticle(event){
 
   if(!(await isAdmin())){
 
-    $('articleMsg').textContent =
-      'Přístup mají pouze administrátoři.';
+    if($('articleMsg')){
+
+      $('articleMsg').textContent =
+        'Přístup mají pouze administrátoři.';
+
+    }
 
     return;
+
   }
 
 
@@ -1176,8 +1984,13 @@ async function saveArticle(event){
 
     if(file){
 
-      $('articleMsg').textContent =
-        'Nahrávám obrázek...';
+      if($('articleMsg')){
+
+        $('articleMsg').textContent =
+          'Nahrávám obrázek...';
+
+      }
+
 
       coverUrl =
         await uploadCoverImage(file);
@@ -1206,9 +2019,28 @@ async function saveArticle(event){
         coverUrl,
 
       category:
-        $('category').value
+        $('category')
+          .value
 
     };
+
+
+    if(!payload.title){
+
+      throw new Error(
+        'Zadejte název článku.'
+      );
+
+    }
+
+
+    if(!payload.content){
+
+      throw new Error(
+        'Zadejte obsah článku.'
+      );
+
+    }
 
 
     let result;
@@ -1232,6 +2064,15 @@ async function saveArticle(event){
         await db.auth.getUser();
 
 
+      if(!user){
+
+        throw new Error(
+          'Musíte být přihlášeni.'
+        );
+
+      }
+
+
       result =
         await db
           .from('articles')
@@ -1248,10 +2089,8 @@ async function saveArticle(event){
     }
 
 
-    $('articleMsg').textContent =
-      editingId
-        ? 'Článek byl upraven.'
-        : 'Článek byl publikován.';
+    const wasEditing =
+      Boolean(editingId);
 
 
     editingId = null;
@@ -1261,7 +2100,16 @@ async function saveArticle(event){
 
 
     if($('cover')){
+
       $('cover').value = '';
+
+    }
+
+
+    if($('coverFile')){
+
+      $('coverFile').value = '';
+
     }
 
 
@@ -1269,14 +2117,34 @@ async function saveArticle(event){
 
 
     if(button){
+
       button.textContent =
         'PUBLIKOVAT ČLÁNEK';
+
     }
+
+
+    if($('articleMsg')){
+
+      $('articleMsg').textContent =
+        wasEditing
+          ? 'Článek byl upraven.'
+          : 'Článek byl publikován.';
+
+    }
+
+
+    showToast(
+      wasEditing
+        ? 'Článek byl upraven.'
+        : 'Článek byl publikován.'
+    );
 
 
     await loadArticles();
 
     await refreshAdminStats();
+
 
   }catch(error){
 
@@ -1286,9 +2154,20 @@ async function saveArticle(event){
     );
 
 
-    $('articleMsg').textContent =
+    if($('articleMsg')){
+
+      $('articleMsg').textContent =
+        error.message ||
+        'Něco se nepodařilo.';
+
+    }
+
+
+    showToast(
       error.message ||
-      'Něco se nepodařilo.';
+      'Něco se nepodařilo.',
+      'error'
+    );
 
   }finally{
 
@@ -1375,18 +2254,22 @@ async function deleteArticle(id){
 
   if(!(await isAdmin())){
 
-    alert(
-      'Přístup mají pouze administrátoři.'
+    showToast(
+      'Přístup mají pouze administrátoři.',
+      'error'
     );
 
     return;
+
   }
 
 
   if(!confirm(
     'Opravdu chcete tento článek smazat?'
   )){
+
     return;
+
   }
 
 
@@ -1409,9 +2292,13 @@ async function deleteArticle(id){
 
   if(error){
 
-    alert(error.message);
+    showToast(
+      error.message,
+      'error'
+    );
 
     return;
+
   }
 
 
@@ -1459,6 +2346,11 @@ async function deleteArticle(id){
 
   await refreshAdminStats();
 
+
+  showToast(
+    'Článek byl smazán.'
+  );
+
 }
 
 
@@ -1481,6 +2373,7 @@ function renderAdminList(){
       '<p class="muted">Zatím nejsou žádné články.</p>';
 
     return;
+
   }
 
 
@@ -1545,19 +2438,32 @@ async function subscribe(event){
   if(!db) return;
 
 
+  const form =
+    event.target;
+
+
   const input =
-    event.target.querySelector(
+    form.querySelector(
       'input[type=email]'
     );
 
 
   const email =
-    input.value
+    input?.value
       .trim()
       .toLowerCase();
 
 
-  if(!email) return;
+  if(!email){
+
+    showToast(
+      'Zadejte e-mail.',
+      'error'
+    );
+
+    return;
+
+  }
 
 
   const {
@@ -1577,23 +2483,27 @@ async function subscribe(event){
       .includes('duplicate')
   ){
 
-    event.target.innerHTML =
-      `
-        <b class="error-text">
-          ${esc(error.message)}
-        </b>
-      `;
+    showToast(
+      error.message,
+      'error'
+    );
 
     return;
+
   }
 
 
-  event.target.innerHTML =
+  form.innerHTML =
     `
       <b class="success-text">
         Jste přihlášeni. Vítejte ve Vireno!
       </b>
     `;
+
+
+  showToast(
+    'Newsletter byl aktivován.'
+  );
 
 
   await refreshAdminStats();
@@ -1618,30 +2528,46 @@ function openArticle(id){
   if(!article) return;
 
 
-  $('articleViewTitle').textContent =
-    article.title || '';
+  if($('articleViewTitle')){
+
+    $('articleViewTitle').textContent =
+      article.title || '';
+
+  }
 
 
-  $('articleViewMeta').textContent =
-    `${formatDate(article.created_at)} · ${article.category || 'POHYB'}`;
+  if($('articleViewMeta')){
+
+    $('articleViewMeta').textContent =
+      `${formatDate(article.created_at)} · ${article.category || 'POHYB'}`;
+
+  }
 
 
-  $('articleViewImage').src =
-    article.cover_url ||
-    'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80';
+  if($('articleViewImage')){
+
+    $('articleViewImage').src =
+      article.cover_url ||
+      defaultImage();
+
+  }
 
 
-  $('articleViewContent').innerHTML =
-    article.content || '';
+  if($('articleViewContent')){
+
+    $('articleViewContent').innerHTML =
+      article.content || '';
+
+  }
 
 
-  $('articleView').classList.remove(
-    'hidden'
-  );
+  $('articleView')
+    ?.classList
+    .remove('hidden');
 
 
   document.body.classList.add(
-    'search-active'
+    'modal-active'
   );
 
 }
@@ -1655,7 +2581,7 @@ function closeArticle(){
 
 
   document.body.classList.remove(
-    'search-active'
+    'modal-active'
   );
 
 }
@@ -1674,12 +2600,16 @@ function clearArticleForm(){
 
 
   if($('cover')){
+
     $('cover').value = '';
+
   }
 
 
   if($('coverFile')){
+
     $('coverFile').value = '';
+
   }
 
 
@@ -1726,6 +2656,927 @@ async function trackVisit(){
     );
 
   }
+
+}
+
+
+/* =====================================================
+   CALCULATORS
+===================================================== */
+
+function calculateBMI(){
+
+  const height =
+    Number(
+      $('bmiHeight')?.value
+    );
+
+
+  const weight =
+    Number(
+      $('bmiWeight')?.value
+    );
+
+
+  const result =
+    $('bmiResult');
+
+
+  if(!height || !weight){
+
+    if(result){
+
+      result.innerHTML =
+        'Zadejte výšku a hmotnost.';
+
+    }
+
+    return;
+
+  }
+
+
+  if(height < 100 || height > 250){
+
+    result.innerHTML =
+      'Výška musí být mezi 100–250 cm.';
+
+    return;
+
+  }
+
+
+  if(weight < 20 || weight > 300){
+
+    result.innerHTML =
+      'Hmotnost musí být mezi 20–300 kg.';
+
+    return;
+
+  }
+
+
+  const meters =
+    height / 100;
+
+
+  const bmi =
+    weight /
+    (meters * meters);
+
+
+  let category =
+    'Normální hmotnost';
+
+
+  if(bmi < 18.5){
+
+    category =
+      'Podváha';
+
+  }else if(bmi >= 25 && bmi < 30){
+
+    category =
+      'Nadváha';
+
+  }else if(bmi >= 30){
+
+    category =
+      'Obezita';
+
+  }
+
+
+  result.innerHTML = `
+    <strong>
+      BMI ${bmi.toFixed(1)}
+    </strong>
+
+    ${category}
+
+    <br>
+
+    <small>
+      BMI je orientační ukazatel a samo o sobě neurčuje zdravotní stav.
+    </small>
+  `;
+
+}
+
+
+function calculateCalories(type){
+
+  const weight =
+    Number(
+      $('calWeight')?.value
+    );
+
+
+  const height =
+    Number(
+      $('calHeight')?.value
+    );
+
+
+  const age =
+    Number(
+      $('calAge')?.value
+    );
+
+
+  const gender =
+    $('calGender')?.value ||
+    'male';
+
+
+  const activity =
+    Number(
+      $('calActivity')?.value
+    );
+
+
+  const result =
+    $('calorieResult');
+
+
+  if(
+    !weight ||
+    !height ||
+    !age
+  ){
+
+    if(result){
+
+      result.innerHTML =
+        'Vyplňte všechny údaje.';
+
+    }
+
+    return;
+
+  }
+
+
+  let bmr;
+
+
+  if(gender === 'female'){
+
+    bmr =
+      10 * weight +
+      6.25 * height -
+      5 * age -
+      161;
+
+  }else{
+
+    bmr =
+      10 * weight +
+      6.25 * height -
+      5 * age +
+      5;
+
+  }
+
+
+  const maintenance =
+    Math.round(
+      bmr * activity
+    );
+
+
+  let calories =
+    maintenance;
+
+
+  let label =
+    'Udržovací příjem';
+
+
+  if(type === 'cut'){
+
+    calories =
+      Math.round(
+        maintenance * 0.80
+      );
+
+    label =
+      'Doporučený start pro cut';
+
+  }
+
+
+  if(type === 'bulk'){
+
+    calories =
+      Math.round(
+        maintenance * 1.10
+      );
+
+    label =
+      'Doporučený start pro bulk';
+
+  }
+
+
+  if(result){
+
+    result.innerHTML = `
+      <strong>
+        ${calories.toLocaleString('cs-CZ')} kcal
+      </strong>
+
+      ${label}
+
+      <br>
+
+      <small>
+        Odhad maintenance:
+        ${maintenance.toLocaleString('cs-CZ')} kcal/den.
+      </small>
+    `;
+
+  }
+
+}
+
+
+function createCalculatorSection(){
+
+  if(
+    document.querySelector(
+      '.calculators-section'
+    )
+  ){
+
+    return;
+
+  }
+
+
+  const section =
+    document.createElement('section');
+
+
+  section.className =
+    'calculators-section';
+
+
+  section.id =
+    'kalkulacky';
+
+
+  section.innerHTML = `
+
+    <div class="calculators-heading">
+
+      <div class="kicker">
+        PRAKTICKÉ NÁSTROJE
+      </div>
+
+      <h2>
+        KALKULAČKY PRO TVŮJ CÍL
+      </h2>
+
+    </div>
+
+
+    <div class="calculators-grid">
+
+
+      <!-- BMI -->
+
+      <div class="calculator">
+
+        <div class="calculator-icon">
+          ⚖️
+        </div>
+
+        <h3>
+          BMI
+        </h3>
+
+        <p>
+          Orientační výpočet BMI podle výšky a hmotnosti.
+        </p>
+
+        <label>
+          Výška (cm)
+        </label>
+
+        <input
+          id="bmiHeight"
+          type="number"
+          min="100"
+          max="250"
+          placeholder="180">
+
+        <label>
+          Hmotnost (kg)
+        </label>
+
+        <input
+          id="bmiWeight"
+          type="number"
+          min="20"
+          max="300"
+          placeholder="80">
+
+        <button
+          type="button"
+          class="btn green"
+          id="bmiCalculate">
+
+          VYPOČÍTAT BMI
+
+        </button>
+
+        <div
+          id="bmiResult"
+          class="calc-result">
+
+          Výsledek se zobrazí zde.
+
+        </div>
+
+      </div>
+
+
+      <!-- MAINTENANCE -->
+
+      <div class="calculator">
+
+        <div class="calculator-icon">
+          🔄
+        </div>
+
+        <h3>
+          MAINTENANCE
+        </h3>
+
+        <p>
+          Odhad denního energetického příjmu pro udržení hmotnosti.
+        </p>
+
+        <label>
+          Pohlaví
+        </label>
+
+        <select id="calGender">
+
+          <option value="male">
+            Muž
+          </option>
+
+          <option value="female">
+            Žena
+          </option>
+
+        </select>
+
+        <label>
+          Věk
+        </label>
+
+        <input
+          id="calAge"
+          type="number"
+          min="15"
+          max="100"
+          placeholder="25">
+
+        <label>
+          Výška (cm)
+        </label>
+
+        <input
+          id="calHeight"
+          type="number"
+          placeholder="180">
+
+        <label>
+          Hmotnost (kg)
+        </label>
+
+        <input
+          id="calWeight"
+          type="number"
+          placeholder="80">
+
+        <label>
+          Aktivita
+        </label>
+
+        <select id="calActivity">
+
+          <option value="1.2">
+            Sedavý režim
+          </option>
+
+          <option value="1.375">
+            Lehká aktivita
+          </option>
+
+          <option value="1.55">
+            Střední aktivita
+          </option>
+
+          <option value="1.725">
+            Vysoká aktivita
+          </option>
+
+          <option value="1.9">
+            Velmi vysoká aktivita
+          </option>
+
+        </select>
+
+        <button
+          type="button"
+          class="btn green"
+          id="maintenanceCalculate">
+
+          VYPOČÍTAT
+
+        </button>
+
+        <div
+          id="calorieResult"
+          class="calc-result">
+
+          Výsledek se zobrazí zde.
+
+        </div>
+
+      </div>
+
+
+      <!-- CUT -->
+
+      <div class="calculator">
+
+        <div class="calculator-icon">
+          🔥
+        </div>
+
+        <h3>
+          CUT
+        </h3>
+
+        <p>
+          Odhad startovního příjmu pro kalorický deficit.
+        </p>
+
+        <label>
+          Pohlaví
+        </label>
+
+        <select id="cutGender">
+
+          <option value="male">
+            Muž
+          </option>
+
+          <option value="female">
+            Žena
+          </option>
+
+        </select>
+
+        <label>
+          Věk
+        </label>
+
+        <input
+          id="cutAge"
+          type="number"
+          placeholder="25">
+
+        <label>
+          Výška (cm)
+        </label>
+
+        <input
+          id="cutHeight"
+          type="number"
+          placeholder="180">
+
+        <label>
+          Hmotnost (kg)
+        </label>
+
+        <input
+          id="cutWeight"
+          type="number"
+          placeholder="80">
+
+        <label>
+          Aktivita
+        </label>
+
+        <select id="cutActivity">
+
+          <option value="1.2">
+            Sedavý režim
+          </option>
+
+          <option value="1.375">
+            Lehká aktivita
+          </option>
+
+          <option value="1.55">
+            Střední aktivita
+          </option>
+
+          <option value="1.725">
+            Vysoká aktivita
+          </option>
+
+          <option value="1.9">
+            Velmi vysoká aktivita
+          </option>
+
+        </select>
+
+        <button
+          type="button"
+          class="btn green"
+          id="cutCalculate">
+
+          VYPOČÍTAT CUT
+
+        </button>
+
+        <div
+          id="cutResult"
+          class="calc-result">
+
+          Výsledek se zobrazí zde.
+
+        </div>
+
+      </div>
+
+
+      <!-- BULK -->
+
+      <div class="calculator">
+
+        <div class="calculator-icon">
+          💪
+        </div>
+
+        <h3>
+          BULK
+        </h3>
+
+        <p>
+          Odhad startovního příjmu pro kontrolovaný kalorický nadbytek.
+        </p>
+
+        <label>
+          Pohlaví
+        </label>
+
+        <select id="bulkGender">
+
+          <option value="male">
+            Muž
+          </option>
+
+          <option value="female">
+            Žena
+          </option>
+
+        </select>
+
+        <label>
+          Věk
+        </label>
+
+        <input
+          id="bulkAge"
+          type="number"
+          placeholder="25">
+
+        <label>
+          Výška (cm)
+        </label>
+
+        <input
+          id="bulkHeight"
+          type="number"
+          placeholder="180">
+
+        <label>
+          Hmotnost (kg)
+        </label>
+
+        <input
+          id="bulkWeight"
+          type="number"
+          placeholder="80">
+
+        <label>
+          Aktivita
+        </label>
+
+        <select id="bulkActivity">
+
+          <option value="1.2">
+            Sedavý režim
+          </option>
+
+          <option value="1.375">
+            Lehká aktivita
+          </option>
+
+          <option value="1.55">
+            Střední aktivita
+          </option>
+
+          <option value="1.725">
+            Vysoká aktivita
+          </option>
+
+          <option value="1.9">
+            Velmi vysoká aktivita
+          </option>
+
+        </select>
+
+        <button
+          type="button"
+          class="btn green"
+          id="bulkCalculate">
+
+          VYPOČÍTAT BULK
+
+        </button>
+
+        <div
+          id="bulkResult"
+          class="calc-result">
+
+          Výsledek se zobrazí zde.
+
+        </div>
+
+      </div>
+
+    </div>
+
+  `;
+
+
+  const footer =
+    document.querySelector(
+      '.footer'
+    );
+
+
+  if(footer){
+
+    footer.parentNode.insertBefore(
+      section,
+      footer
+    );
+
+  }else{
+
+    document.body.appendChild(
+      section
+    );
+
+  }
+
+
+  setupCalculatorEvents();
+
+}
+
+
+function calculateStandalone(
+  prefix,
+  multiplier,
+  resultId,
+  label
+){
+
+  const weight =
+    Number(
+      $(`${prefix}Weight`)?.value
+    );
+
+
+  const height =
+    Number(
+      $(`${prefix}Height`)?.value
+    );
+
+
+  const age =
+    Number(
+      $(`${prefix}Age`)?.value
+    );
+
+
+  const gender =
+    $(`${prefix}Gender`)?.value ||
+    'male';
+
+
+  const activity =
+    Number(
+      $(`${prefix}Activity`)?.value
+    );
+
+
+  const result =
+    $(resultId);
+
+
+  if(
+    !weight ||
+    !height ||
+    !age
+  ){
+
+    if(result){
+
+      result.innerHTML =
+        'Vyplňte všechny údaje.';
+
+    }
+
+    return;
+
+  }
+
+
+  let bmr;
+
+
+  if(gender === 'female'){
+
+    bmr =
+      10 * weight +
+      6.25 * height -
+      5 * age -
+      161;
+
+  }else{
+
+    bmr =
+      10 * weight +
+      6.25 * height -
+      5 * age +
+      5;
+
+  }
+
+
+  const maintenance =
+    Math.round(
+      bmr * activity
+    );
+
+
+  const calories =
+    Math.round(
+      maintenance * multiplier
+    );
+
+
+  if(result){
+
+    result.innerHTML = `
+      <strong>
+        ${calories.toLocaleString('cs-CZ')} kcal
+      </strong>
+
+      ${label}
+
+      <br>
+
+      <small>
+        Odhad maintenance:
+        ${maintenance.toLocaleString('cs-CZ')} kcal/den.
+      </small>
+    `;
+
+  }
+
+}
+
+
+function setupCalculatorEvents(){
+
+  $('bmiCalculate')
+    ?.addEventListener(
+      'click',
+      calculateBMI
+    );
+
+
+  $('maintenanceCalculate')
+    ?.addEventListener(
+      'click',
+      () => {
+
+        calculateCalories(
+          'maintenance'
+        );
+
+      }
+    );
+
+
+  $('cutCalculate')
+    ?.addEventListener(
+      'click',
+      () => {
+
+        calculateStandalone(
+          'cut',
+          .80,
+          'cutResult',
+          'Doporučený start pro cut'
+        );
+
+      }
+    );
+
+
+  $('bulkCalculate')
+    ?.addEventListener(
+      'click',
+      () => {
+
+        calculateStandalone(
+          'bulk',
+          1.10,
+          'bulkResult',
+          'Doporučený start pro bulk'
+        );
+
+      }
+    );
+
+}
+
+
+/* =====================================================
+   MOBILE MENU
+===================================================== */
+
+function setupMobileMenu(){
+
+  const menu =
+    $('menuBtn');
+
+
+  if(!menu) return;
+
+
+  menu.addEventListener(
+    'click',
+    toggleDrawer
+  );
+
+
+  document
+    .querySelectorAll(
+      '.mobile-nav a'
+    )
+    .forEach(link => {
+
+      const category =
+        getCategoryFromText(
+          link.textContent
+        );
+
+
+      if(category){
+
+        link.addEventListener(
+          'click',
+          event => {
+
+            event.preventDefault();
+
+            filterCategory(
+              category
+            );
+
+            toggleDrawer();
+
+          }
+        );
+
+      }
+
+    });
 
 }
 
@@ -1852,74 +3703,76 @@ function setupEvents(){
 
   setupAllArticles();
 
+  setupCategories();
+
+  setupMobileMenu();
+
+  createCalculatorSection();
+
 
   document.addEventListener(
     'keydown',
     event => {
 
       if(
-        event.key === 'Escape'
+        event.key !== 'Escape'
       ){
 
-        if(searchOpen){
-          closeSearch();
-        }
+        return;
 
-        if(
-          !$('articleView')
-            ?.classList
-            .contains('hidden')
-        ){
+      }
 
-          closeArticle();
 
-        }
+      if(searchOpen){
 
-        if(
-          !$('auth')
-            ?.classList
-            .contains('hidden')
-        ){
+        closeSearch();
 
-          closeAuth();
+      }
 
-        }
+
+      if(
+        !$('articleView')
+          ?.classList
+          .contains('hidden')
+      ){
+
+        closeArticle();
+
+      }
+
+
+      if(
+        !$('auth')
+          ?.classList
+          .contains('hidden')
+      ){
+
+        closeAuth();
 
       }
 
     }
   );
 
+}
 
-  document
-    .querySelectorAll(
-      '.desktop-nav a'
-    )
-    .forEach(link => {
 
-      link.addEventListener(
-        'click',
-        () => {
+/* =====================================================
+   AUTH STATE
+===================================================== */
 
-          document
-            .querySelectorAll(
-              '.desktop-nav a'
-            )
-            .forEach(
-              item =>
-                item.classList.remove(
-                  'active'
-                )
-            );
+function setupAuthListener(){
 
-          link.classList.add(
-            'active'
-          );
+  if(!db) return;
 
-        }
-      );
 
-    });
+  db.auth.onAuthStateChange(
+    async () => {
+
+      await updateUserUI();
+
+    }
+  );
 
 }
 
@@ -1942,10 +3795,13 @@ async function init(){
     );
 
     return;
+
   }
 
 
   setupEvents();
+
+  setupAuthListener();
 
 
   await loadArticles();
