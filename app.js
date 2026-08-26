@@ -92,28 +92,33 @@ function setActiveNav(type, value = null){
 
       link.classList.remove('active');
 
-      if(type === 'home'){
+      const section =
+        link.dataset.section;
 
-        if(link.dataset.section === 'home'){
-          link.classList.add('active');
-        }
+      const category =
+        link.dataset.category;
 
+
+      if(type === 'home' && section === 'home'){
+        link.classList.add('active');
       }
 
-      if(type === 'calculators'){
 
-        if(link.dataset.section === 'calculators'){
-          link.classList.add('active');
-        }
-
+      if(
+        type === 'calculators' &&
+        section === 'calculators'
+      ){
+        link.classList.add('active');
       }
 
-      if(type === 'category'){
 
-        if(link.dataset.category === value){
-          link.classList.add('active');
-        }
-
+      if(
+        type === 'category' &&
+        category &&
+        String(category).toUpperCase() ===
+        String(value).toUpperCase()
+      ){
+        link.classList.add('active');
       }
 
     });
@@ -134,6 +139,72 @@ function hideAllPages(){
   $('calculatorsPage')
     ?.classList
     .add('hidden');
+
+}
+
+
+/*
+  Tohle zajistí funkční horní menu i v případě,
+  že v HTML jsou odkazy pouze s data-section
+  nebo data-category.
+*/
+
+function setupNavigation(){
+
+  document
+    .querySelectorAll(
+      '.desktop-nav a, .mobile-nav a'
+    )
+    .forEach(link => {
+
+      link.addEventListener(
+        'click',
+        event => {
+
+          const section =
+            link.dataset.section;
+
+          const category =
+            link.dataset.category;
+
+
+          if(
+            section === 'home'
+          ){
+
+            event.preventDefault();
+
+            showHome();
+
+            return;
+          }
+
+
+          if(
+            section === 'calculators'
+          ){
+
+            event.preventDefault();
+
+            showCalculators();
+
+            return;
+          }
+
+
+          if(category){
+
+            event.preventDefault();
+
+            showCategory(category);
+
+            return;
+          }
+
+        }
+      );
+
+    });
 
 }
 
@@ -195,15 +266,22 @@ function showAllArticles(){
 
   setActiveNav('home');
 
+
   if($('articlesHeading')){
+
     $('articlesHeading').textContent =
       'VŠECHNY ČLÁNKY';
+
   }
 
+
   if($('articlesDescription')){
+
     $('articlesDescription').textContent =
       'Prohlédněte si všechny články na jednom místě.';
+
   }
+
 
   renderArticlePage(articles);
 
@@ -226,7 +304,11 @@ function showCategory(category){
     ?.classList
     .remove('hidden');
 
-  setActiveNav('category', category);
+  setActiveNav(
+    'category',
+    category
+  );
+
 
   const filtered =
     articles.filter(article =>
@@ -236,39 +318,62 @@ function showCategory(category){
         .toUpperCase()
     );
 
+
+  const names = {
+
+    'POHYB':'POHYB',
+
+    'VÝŽIVA':'VÝŽIVA',
+
+    'HUBNUTÍ':'HUBNUTÍ',
+
+    'REGENERACE':'REGENERACE',
+
+    'ZDRAVÍ':'ZDRAVÍ'
+
+  };
+
+
+  const descriptions = {
+
+    'POHYB':
+      'Cvičení, pohyb, síla, kondice a jak zůstat aktivní i po 40.',
+
+    'VÝŽIVA':
+      'Praktické informace o jídle, stravování a zdravějších návycích.',
+
+    'HUBNUTÍ':
+      'Hubnutí, kalorický příjem, redukce tuku a dlouhodobě udržitelné výsledky.',
+
+    'REGENERACE':
+      'Spánek, odpočinek, stres a regenerace organismu.',
+
+    'ZDRAVÍ':
+      'Prevence, zdraví, péče o tělo a praktické informace pro každodenní život.'
+
+  };
+
+
   if($('articlesHeading')){
+
     $('articlesHeading').textContent =
-      category;
+      names[String(category).toUpperCase()] ||
+      String(category).toUpperCase();
+
   }
+
 
   if($('articlesDescription')){
 
-    const descriptions = {
-
-      'POHYB':
-        'Články o cvičení, pohybu, síle a kondici.',
-
-      'VÝŽIVA':
-        'Články o jídle, stravování a praktické výživě.',
-
-      'HUBNUTÍ':
-        'Články o hubnutí, kalorickém příjmu a redukci tuku.',
-
-      'REGENERACE':
-        'Články o spánku, odpočinku a regeneraci.',
-
-      'ZDRAVÍ':
-        'Články o zdraví, prevenci a péči o tělo.'
-
-    };
-
     $('articlesDescription').textContent =
-      descriptions[category] ||
+      descriptions[String(category).toUpperCase()] ||
       'Články podle vybraného tématu.';
 
   }
 
+
   renderArticlePage(filtered);
+
 
   window.scrollTo({
     top:0,
@@ -284,10 +389,12 @@ function renderArticlePage(list){
 
   if(!cards) return;
 
+
   if(!list.length){
 
     cards.innerHTML = `
       <div class="no-results">
+
         <strong>
           V tomto tématu zatím nejsou žádné články.
         </strong>
@@ -295,11 +402,13 @@ function renderArticlePage(list){
         <span>
           Zkuste jiné téma nebo se podívejte na všechny články.
         </span>
+
       </div>
     `;
 
     return;
   }
+
 
   cards.innerHTML =
     list
@@ -320,21 +429,26 @@ function renderHomeArticles(){
 
   if(!cards) return;
 
+
   const visible =
     articles.slice(0,4);
+
 
   if(!visible.length){
 
     cards.innerHTML = `
       <div class="no-results">
+
         <strong>
           Zatím zde nejsou žádné články.
         </strong>
+
       </div>
     `;
 
     return;
   }
+
 
   cards.innerHTML =
     visible
@@ -354,6 +468,7 @@ function setupSearch(){
   const input = $('searchInput');
   const close = $('searchClose');
   const overlay = $('searchOverlay');
+
 
   if(
     !button ||
@@ -447,6 +562,7 @@ function closeSearch(){
     'search-active'
   );
 
+
   if(currentPage === 'home'){
     renderHomeArticles();
   }
@@ -461,10 +577,13 @@ function filterArticles(value = ''){
       .trim()
       .toLowerCase();
 
+
   if(!query){
 
     if(currentPage === 'home'){
+
       renderHomeArticles();
+
     }else if(currentPage === 'articles'){
 
       if(currentCategory){
@@ -502,6 +621,7 @@ function filterArticles(value = ''){
           article.content || ''
         ).toLowerCase();
 
+
       return (
         title.includes(query) ||
         category.includes(query) ||
@@ -520,15 +640,24 @@ function filterArticles(value = ''){
 
   currentPage = 'articles';
 
+  currentCategory = null;
+
+
   if($('articlesHeading')){
+
     $('articlesHeading').textContent =
       'VÝSLEDKY VYHLEDÁVÁNÍ';
+
   }
 
+
   if($('articlesDescription')){
+
     $('articlesDescription').textContent =
       `Výsledky pro: „${value.trim()}“`;
+
   }
+
 
   setActiveNav('home');
 
@@ -548,6 +677,7 @@ function openAuth(mode='login'){
   const auth = $('auth');
 
   if(!auth) return;
+
 
   auth.classList.remove('hidden');
 
@@ -619,6 +749,7 @@ async function handleAuth(event){
 
   event.preventDefault();
 
+
   if(!db){
 
     $('authMsg').textContent =
@@ -631,7 +762,9 @@ async function handleAuth(event){
   const email =
     $('authEmail')
       .value
-      .trim();
+      .trim()
+      .toLowerCase();
+
 
   const password =
     $('authPassword')
@@ -642,6 +775,15 @@ async function handleAuth(event){
 
     $('authMsg').textContent =
       'Vyplňte e-mail a heslo.';
+
+    return;
+  }
+
+
+  if(password.length < 6){
+
+    $('authMsg').textContent =
+      'Heslo musí mít alespoň 6 znaků.';
 
     return;
   }
@@ -758,6 +900,7 @@ async function getProfile(userId){
 
   if(!db || !userId) return null;
 
+
   const {
     data,
     error
@@ -767,6 +910,7 @@ async function getProfile(userId){
       .select('role')
       .eq('id', userId)
       .maybeSingle();
+
 
   if(error){
 
@@ -778,6 +922,7 @@ async function getProfile(userId){
     return null;
   }
 
+
   return data;
 
 }
@@ -787,6 +932,7 @@ async function isAdmin(){
 
   if(!db) return false;
 
+
   const {
     data:{
       user
@@ -794,10 +940,13 @@ async function isAdmin(){
   } =
     await db.auth.getUser();
 
+
   if(!user) return false;
+
 
   const profile =
     await getProfile(user.id);
+
 
   return profile?.role === 'admin';
 
@@ -808,6 +957,7 @@ async function updateUserUI(){
 
   if(!db) return;
 
+
   try{
 
     const {
@@ -816,6 +966,7 @@ async function updateUserUI(){
       }
     } =
       await db.auth.getUser();
+
 
     const loginBtn =
       $('loginBtn');
@@ -836,7 +987,10 @@ async function updateUserUI(){
 
       }
 
-      admin?.classList.add('hidden');
+
+      admin?.classList.add(
+        'hidden'
+      );
 
       return;
     }
@@ -894,6 +1048,7 @@ function card(article){
   const image =
     article.cover_url ||
     'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=900&q=80';
+
 
   return `
     <article
@@ -955,6 +1110,7 @@ async function loadArticles(){
 
   if(!db) return;
 
+
   const {
     data,
     error
@@ -977,8 +1133,10 @@ async function loadArticles(){
       error
     );
 
+
     const message = `
       <div class="no-results">
+
         <strong>
           Články se nepodařilo načíst.
         </strong>
@@ -986,16 +1144,20 @@ async function loadArticles(){
         <span>
           Zkuste stránku obnovit.
         </span>
+
       </div>
     `;
+
 
     if($('homeCards')){
       $('homeCards').innerHTML = message;
     }
 
+
     if($('cards')){
       $('cards').innerHTML = message;
     }
+
 
     return;
   }
@@ -1011,27 +1173,36 @@ async function loadArticles(){
   if(currentPage === 'articles'){
 
     if(currentCategory){
+
       showCategory(currentCategory);
+
     }else{
+
       renderArticlePage(articles);
+
     }
 
   }
 
 
   if($('adminArticles')){
+
     $('adminArticles').textContent =
       articles.length;
+
   }
 
 
   if($('publicArticles')){
+
     $('publicArticles').textContent =
       articles.length;
+
   }
 
 
   renderAdminList();
+
   renderDrawerArticles();
 
 }
@@ -1054,6 +1225,7 @@ function renderDrawerArticles(){
 
   const drawer =
     $('drawerArticles');
+
 
   if(!drawer) return;
 
@@ -1121,6 +1293,7 @@ function renderDrawerArticles(){
 async function refreshAdminStats(){
 
   if(!db) return;
+
 
   try{
 
@@ -1288,6 +1461,7 @@ function showCoverPreview(url){
   const image =
     $('coverPreviewImg');
 
+
   if(!preview || !image) return;
 
 
@@ -1300,6 +1474,7 @@ function showCoverPreview(url){
     image.src = '';
 
     return;
+
   }
 
 
@@ -1453,14 +1628,17 @@ async function saveArticle(event){
 
 
     if(button){
+
       button.textContent =
         'PUBLIKOVAT ČLÁNEK';
+
     }
 
 
     await loadArticles();
 
     await refreshAdminStats();
+
 
   }catch(error){
 
@@ -1665,6 +1843,7 @@ function renderAdminList(){
       '<p>Zatím nejsou žádné články.</p>';
 
     return;
+
   }
 
 
@@ -1893,6 +2072,7 @@ function showCalculatorError(element, text){
 
   if(!element) return;
 
+
   element.innerHTML = `
     <span>
       ${esc(text)}
@@ -1902,6 +2082,10 @@ function showCalculatorError(element, text){
 }
 
 
+/* =====================================================
+   BMI
+===================================================== */
+
 function calculateBMI(){
 
   const weight =
@@ -1909,18 +2093,20 @@ function calculateBMI(){
       $('bmiWeight')?.value
     );
 
+
   const heightCm =
     parseFloat(
       $('bmiHeight')?.value
     );
+
 
   const result =
     $('bmiResult');
 
 
   if(
-    !weight ||
-    !heightCm ||
+    !Number.isFinite(weight) ||
+    !Number.isFinite(heightCm) ||
     weight <= 0 ||
     heightCm <= 0
   ){
@@ -1938,6 +2124,7 @@ function calculateBMI(){
   const height =
     heightCm / 100;
 
+
   const bmi =
     weight /
     (height * height);
@@ -1945,6 +2132,7 @@ function calculateBMI(){
 
   let category =
     '';
+
 
   if(bmi < 18.5){
 
@@ -1971,6 +2159,7 @@ function calculateBMI(){
 
   result.innerHTML = `
     <div>
+
       <strong>
         BMI ${bmi.toFixed(1)}
       </strong>
@@ -1980,36 +2169,46 @@ function calculateBMI(){
       <span>
         Orientačně: ${category}.
       </span>
+
     </div>
   `;
 
 }
 
 
+/* =====================================================
+   UDRŽOVACÍ PŘÍJEM
+===================================================== */
+
 function calculateMaintenance(){
 
   const sex =
     $('maintenanceSex')?.value;
+
 
   const age =
     parseFloat(
       $('maintenanceAge')?.value
     );
 
+
   const weight =
     parseFloat(
       $('maintenanceWeight')?.value
     );
+
 
   const height =
     parseFloat(
       $('maintenanceHeight')?.value
     );
 
+
   const activity =
     parseFloat(
       $('maintenanceActivity')?.value
     );
+
 
   const result =
     $('maintenanceResult');
@@ -2017,10 +2216,10 @@ function calculateMaintenance(){
 
   if(
     !sex ||
-    !age ||
-    !weight ||
-    !height ||
-    !activity
+    !Number.isFinite(age) ||
+    !Number.isFinite(weight) ||
+    !Number.isFinite(height) ||
+    !Number.isFinite(activity)
   ){
 
     showCalculatorError(
@@ -2029,6 +2228,7 @@ function calculateMaintenance(){
     );
 
     return;
+
   }
 
 
@@ -2036,7 +2236,8 @@ function calculateMaintenance(){
     age < 15 ||
     age > 100 ||
     weight <= 0 ||
-    height <= 0
+    height <= 0 ||
+    activity <= 0
   ){
 
     showCalculatorError(
@@ -2045,6 +2246,7 @@ function calculateMaintenance(){
     );
 
     return;
+
   }
 
 
@@ -2082,6 +2284,7 @@ function calculateMaintenance(){
 
   result.innerHTML = `
     <div>
+
       <strong>
         Přibližně ${maintenance} kcal / den
       </strong>
@@ -2089,13 +2292,18 @@ function calculateMaintenance(){
       <br>
 
       <span>
-        To je orientační odhad udržovacího příjmu.
+        Orientační udržovací příjem.
       </span>
+
     </div>
   `;
 
 }
 
+
+/* =====================================================
+   HUBNUTÍ
+===================================================== */
 
 function calculateCut(){
 
@@ -2104,17 +2312,19 @@ function calculateCut(){
       $('cutMaintenance')?.value
     );
 
+
   const deficit =
     parseFloat(
       $('cutDeficit')?.value
     );
+
 
   const result =
     $('cutResult');
 
 
   if(
-    !maintenance ||
+    !Number.isFinite(maintenance) ||
     maintenance <= 0
   ){
 
@@ -2124,6 +2334,23 @@ function calculateCut(){
     );
 
     return;
+
+  }
+
+
+  if(
+    !Number.isFinite(deficit) ||
+    deficit < 0 ||
+    deficit > .5
+  ){
+
+    showCalculatorError(
+      result,
+      'Zvolte platný kalorický deficit.'
+    );
+
+    return;
+
   }
 
 
@@ -2143,6 +2370,7 @@ function calculateCut(){
 
   result.innerHTML = `
     <div>
+
       <strong>
         ${calories} kcal / den
       </strong>
@@ -2152,11 +2380,16 @@ function calculateCut(){
       <span>
         Přibližně ${difference} kcal pod udržovacím příjmem.
       </span>
+
     </div>
   `;
 
 }
 
+
+/* =====================================================
+   NABÍRÁNÍ
+===================================================== */
 
 function calculateBulk(){
 
@@ -2165,17 +2398,19 @@ function calculateBulk(){
       $('bulkMaintenance')?.value
     );
 
+
   const surplus =
     parseFloat(
       $('bulkSurplus')?.value
     );
+
 
   const result =
     $('bulkResult');
 
 
   if(
-    !maintenance ||
+    !Number.isFinite(maintenance) ||
     maintenance <= 0
   ){
 
@@ -2185,6 +2420,23 @@ function calculateBulk(){
     );
 
     return;
+
+  }
+
+
+  if(
+    !Number.isFinite(surplus) ||
+    surplus < 0 ||
+    surplus > .5
+  ){
+
+    showCalculatorError(
+      result,
+      'Zvolte platný kalorický nadbytek.'
+    );
+
+    return;
+
   }
 
 
@@ -2204,6 +2456,7 @@ function calculateBulk(){
 
   result.innerHTML = `
     <div>
+
       <strong>
         ${calories} kcal / den
       </strong>
@@ -2213,6 +2466,7 @@ function calculateBulk(){
       <span>
         Přibližně ${difference} kcal nad udržovacím příjmem.
       </span>
+
     </div>
   `;
 
@@ -2307,16 +2561,20 @@ function setupEvents(){
         const file =
           event.target.files?.[0];
 
+
         if(!file) return;
+
 
         const reader =
           new FileReader();
+
 
         reader.onload =
           () =>
             showCoverPreview(
               reader.result
             );
+
 
         reader.readAsDataURL(file);
 
@@ -2361,6 +2619,8 @@ function setupEvents(){
 
 
   setupSearch();
+
+  setupNavigation();
 
 
   document.addEventListener(
