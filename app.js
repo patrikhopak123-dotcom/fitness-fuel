@@ -1992,8 +1992,19 @@ function openArticle(id){
     'https://images.unsplash.com/photo-1498837167922-ddd27525d352?auto=format&fit=crop&w=1200&q=80';
 
 
+  const articleContent = article.content || '';
+
   $('articleViewContent').innerHTML =
-    article.content || '';
+    esc(articleContent)
+      .replace(/\r\n/g, '\n')
+      .replace(/\r/g, '\n')
+      .replace(/\n\n+/g, '</p><p>')
+      .replace(/\n/g, '<br>');
+
+  if(articleContent.trim()){
+    $('articleViewContent').innerHTML =
+      '<p>' + $('articleViewContent').innerHTML + '</p>';
+  }
 
 
   $('articleView').classList.remove(
