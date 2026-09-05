@@ -2193,6 +2193,14 @@ h3{
 
   color:#454941;
 
+  /*
+     Zachová odřádkování a prázdné řádky
+     zadané v administrátorském editoru.
+  */
+  white-space:pre-wrap;
+
+  overflow-wrap:anywhere;
+
 }
 
 
